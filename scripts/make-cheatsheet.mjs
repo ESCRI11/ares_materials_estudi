@@ -104,16 +104,23 @@ try {
 	// importantly, that nothing ELSE was. A glyph missing from a subset (Ω, →, ≈ are all
 	// absent from Plex Mono's latin set) makes Chromium quietly embed a third font and set
 	// that one character in it, which reads as a typographic mistake rather than a bug.
-	const ALLOWED = ['Arimo', 'IBMPlexMono-Regular', 'IBMPlexMono-Medium'];
+	// Match on the family prefix, not the exact PostScript name: Google Fonts serves a
+	// different file depending on the browser's User-Agent, so the same request embeds
+	// "Arimo" here and "Arimo-Regular" on a CI runner. The prefix still fails loudly on a
+	// genuine stranger like DejaVuSansMono, which is the case that matters.
+	const ALLOWED = ['Arimo', 'IBMPlexMono'];
 	const embedded = [
 		...new Set(
 			[...raw.matchAll(/\/BaseFont\s*\/(?:[A-Z]{6}\+)?([A-Za-z0-9-]+)/g)].map((m) => m[1]),
 		),
 	];
-	for (const want of ['Arimo', 'IBMPlexMono-Medium']) {
-		assert.ok(embedded.includes(want), `${want} is not embedded in the PDF`);
+	for (const want of ALLOWED) {
+		assert.ok(
+			embedded.some((f) => f.startsWith(want)),
+			`${want} is not embedded in the PDF — embedded: ${embedded.join(', ')}`,
+		);
 	}
-	const unexpected = embedded.filter((f) => !ALLOWED.includes(f));
+	const unexpected = embedded.filter((f) => !ALLOWED.some((a) => f.startsWith(a)));
 	assert.deepEqual(
 		unexpected,
 		[],
@@ -124,7 +131,9 @@ try {
 	assert.ok(pdf.length < 2_000_000, `suspiciously large (${pdf.length} bytes) — rasterised?`);
 
 	writeFileSync(OUT, pdf);
-	console.log(`${OUT} — ${pages} pages, ${(pdf.length / 1024).toFixed(0)} kB, fonts embedded`);
+	console.log(
+		`${OUT} — ${pages} pages, ${(pdf.length / 1024).toFixed(0)} kB, fonts: ${embedded.join(', ')}`,
+	);
 } finally {
 	stop();
 }

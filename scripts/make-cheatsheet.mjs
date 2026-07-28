@@ -56,12 +56,28 @@ try {
 
 	assert.deepEqual(failed, [], 'a request failed while rendering — fonts may be substituted');
 
-	const fontsOk = await page.evaluate(() => ({
-		arimo: document.fonts.check('400 10px Arimo'),
-		mono: document.fonts.check('500 10px "IBM Plex Mono"'),
-	}));
-	assert.ok(fontsOk.arimo, 'Arimo did not load — a substitute would be embedded');
-	assert.ok(fontsOk.mono, 'IBM Plex Mono did not load — a substitute would be embedded');
+	// Do NOT use document.fonts.check() here: it returned true on a CI runner where the
+	// font had not loaded at all and Liberation Sans was rendering instead. Measure what is
+	// actually being drawn — if a family renders at the same width as a nonsense family, the
+	// browser fell back and the check has caught it.
+	const sameAsFallback = await page.evaluate(() => {
+		const measure = (family) => {
+			const el = document.createElement('span');
+			el.style.cssText = `position:absolute;visibility:hidden;white-space:pre;font:40px ${family}`;
+			el.textContent = 'Handgloves 0123456789';
+			document.body.append(el);
+			const w = el.getBoundingClientRect().width;
+			el.remove();
+			return w;
+		};
+		const base = measure('"no-such-family-xyz", monospace');
+		return {
+			arimo: measure('Arimo, "no-such-family-xyz", monospace') === base,
+			mono: measure('"IBM Plex Mono", "no-such-family-xyz", monospace') === base,
+		};
+	});
+	assert.ok(!sameAsFallback.arimo, 'Arimo is not rendering — the browser fell back');
+	assert.ok(!sameAsFallback.mono, 'IBM Plex Mono is not rendering — the browser fell back');
 
 	// Content that does not fit spills out of the fixed-height sheet. Catch it here and say
 	// which page to cut, rather than shipping a card with a line sliced off the bottom.

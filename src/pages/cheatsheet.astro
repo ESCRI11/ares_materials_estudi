@@ -395,14 +395,31 @@ const SHEETS = [
 			name="description"
 			content="A two-page printable reference card for the technical material of the MA SUPSI in Interaction Design."
 		/>
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		{/* Arimo is Arial-metric, which is what the site falls back to on most machines.
-		    IBM Plex Mono 500 is exactly the face the syllabus embeds. */}
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
-		/>
+		{/* Self-hosted on purpose. Loading these from a CDN worked here and silently failed
+		    on the CI runner, which fell back to Liberation Sans and embedded the wrong
+		    typeface in the PDF — with no failed request to catch it. Arimo is Arial-metric,
+		    which is the fallback the site itself names; Plex Mono Medium is the face the
+		    syllabus embeds. See public/fonts/README.md for licences. */}
+		<style is:inline>
+			@font-face {
+				font-family: 'Arimo';
+				src: url('/ares_materials_estudi/fonts/arimo.woff2') format('woff2');
+				font-weight: 400 700;
+				font-display: block;
+			}
+			@font-face {
+				font-family: 'IBM Plex Mono';
+				src: url('/ares_materials_estudi/fonts/plexmono-400.woff2') format('woff2');
+				font-weight: 400;
+				font-display: block;
+			}
+			@font-face {
+				font-family: 'IBM Plex Mono';
+				src: url('/ares_materials_estudi/fonts/plexmono-500.woff2') format('woff2');
+				font-weight: 500;
+				font-display: block;
+			}
+		</style>
 	</head>
 	<body>
 		<p class="screen-only">

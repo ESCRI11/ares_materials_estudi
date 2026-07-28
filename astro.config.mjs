@@ -117,6 +117,7 @@ export default defineConfig({
 				},
 				{ label: 'Data', items: [{ autogenerate: { directory: 'data' } }] },
 				{ label: 'Design Methods', items: [{ autogenerate: { directory: 'design-methods' } }] },
+				{ label: 'Claude Code', items: [{ autogenerate: { directory: 'claude-code' } }] },
 			],
 		}),
 	],

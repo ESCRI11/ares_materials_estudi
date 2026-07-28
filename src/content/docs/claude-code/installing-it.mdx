@@ -1,0 +1,142 @@
+---
+title: Installing it
+description: The native installer inside WSL2 Ubuntu and on macOS, signing in, and what your first session in a project folder looks like.
+sidebar:
+  order: 2
+---
+
+Installing this is one command, and the only way to get it wrong is to run that command in the
+wrong window or to follow a tutorial written a year ago.
+
+## One warning about older instructions
+
+Search for how to install Claude Code and a good number of the results will tell you to use
+**npm**, the package manager that comes with Node.js. That route still works, and it needs Node
+version 22 or newer. It is no longer the recommended one.
+
+The current recommendation is the **native installer**: a script you run once that fetches the
+right build for your machine and, importantly, keeps itself up to date afterwards. Installations
+done through Homebrew or a system package manager do not auto-update; you have to remember, and
+you will not.
+
+If a page you are reading opens with `npm install -g @anthropic-ai/claude-code`, it was written
+before this changed. It is not wrong, only dated.
+
+## Windows: inside Ubuntu, not PowerShell
+
+You set up [WSL2 with Ubuntu](/ares_materials_estudi/your-machine/wsl2/) in the first section.
+Open that Ubuntu terminal — the one with a penguin or an Ubuntu logo, not the blue PowerShell
+window — and run:
+
+```sh
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+`curl` downloads what is at that address; the `| bash` hands what came down to your shell to run.
+That is a command with real power over your machine, which is exactly why the rule from the
+[installing software lesson](/ares_materials_estudi/your-machine/installing-software/) applies:
+this line comes from the tool's own documentation at
+[code.claude.com/docs/en/setup](https://code.claude.com/docs/en/setup.md), and that is where you
+should copy it from rather than from a forum post.
+
+:::caution[Why Ubuntu and not PowerShell]
+Your projects live in the Linux filesystem, git is installed in Linux, and every error message
+you will paste into a search box assumes a Linux shell. Installing into PowerShell instead gives
+you a tool that cannot see the folder you actually work in. Same rule as everything else in this
+site: command-line tools go where you type their names.
+:::
+
+## macOS
+
+The same command, in Terminal:
+
+```sh
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
+Homebrew also has it, if you would rather keep everything in one place:
+
+```sh
+brew install --cask claude-code
+```
+
+Trade-off: Homebrew installs do not update themselves, so you would be running `brew upgrade`
+yourself. The native installer handles it. Pick one, not both.
+
+## Check it landed
+
+```sh
+claude --version
+```
+
+A version number means you are done. `command not found` almost always means one of two things,
+in this order:
+
+1. **The terminal window was open before the install.** A shell reads its `PATH` — the list of
+   folders it searches for commands — when it starts. Close the window, open a new one, try
+   again.
+2. The installer printed instructions at the end that you scrolled past. Scroll back up and run
+   them.
+
+## Your first session
+
+Claude Code works on one folder at a time, and it needs to be *your* folder — one you can undo.
+Use a project you made in the [git section](/ares_materials_estudi/git-and-github/your-first-repository/),
+or make a fresh one. Do not start in your home folder or on the desktop.
+
+```sh
+cd ~/projects/my-first-site
+claude
+```
+
+Three things happen:
+
+1. **The first time only, it authenticates you.** A browser window opens and asks you to sign in
+   to the Claude account you are paying with. Approve it, come back to the terminal. It remembers
+   after that.
+2. **A prompt appears.** Above it you get a short header: the version, which model is running,
+   and — read this one — the working directory. That directory is what it can see. If it says
+   something you did not expect, press `Ctrl+C` and start again from the right folder.
+3. **It waits.** It does nothing until you type something.
+
+Type this first:
+
+```text
+/help
+```
+
+Anything beginning with `/` is a **slash command**: an instruction to the tool itself rather than
+a request to the model. `/help` lists them. You will meet the handful that matter in
+[lesson 5](/ares_materials_estudi/claude-code/claude-md-and-commands/); for now, look at the
+list, notice that it exists, and move on.
+
+Then ask it something that changes nothing:
+
+```text
+What is in this project? Do not change anything.
+```
+
+It will read the files and describe them back to you. Reading is the one thing it does without
+asking permission, which is the subject of the next lesson.
+
+To leave, type `/exit` or press `Ctrl+C` twice.
+
+:::tip[Commit before you experiment]
+Before you ask it to change anything at all, run `git add -A && git commit -m "before Claude
+Code"`. It costs five seconds and it means every experiment from here on is reversible with
+`git restore .`. This habit is worth more than any technique in this section.
+:::
+
+## Do this on your machine
+
+- [ ] I decided whether I am paying for a plan, and I have an account that includes Claude Code
+- [ ] Windows: I ran the install command in the **Ubuntu** terminal, not PowerShell
+- [ ] macOS: I installed it with either the native installer or Homebrew, not both
+- [ ] `claude --version` prints a version number
+- [ ] I made or chose a project folder that is a git repository
+- [ ] I committed everything in it before starting
+- [ ] I ran `claude` inside that folder and signed in when the browser opened
+- [ ] I checked that the working directory shown in the header is the folder I meant
+- [ ] I ran `/help` and read the list of commands without trying to memorise it
+- [ ] I asked it one read-only question about my project and got a sensible answer
+- [ ] I know how to leave the session

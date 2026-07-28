@@ -619,6 +619,21 @@ const GLOSSARY = {
 	"design token": "A name given to a single design decision — a colour, a spacing step, a type size, a duration — so it can be referred to instead of repeated. In CSS it is a custom property such as --space-3, used with var().",
 	"design system": "The agreed set of components, tokens and rules an interface is built from, held in both a design file and code. Its value is that the two sides use the same names for the same things.",
 	"focus state": "The visible indication of where the keyboard currently is on a page. Not the same as hover, which follows a pointer and does not exist on touch, and required for anyone using an interface without a mouse.",
+
+	// added from 11
+	"claude code": "An agentic coding tool you run in the terminal. It reads the whole project, runs commands and edits real files on disk, looping until a task is done, rather than handing you text to copy back.",
+	"agentic coding": "Using a tool that acts on a project rather than only answering about it — opening files, running the code, writing changes — and keeps going until the task is finished or it gets stuck.",
+	codebase: "All the files that make up a project, taken together. Distinct from a snippet: a tool that works on the codebase can see how one file affects another.",
+	diff: "The old and new versions of a file shown together, with removed lines marked minus and added lines marked plus. What a pull request displays, and what an AI coding tool shows you before it changes anything.",
+	autocomplete: "The editor feature that suggests the rest of the line as you type. AI versions finish a few lines at a time, but they see roughly the file you are in, not the whole project.",
+	"permission mode": "How much an AI coding tool asks before acting. Default asks before every change, accept-edits stops asking for file edits, plan mode never changes anything, auto asks least.",
+	"plan mode": "A setting where an AI coding tool explores your project and proposes an approach without editing a single file. The safest way to ask how something works.",
+	"slash command": "An instruction typed to the tool itself rather than to the model, written with a leading slash — /help, /clear, /context. It is intercepted before anything is sent.",
+	"claude.md": "A plain Markdown file at a project's root holding standing instructions for an AI coding tool. It is loaded at the start of every session, so rules written once survive a cleared conversation.",
+	session: "One continuous conversation with a coding tool in one folder. Sessions are stored per folder on your machine; a new one starts with an empty context window but reloads CLAUDE.md.",
+	"edge case": "An input at the boundary of what you had in mind — the empty list, zero, a name with an apostrophe, a second click before the first finished. Where plausible-looking code usually breaks.",
+	"api credits": "Paying for what you use rather than a monthly amount: you buy credit and each request draws it down. The alternative to a subscription plan.",
+	curl: "A command-line program that fetches whatever is at a web address. Piped into a shell with | bash, it downloads and runs an install script in one line — which is why the address should come from the tool's own documentation.",
 };
 
 const API = 'https://api.dictionaryapi.dev/api/v2/entries/en/';

@@ -161,6 +161,9 @@ cross-checked against maind.supsi.ch. Folder names are the directories under
 | 7 | `ai-as-a-material` | LLM fundamentals, prompting, cloud APIs, **local models**, ethics | Intelligence as a Material (ID131.02) |
 | 8 | `data` | Data in design, CSV/JSON, structuring, visual models, ML training vs prompting | Making Sense of Data (ID190.01) |
 | 9 | `design-methods` | Design Thinking, research plans, insights, **flow and customer-experience mapping**, adaptive/agentic vocabulary | ID111.01, ID180.01, ID170.02 |
+| 10 | `claude-code` | What it is, installing on WSL2, the permission model, learning vs outsourcing, CLAUDE.md, failure modes | none — added by the author |
+
+§10 is deliberately last and deliberately sceptical. ID102.01 sets **a weekly individual written test**, so a reader who lets an assistant write code they don't understand passes the assignments and fails the tests. Any edit to that section must keep the learning-not-outsourcing framing; do not turn it into a product tour.
 
 Two facts that are easy to get wrong, because the obvious guess is the wrong one:
 

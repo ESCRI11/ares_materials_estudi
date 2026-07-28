@@ -1,0 +1,175 @@
+---
+title: Where it is wrong
+description: The five ways an AI coding tool fails, what each one looks like in practice, how you would notice it, and the short list of subjects never to trust it on without checking.
+sidebar:
+  order: 6
+---
+
+import Quiz from '@components/Quiz.astro';
+
+Every failure in this lesson has the same shape: it looks like success. None of them announce
+themselves, none of them produce an error, and all of them are written in the same confident,
+well-organised prose as everything that was correct.
+
+That is the whole difficulty. A tool that failed loudly would need no lesson.
+
+## Plausible code that fails on an edge case
+
+The most common one by a distance. You get code that is well structured, reads correctly, and
+works on the example you tried. It breaks on the input you did not try.
+
+An **edge case** is an input at the boundary of what you had in mind: the empty list, the value of
+zero, the name with an apostrophe in it, the window resized to 320 pixels wide, the second click
+before the first has finished, the microphone the user denied permission to.
+
+```js
+// looks right, and is right, until the array is empty
+const average = nums.reduce((a, b) => a + b) / nums.length;
+```
+
+**Notice it by** trying the awkward input on purpose, immediately, before you move on. Empty,
+zero, negative, very long, wrong type, twice in a row. Thirty seconds of hostile testing catches
+most of them, and it is a habit that makes you better at writing code as well as at checking it.
+
+## Inventing something that does not exist
+
+It will occasionally use a function, a file, an option or a package that is not real. Not a typo —
+a plausible name that fits the pattern of names in that library, produced because plausible text
+is what the mechanism produces. This is
+[hallucination](/ares_materials_estudi/ai-as-a-material/what-a-language-model-is/) in its coding
+form, and the code equivalent of an invented citation.
+
+You often meet it as an immediate error, which makes it the friendliest failure in this list.
+Sometimes it is quieter: an option name that does not exist is simply ignored, so the code runs
+and the setting you thought you applied does nothing.
+
+**Notice it by** the error, when you are lucky, and by checking the documentation for anything you
+have not seen before. If it names a package you have never heard of, look it up before installing
+it.
+
+## Losing your earlier instructions
+
+Twenty exchanges in, a constraint you set at the start stops being honoured. You said no
+libraries; there is now a library. You said keep it in one file; there are three.
+
+This is the [context window](/ares_materials_estudi/claude-code/claude-md-and-commands/) filling
+up. It is not the tool ignoring you and it is not fixed by repeating yourself more firmly.
+
+**Notice it by** the reappearance of something you already ruled out. When it happens, `/clear`
+and start again — with the rule in CLAUDE.md this time, since that reloads on every session and
+your twenty-minute-old sentence does not.
+
+## Vague request, vague result
+
+Ask for "make the page look better" and you get an answer to a question nobody asked: a change
+that is defensible, generic, and not what you wanted. This is the same failure as
+[a bad brief](/ares_materials_estudi/ai-as-a-material/prompting/), and the same fix.
+
+**Notice it by** reading the diff and finding a solution to a different problem. That is a
+signal about your request, not about the tool. Name the file, name the behaviour you want, name
+what should not change.
+
+## Confidently explaining something wrong
+
+The most dangerous one, because there is no error, no diff to read and nothing to run. You asked
+how something works, you got a clear and well-organised explanation, and part of it is untrue.
+
+Three subjects where this is most likely, and where being wrong costs the most:
+
+- **Security.** How to store a key, what is safe to put in a public repository, whether input
+  needs checking. Confident answers here are common and wrong answers have consequences that
+  arrive months later.
+- **Performance.** "This is faster" is a claim about a specific machine running specific code,
+  and it is usually asserted rather than measured. Measure it or drop the claim.
+- **Accessibility and standards.** Whether an element is correct for the job, what a screen reader
+  announces, what the specification actually says. Plausible-sounding accessibility advice is
+  everywhere in the training material, including plenty that is out of date.
+
+**Notice it by** treating explanations in these three areas as leads rather than answers, and
+checking them against the actual documentation — MDN for the web, the tool's own docs otherwise.
+
+## Why the diff review habit catches most of this
+
+Read the diff before approving and four of the five above become visible:
+
+| Failure | What the diff shows |
+|---|---|
+| Edge case | Nothing directly — but you see the logic, so you can ask what happens when it is empty |
+| Invented function | An unfamiliar name you have not seen in this project before |
+| Lost instruction | The library you banned, appearing in an `import` line |
+| Vague request | A change that solves a different problem from the one you had |
+
+The fifth — a wrong explanation — has no diff, which is exactly why it is the one to be most
+sceptical about. There is nothing to review, so the checking has to be deliberate.
+
+## What never to accept without verifying
+
+- **Anything about security.** Keys, credentials, what is safe to commit, what is safe to publish.
+- **Any performance claim.** Unmeasured means unknown.
+- **Any accessibility or standards claim.** Check the specification.
+- **Any package or version number** you have not seen before, especially before installing it.
+- **Any explanation you are going to rely on in an exam.** Confirm it against the course material
+  or the documentation, because in the room it will be your answer, not its.
+
+None of this makes it a bad tool. A knowledgeable colleague who is right most of the time, occasionally
+wrong with total confidence, and never says "I am not sure" is still worth having — you adjust by
+checking rather than by not asking. The adjustment is the skill.
+
+:::tip[The two-minute check]
+Before accepting anything non-trivial: run it, try one awkward input, and read the diff for a name
+you do not recognise. That catches the majority of what this lesson describes, and it is short
+enough that you will actually do it.
+:::
+
+<Quiz
+	questions={[
+		{
+			q: 'You get code that works perfectly on your test input. What is the most likely remaining problem?',
+			options: [
+				'It will be slow',
+				'It fails on an edge case — empty input, zero, a second click, an unusual value',
+				'It uses an outdated style',
+			],
+			answer: 1,
+			explanation:
+				'Generated code is typically correct for the case you described and untested at the boundaries. Thirty seconds of deliberately hostile input — empty, zero, very long, twice in a row — catches most of it, and the habit makes you a better writer of code as well as a better checker.',
+		},
+		{
+			q: 'Twenty exchanges into a session, it uses a library you told it at the start not to use. What is going on?',
+			options: [
+				'It is overriding your instruction because it disagrees',
+				'The context window has filled and your early instruction has lost weight — clear the session and put the rule in CLAUDE.md',
+				'The instruction was not phrased strongly enough',
+			],
+			answer: 1,
+			explanation:
+				'Everything in the session competes for a finite window, and early instructions fade as it fills. Repeating yourself more firmly in the same session does not fix it. A fresh session reloads CLAUDE.md, which is why durable rules belong in that file rather than in a sentence you typed once.',
+		},
+		{
+			q: 'Which kind of failure does reading the diff NOT help you catch?',
+			options: [
+				'A function that does not exist',
+				'A library you banned reappearing',
+				'A confident but wrong explanation of how something works',
+			],
+			answer: 2,
+			explanation:
+				'An explanation produces no diff — there is nothing to review, which is precisely why it is the failure to be most sceptical about. Security, performance and accessibility claims are the three areas where it is most likely and most costly, and they have to be checked against real documentation on purpose.',
+		},
+		{
+			q: 'It tells you a particular way of storing an API key is safe. What do you do?',
+			options: [
+				'Accept it — this is a common, well-documented subject',
+				'Check it against actual documentation before relying on it',
+				'Ask the same question again in a new session and compare answers',
+			],
+			answer: 1,
+			explanation:
+				'Security is one of the three subjects where confident wrong answers are most common and most expensive, and the cost arrives long after the decision. Asking twice tests consistency, not correctness — two confident answers can agree and both be wrong.',
+		},
+	]}
+/>
+
+That is the section. What it leaves you with is a tool you can point at your own project without
+being nervous, and a clear sense of the two places it will hurt you: the diff you approved without
+reading, and the explanation you believed without checking.

@@ -1,0 +1,219 @@
+---
+title: Learning, not outsourcing
+description: How to use an AI coding tool so that you end up knowing more rather than less — and the specific things to keep doing by hand while your course is still testing you every week.
+sidebar:
+  order: 4
+---
+
+import Quiz from '@components/Quiz.astro';
+
+This is the lesson the rest of the section exists to set up.
+
+You are an adult choosing how to spend a semester. Nobody is going to check which lines you wrote,
+and nothing here is a rule you would be breaking. What follows is a description of a trap that is
+easy to fall into without noticing, and of the specific habits that keep you out of it.
+
+## The situation, plainly
+
+Creative Coding Foundations is 94 hours. Part of how it is assessed is a *"brief individual
+written test covering all previous topics"* — weekly, individual, written.
+
+So there are two ways through the semester, and they look identical from the outside until the
+first test.
+
+**Route one.** You describe what you want, it writes the code, it works, you hand it in. The
+assignments are fine. Every week the material builds on the week before, and every week your
+actual grasp of the week before is a little thinner than the assignment suggests. Around week
+four the tests stop going well and you cannot point to where it started.
+
+**Route two.** You use the same tool constantly, and you end the semester able to write the code
+without it.
+
+The difference is not effort or time. It is which question you ask.
+
+## Why it happens to careful people
+
+Reading code that works produces a strong feeling of understanding. That feeling is real and it
+is not the same thing as being able to produce the code.
+
+Psychologists call this the difference between recognition and recall, and the honest version is
+this: recognising a correct `for` loop is nearly effortless, and writing one on paper with the
+semicolons in the right places is a different skill that only comes from doing it. You cannot
+tell the two apart from the inside. Everything feels clear right up until the blank page.
+
+The tool does not cause this. Copying from Stack Overflow caused it for twenty years. What is new
+is the speed: you can now stay in the comfortable state for an entire semester without ever
+hitting the friction that used to force you to learn.
+
+## Six things that make it a tutor
+
+### Ask it to explain code rather than write it
+
+The single highest-value habit. Same tool, different verb.
+
+```text
+Explain what this function does, line by line, as if I have written
+JavaScript for two weeks. Tell me what would break if I removed
+the second line.
+```
+
+The follow-up question is where the value is. "What would break if" forces a claim you can go and
+test, which turns an explanation into an experiment.
+
+### Paste the actual error text
+
+Not "it says something about undefined". The whole message, exactly, including the file name and
+the line number.
+
+Two reasons. The obvious one is that it can only diagnose what it can see, and your paraphrase
+has usually dropped the part that mattered. The better one is that reading error messages closely
+enough to copy them is itself the skill the
+[debugging lesson](/ares_materials_estudi/javascript/when-it-breaks/) was teaching. Do it enough
+times and you start recognising the message before you finish pasting it.
+
+### Use plan mode to explore
+
+`Shift+Tab` to plan mode, then ask how something works. Nothing can change, so nothing has to be
+reviewed, and you can be as curious as you like about a project you do not yet understand.
+
+```text
+How does the data get from the fetch call to the thing drawn on screen?
+Name the files and the order they run in.
+```
+
+### Ask "why this and not that"
+
+When it produces something, or when you have already written something yourself:
+
+```text
+Why const here and not let?
+Why a loop rather than three separate lines?
+What is the argument against doing it the way I did it?
+```
+
+This is the question that turns an answer into a principle. It is also the one most likely to
+surface a genuine trade-off rather than a fact — and trade-offs are what the course is actually
+teaching.
+
+### Break the task down, then implement the first step yourself
+
+```text
+Break this into steps small enough that each one is a single change.
+List them. Do not write any code.
+```
+
+Then do step one with your own hands. Ask about step two only when step one runs. The plan is the
+part that is genuinely hard to produce when you are new, and the implementation is the part you
+are being tested on — so take the help where it is scarce and do the work where it counts.
+
+### Have it check your work instead of replacing it
+
+```text
+Here is my version. Do not rewrite it. Tell me what is wrong with it,
+what is fine, and what you would do differently and why.
+```
+
+You get a code review, which is a thing working designers and developers pay each other for, and
+your code stays yours. If it does rewrite it anyway, reject the diff and ask again more firmly.
+
+## What to keep doing by hand
+
+While your fundamentals are being tested weekly, these stay yours:
+
+- **Variables, conditionals, loops and functions.** The whole content of the written tests. Write
+  every one of them yourself, wrongly at first, until they are boring.
+- **The first version of anything.** Get something bad running before you ask about it. A bad
+  version you wrote is a far better basis for a question than a blank file.
+- **Debugging you have not attempted.** Read the error. Form a guess. Check the guess. *Then* ask.
+  Skipping to the answer costs you the only reliable way to learn to read errors.
+- **Anything you are about to hand in that you could not explain out loud.** If a lecturer asked
+  you to talk through line nine and you could not, it is not finished.
+- **Any diff you cannot read.** Not "did not read" — could not. If the change uses something you
+  have never seen, that is a signal to stop and ask what it is, not to approve and move on.
+
+## The test that settles it
+
+One question, asked honestly, resolves nearly every case:
+
+> **Could I write this again tomorrow, from an empty file, without help?**
+
+If yes, using the tool saved you time and cost you nothing.
+
+If no, you now have two options and both are fine as long as you pick one deliberately: close it
+and write the thing yourself, or accept that this particular piece is not something you know yet
+and note it as something to come back to. What is not fine is not asking the question, because
+that is how week four arrives without warning.
+
+:::tip[A reasonable way to run the semester]
+Write it yourself first. Ask the tool to review it and explain what it would change. Argue with
+it. Keep or reject the suggestion on purpose.
+
+Slower than having it write the thing. Faster than the alternative, once you count the weeks
+spent relearning material you were supposed to have.
+:::
+
+## The other side of it
+
+None of this is an argument for suffering. There are things it is straightforwardly good at that
+cost you nothing to accept:
+
+- Setup, configuration and tooling — the parts your course is not testing and nobody enjoys.
+- Explaining an error message that means nothing to you yet.
+- Writing the boring repetitive part after you have written the interesting part.
+- Answering the basic question you feel embarrassed to ask a lecturer for the third time. It has
+  no opinion about you, which is a genuine advantage at eleven at night in week two.
+- Being a second reader on your own work.
+
+The distinction is not "hard things" versus "easy things". It is **the things the course is
+testing** versus everything else. Guard the first list. Take all the help you like on the second.
+
+<Quiz
+	questions={[
+		{
+			q: 'You are stuck on an exercise about loops, which is this week\'s topic in ID102.01. What is the most useful thing to ask for?',
+			options: [
+				'A working version of the loop, which you then read carefully',
+				'An explanation of why your attempt does not work, so you can fix it yourself',
+				'Three different working versions, so you can compare approaches',
+			],
+			answer: 1,
+			explanation:
+				'All three teach you something, but only the second leaves the writing with you — and writing loops is exactly what the weekly written test measures. Reading a correct version produces a strong feeling of understanding that does not transfer to a blank page.',
+		},
+		{
+			q: 'Something breaks and the browser console shows an error you have never seen. What is the order of operations?',
+			options: [
+				'Paste the error and ask for a fix straight away',
+				'Read the error, form a guess about the cause, check the guess, and ask if you are still stuck — pasting the message exactly',
+				'Describe the error in your own words to save time',
+			],
+			answer: 1,
+			explanation:
+				'Reading errors is a skill that only develops when you attempt them, and it is one you will use for the rest of your career. When you do ask, paste the message verbatim: your paraphrase has usually dropped the part that identified the problem.',
+		},
+		{
+			q: 'What is the single question that tells you whether a piece of assisted work is a problem?',
+			options: [
+				'Did I write more than half of the lines myself?',
+				'Could I write this again tomorrow from an empty file, without help?',
+				'Would my lecturer be able to tell it was assisted?',
+			],
+			answer: 1,
+			explanation:
+				'Line-counting measures nothing, and detectability is the wrong concern — nobody is policing this. The only thing that matters is whether the capability ended up in you, and that question asks it directly.',
+		},
+		{
+			q: 'Which of these is the tool genuinely well suited to, with no cost to your learning?',
+			options: [
+				'Writing the functions for this week\'s exercise',
+				'Setting up your tooling and explaining an error message you have never seen',
+				'Producing the final version of anything you will hand in',
+			],
+			answer: 1,
+			explanation:
+				'The line is not hard versus easy, it is tested versus untested. Configuration and setup are not on any written test and are nobody\'s idea of a good time. The fundamentals the course examines every week are the ones to guard.',
+		},
+	]}
+/>
+
+Next: [CLAUDE.md and the commands worth knowing](/ares_materials_estudi/claude-code/claude-md-and-commands/).

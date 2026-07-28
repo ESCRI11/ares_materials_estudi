@@ -1,0 +1,135 @@
+---
+title: CLAUDE.md and the commands worth knowing
+description: The file that stops you re-explaining your project every session, the handful of slash commands a beginner actually needs, and how sessions and the context window work.
+sidebar:
+  order: 5
+---
+
+Two sessions in, you will notice you are repeating yourself. "This project uses plain JavaScript,
+not a framework." "British spelling." "Do not add libraries." Every session, from scratch, because
+each one starts with no memory of the last.
+
+There is a file for that.
+
+## CLAUDE.md
+
+**CLAUDE.md** is a plain [Markdown](/ares_materials_estudi/git-and-github/markdown/) file at the
+root of your project. Claude Code reads it at the start of every session, before you type
+anything. Whatever is in it is treated as standing instructions.
+
+It is the same idea as the system prompt from the
+[prompting lesson](/ares_materials_estudi/ai-as-a-material/prompting/): the rules that apply to
+every request go in one place, so only the changing part goes in what you type. The difference is
+that this one lives in your repository, so it gets committed, travels with the project, and is
+visible to anyone you share the folder with.
+
+A first one for a student project might be the whole of this:
+
+```markdown
+# CLAUDE.md
+
+## What this is
+A coursework sketch for Creative Coding Foundations. Plain HTML, CSS and
+JavaScript in VS Code. No frameworks, no build step — index.html opens
+directly in a browser.
+
+## How to help me
+I am learning. Explain changes rather than only making them, and when
+there is a choice, say why you picked one option over the other.
+Prefer the smallest thing that works over the clever version.
+
+## Rules
+- No new libraries without asking first.
+- British spelling in comments and text.
+- Keep functions short enough to read in one screen.
+```
+
+Three headings and a dozen lines. Resist writing more than that at first: a long file dilutes
+itself, and a rule that is never followed is usually one buried at line ninety of a document
+nobody meant to write.
+
+Add to it when you catch yourself explaining the same thing twice. That is the signal.
+
+:::note[You have already seen one]
+This site's own repository has a file exactly like this at its root, telling any AI tool working
+on it which stack to use, how a lesson is structured, and what not to add. It is why a new
+session can add a page without being told the conventions again.
+:::
+
+### `/init` writes you a starting point
+
+Run `/init` inside a project and it reads the codebase and generates a CLAUDE.md describing what
+it found — the stack, the layout, how to run things.
+
+Treat the result as a draft. It is good at describing what is there and cannot know what you
+intend, so the "how to help me" part is yours to write. Delete anything that is not true or not
+useful; an inaccurate CLAUDE.md is worse than none, because it is believed.
+
+## The commands worth knowing
+
+Anything starting with `/` is a **slash command** — an instruction to the tool rather than a
+request to the model. `/help` lists them all. These are the ones that earn their place early.
+
+| Command | What it does |
+|---|---|
+| `/help` | Lists everything available. |
+| `/init` | Generates a starter CLAUDE.md by reading your project. |
+| `/clear` | Starts a fresh conversation in the same folder. |
+| `/context` | Shows how full the context window is. |
+| `/memory` | Opens CLAUDE.md for editing without leaving the session. |
+| `/config` | Settings — model, theme, and so on. |
+| `/login` | Signs in, or switches account. |
+
+Learn `/clear` and `/context` properly; the rest you can look up when you need them.
+
+## The context window, and why `/clear` matters
+
+The **context window** is the total amount of text a model can hold at once: your messages, its
+replies, and every file it read to answer them. It is finite. As a session goes on, it fills.
+
+A full window is where the quality quietly drops. Instructions you gave twenty minutes ago carry
+less weight, it forgets a constraint you set at the start, and it starts re-reading files it
+already knows. This is the same drift described in the
+[prompting lesson](/ares_materials_estudi/ai-as-a-material/prompting/), and it has the same fix.
+
+`/context` tells you where you stand. When it is filling up, or whenever you move to a genuinely
+different task, run:
+
+```text
+/clear
+```
+
+That starts a fresh conversation with an empty window in the same folder. **CLAUDE.md is loaded
+again**, so everything important survives — which is the real reason to have written one. The
+disposable part is disposed of; the durable part persists.
+
+The instinct to keep one long session going because "it knows the project now" is backwards. It
+knows the project because it can read the project. What a long session accumulates is mostly
+noise.
+
+## Sessions
+
+Sessions are stored per folder, on your machine.
+
+```sh
+claude --continue    # pick up the most recent session in this folder
+claude --resume      # choose from a list of earlier ones
+```
+
+Useful when you stop mid-task and come back after lunch. Less useful than you would think for
+anything older than that, for the reason above — a fresh session with a good CLAUDE.md usually
+beats a resumed one carrying two days of accumulated conversation.
+
+Because sessions belong to the folder, `claude` in a different project is a different history.
+Nothing leaks between them.
+
+## Do this on your machine
+
+- [ ] I ran `/init` in one of my projects and read what it generated
+- [ ] I edited the result: deleted anything untrue, and added a short "how to help me" section
+- [ ] My CLAUDE.md says I am learning and asks for explanations rather than only changes
+- [ ] I committed CLAUDE.md, so it is part of the project
+- [ ] I ran `/context` mid-session and saw how full the window was
+- [ ] I ran `/clear` and confirmed the new session still follows my CLAUDE.md rules
+- [ ] I quit a session and came back with `claude --continue`
+- [ ] I added a rule to CLAUDE.md the second time I found myself explaining the same thing

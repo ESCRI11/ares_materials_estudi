@@ -1,0 +1,260 @@
+---
+title: CSS and selectors
+description: How style attaches to structure — rules, selectors, colour, type, and the two words that explain every CSS surprise.
+sidebar:
+  order: 3
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+You already know what you want a page to look like. CSS is the notation for saying it. The
+grammar is small — most of the learning is vocabulary, and most of the vocabulary is words you
+use daily anyway: colour, font size, line height, alignment, spacing.
+
+**CSS** stands for Cascading Style Sheets. A **stylesheet** is a document of styling
+instructions; *cascading* refers to how conflicts between them get settled, which is the last
+part of this lesson.
+
+## A rule
+
+CSS is written as **rules**. A rule has two parts:
+
+```css
+h1 {
+  color: crimson;
+  font-size: 3rem;
+}
+```
+
+The part before the braces — `h1` — is the **selector**: it chooses which elements this rule
+applies to. Everything inside the braces is the **declaration block**, a list of
+**declarations**. Each declaration is a **property** (what you are changing), a colon, a
+**value** (what you are changing it to), and a semicolon.
+
+The semicolon after every declaration is not optional. A missing one silently kills the
+declaration after it, and it is the single most common reason a beginner's CSS "does nothing".
+
+## Three ways to attach CSS to HTML
+
+**Inline**, as a `style` attribute on one element. Fast for a demonstration, bad for real
+work, because the style applies to that element and no other:
+
+<LiveCode
+	title="Inline — one element only"
+	code={`<p style="color: crimson">Change crimson to teal and press Run.</p>`}
+/>
+
+**In a `style` element** in the head of the document. Now one rule reaches every matching
+element on the page:
+
+<LiveCode
+	title="A style block — every matching element"
+	height={240}
+	code={`<style>
+  p { color: crimson; }
+</style>
+
+<p>Both paragraphs turn.</p>
+<p>Because the selector matched both.</p>`}
+/>
+
+**In a separate file**, which is what real projects do. You write your rules in `style.css`,
+save it next to `index.html`, and connect the two with one line in the head:
+
+```html
+<link rel="stylesheet" href="style.css">
+```
+
+Now one file controls every page that links to it. Change the type scale once, and forty pages
+follow — the reason the separation between HTML and CSS exists in the first place.
+
+## Selectors
+
+Three selectors carry almost all the weight.
+
+**Element selector** — the tag name, matching every element of that kind: `p`, `h1`, `img`.
+Use it for site-wide defaults, the way you would set a paragraph style for body copy.
+
+**Class selector** — a dot followed by a name, matching every element carrying that `class`
+attribute. This is your workhorse. A **class** is a label you invent and attach to any number
+of elements; it is the closest thing CSS has to a paragraph or object style in InDesign.
+
+<LiveCode
+	title="A class, reused"
+	height={260}
+	code={`<style>
+  .caption {
+    color: #777;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+</style>
+
+<p class="caption">Fig. 1 — first prototype</p>
+<p>Ordinary body copy, untouched.</p>
+<p class="caption">Fig. 2 — second attempt</p>`}
+/>
+
+Note the dot in the CSS and no dot in the HTML: `class="caption"` in the markup,
+`.caption` in the stylesheet. An element can hold several classes separated by spaces —
+`class="caption dark"` — and gets the styling of both.
+
+**ID selector** — a hash followed by a name, matching the single element carrying that `id`
+attribute. An `id` must be unique in the page. Useful for one-off things, but reach for a
+class by default; a class you can reuse tomorrow, an id you cannot.
+
+You can also **group** selectors with commas, and target descendants with a space:
+
+```css
+h1, h2, h3 { font-family: Helvetica, Arial, sans-serif; }
+.card p    { color: #555; }
+```
+
+The second rule reads "any paragraph inside anything with the class `card`" — a paragraph
+elsewhere on the page is untouched.
+
+## Colour and type
+
+Colour comes in the notations you already use:
+
+```css
+color: crimson;             /* one of about 140 named colours */
+color: #1b1b1b;             /* hex, exactly as in any design tool */
+color: rgb(27 27 27);       /* red, green, blue, 0–255 */
+color: rgb(27 27 27 / 50%); /* the same, at 50% opacity */
+```
+
+`color` sets the colour of text. `background-color` fills the element behind it. American
+spelling throughout — `color`, never `colour` — which trips up more people than it should.
+
+Typography maps almost one-to-one onto the panel you already know:
+
+<LiveCode
+	title="Type controls"
+	height={300}
+	code={`<style>
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 1.5rem;
+  }
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.2em;
+  }
+  .lead { font-size: 1.2rem; color: #555; max-width: 32em; }
+</style>
+
+<h1>Set the type first</h1>
+<p class="lead">Type, colour and spacing account for most of what a page looks like.
+Layout comes after, and there is less of it than you expect.</p>`}
+/>
+
+- `font-family` takes a list, tried left to right, so the browser can fall back if the first
+  is missing. End with a generic family (`sans-serif`, `serif`, `monospace`).
+- `line-height` without a unit is a multiplier of the font size — `1.5` is a good default for
+  body copy, and it keeps working when the size changes.
+- `font-weight` runs 100 to 900, where `400` is regular and `700` is bold.
+- `text-align`, `text-transform` and `letter-spacing` do what you would expect.
+
+## The cascade, briefly
+
+Two rules can both match the same element and disagree. The browser settles it in this order.
+
+**1. Specificity.** The more precisely a selector names its target, the more it wins. An id
+beats a class; a class beats an element name; an inline `style` attribute beats all three.
+
+<LiveCode
+	title="Specificity, visible"
+	height={280}
+	code={`<style>
+  p        { color: grey; }
+  .alert   { color: crimson; }
+  #banner  { color: teal; }
+</style>
+
+<p>Element rule: grey.</p>
+<p class="alert">Class beats element: crimson.</p>
+<p class="alert" id="banner">Id beats class: teal.</p>
+<p class="alert" id="banner" style="color: black">Inline beats everything: black.</p>`}
+/>
+
+**2. Order.** When specificity ties, the rule written later wins. Two `.alert` rules in the
+same file: the second one takes it. This is why the stylesheet you load last is the one that
+overrides the others.
+
+**3. Inheritance.** Some properties pass down from parent to child on their own — mostly the
+typographic ones. Set `font-family` and `color` on `body` and the entire page inherits them,
+which is why almost every stylesheet starts there. Box properties like `border` and `padding`
+do not inherit; they would look absurd if they did.
+
+:::tip[When a style refuses to apply]
+It is nearly always one of four things: a typo in the class name, a missing semicolon on the
+line above, another rule winning on specificity, or the file not saved. Check in that order.
+The [dev tools lesson](/ares_materials_estudi/html-and-css/dev-tools/) shows you how to see
+the answer in the browser instead of guessing at it.
+:::
+
+## Try it
+
+The card below is unstyled. Give it a light grey background, near-black text, a sans-serif
+face, and make the year small and uppercase. Everything you need is in this lesson.
+
+<LiveCode
+	title="Challenge"
+	height={300}
+	code={`<style>
+  /* Anything between these marks is a comment — the browser ignores it.
+     Write your rules here. The class names are already in the HTML. */
+  .card {
+  }
+  .year {
+  }
+</style>
+
+<div class="card">
+  <h2>Breathing lamp</h2>
+  <p>A lamp that matches the pace of the room it sits in.</p>
+  <p class="year">2025</p>
+</div>`}
+/>
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'In the rule .caption { color: #777; }, which part is the selector?',
+			options: ['.caption', 'color', '#777'],
+			answer: 0,
+			explanation:
+				'The selector is everything before the braces — it chooses what the rule applies to. Inside, color is the property and #777 is the value. Together they form one declaration.',
+		},
+		{
+			q: 'Two rules both match your paragraph: p { color: grey; } and .lead { color: crimson; }. The paragraph has class="lead". What colour is it?',
+			options: [
+				'Grey, because the element selector is more general',
+				'Crimson, because a class is more specific than an element name',
+				'Whichever rule is written last in the file',
+			],
+			answer: 1,
+			explanation:
+				'Specificity is checked before order. A class outranks an element name, so crimson wins wherever the two rules sit in the file. Order only decides ties between selectors of equal specificity.',
+		},
+		{
+			q: 'You want the same styling on twelve captions across the page. Which selector do you use?',
+			options: [
+				'An id, applied to each of the twelve',
+				'A class, applied to each of the twelve',
+				'Twelve inline style attributes',
+			],
+			answer: 1,
+			explanation:
+				'A class is designed to be reused across any number of elements. An id must be unique in the page, so twelve of them is invalid. Inline styles work but leave you editing twelve places for one change.',
+		},
+	]}
+/>

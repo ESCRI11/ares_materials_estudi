@@ -1,0 +1,230 @@
+---
+title: Variables
+description: Storing a value and giving it a name. let and const, the three types you will use constantly, and how to name things so the code stays readable.
+sidebar:
+  order: 2
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+A **variable** is a name you attach to a value so you can use it again. That is the entire
+idea. In the last lesson every value was thrown away the moment it was printed; a variable is
+how you keep one.
+
+You have done this in design software without calling it that. A colour style named
+*Ink/900*, a text style named *Body*, a Figma variable named `spacing-m` — one value, one
+name, used in fifty places. When the value changes you change it once. Code works the same
+way, and for the same reason.
+
+## Making one
+
+<LiveCode
+	title="A name and a value"
+	height={120}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const baseSize = 16;
+  console.log(baseSize);
+  console.log(baseSize * 1.5);
+</script>`}
+/>
+
+Read `const baseSize = 16;` from the middle outwards:
+
+- `=` does not mean "is equal to". It means **assign**: take the value on the right and put it
+  in the name on the left. It only ever travels right to left.
+- `baseSize` is the name. You invented it. JavaScript has no opinion about it.
+- `const` says you are creating a new name here, for the first time. Creating a name is called
+  **declaring** it.
+
+After that line, `baseSize` can be used anywhere a `16` could be used. It is not a copy of the
+text `16` — it is the number itself, so arithmetic works on it.
+
+## const, and let
+
+There are two words for declaring a variable, and the difference is whether the name is
+allowed to point at something else later.
+
+**`const`** — constant — means this name keeps this value. Try to reassign it and the program
+stops.
+
+<LiveCode
+	title="What const refuses to do"
+	height={140}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const baseSize = 16;
+  console.log("base is", baseSize);
+
+  baseSize = 24;
+  console.log("this line never runs");
+</script>`}
+/>
+
+The first line printed. The third line threw an error, the program stopped there, and the last
+line never happened — which is why you only see one line of output. (The error itself went to
+the browser's own console, which this panel cannot show you. In your own work you would see
+`TypeError: Assignment to constant variable`.)
+
+**`let`** makes a name that can be pointed at a new value later. Reassigning does not need the
+word `let` again — `let` is only for the first time.
+
+<LiveCode
+	title="A value that changes"
+	height={140}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  let clicks = 0;
+  console.log(clicks);
+
+  clicks = clicks + 1;
+  console.log(clicks);
+</script>`}
+/>
+
+`clicks = clicks + 1` looks like nonsense as an equation, and it is. As an instruction it is
+ordinary: work out `clicks + 1`, then put the result back into `clicks`. Right to left, always.
+
+:::tip[Which one to use]
+Reach for `const` first, every time. Switch to `let` only when you find yourself needing to
+change the value — a counter, a score, a position that moves. Most variables in real code
+never change, and `const` says so in a way a reader can trust at a glance.
+:::
+
+### And `var`
+
+Older code and older tutorials use a third word, `var`. It has rules about where the name is
+visible that surprised people so consistently that `let` and `const` were added to replace it.
+It still works, so nothing you find online is broken — but do not write it. If you see `var`
+in a tutorial, the tutorial is from before 2015, which matters for the rest of its advice too.
+
+## Three types of value
+
+Every value in JavaScript has a **type** — what kind of thing it is. Three of them cover
+almost everything you will write this year.
+
+- **number** — `16`, `1.5`, `-4`, `0`. One type for whole and decimal numbers; there is no
+  separate integer.
+- **string** — text in quotes: `"Ana"`, `"#f7f7f7"`, `"16px"`. Single or double quotes both
+  work, as long as you close with the one you opened with.
+- **boolean** — exactly two possible values, `true` and `false`, written without quotes. This
+  is the type of an answer to a yes-or-no question, and the whole of the next lesson runs on it.
+
+`typeof` tells you which one you have. It is worth checking when something behaves oddly.
+
+<LiveCode
+	title="Same-looking, not the same"
+	height={160}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const size = 16;
+  const label = "16";
+
+  console.log(typeof size, typeof label);
+  console.log(size + 4);
+  console.log(label + 4);
+</script>`}
+/>
+
+`16` and `"16"` look identical on screen and behave completely differently: `+` on numbers
+adds, `+` on strings glues. Most confusing bugs early on are a value being a string when you
+thought it was a number — anything typed into a form arrives as a string, for instance.
+
+## Putting values inside text
+
+Gluing with `+` gets unreadable fast. There is a second kind of quote for strings: the
+backtick, `` ` ``, on the key to the left of `1` on most keyboards. Inside a backtick string,
+`${` … `}` drops the value of any expression straight into the text. This is called a
+**template literal**, and you will see it everywhere.
+
+<LiveCode
+	title="Template literal"
+	height={140}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const name = "Ana";
+  const size = 16;
+
+  console.log(\`\${name} sets body text at \${size}px\`);
+</script>`}
+/>
+
+## Naming things well
+
+Naming is a design problem, not a technical one, and it is most of what makes code readable.
+
+- Use words, not letters. `baseSize` beats `bs` beats `x`.
+- More than one word runs together with capitals after the first: `backgroundColour`,
+  `isVisible`, `surveyResponses`. This is called **camelCase**, and it is the convention for
+  JavaScript. No spaces and no hyphens are allowed in a name anyway.
+- Case matters. `size` and `Size` are two different names, and mixing them up produces a
+  `ReferenceError` that takes a while to spot.
+- Name what it *is*, not how you got it: `firstResponse`, not `theThingFromTheList`.
+- Booleans read well as a question: `isDark`, `hasAnswered`.
+
+A name cannot start with a digit, cannot contain a space, and cannot be one of the words
+JavaScript has taken for itself — `let`, `const`, `if`, `for`, `function` and a few dozen more.
+You do not have to learn that list; you will get a `SyntaxError` if you tread on one.
+
+## Evaluation
+
+The snippet below prints the wrong total, because one of the values is a string when it should
+be a number. Fix it so the last line prints `40` rather than `328`.
+
+<LiveCode
+	title="Find the string"
+	height={160}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const columnWidth = 32;
+  const gutter = "8";
+
+  console.log(typeof columnWidth, typeof gutter);
+  console.log(columnWidth + gutter);
+</script>`}
+/>
+
+<Quiz
+	questions={[
+		{
+			q: 'let total = 10; total = total + 5; console.log(total); — what is printed?',
+			options: ['10', '15', 'An error, because total is used on both sides'],
+			answer: 1,
+			explanation:
+				'The = sign assigns rather than compares. The right-hand side is worked out first — 10 + 5 — and the result is then stored back in total, replacing the old value.',
+		},
+		{
+			q: 'const colour = "#1b1b1b"; colour = "#f7f7f7"; console.log(colour); — what happens?',
+			options: [
+				'It prints #f7f7f7',
+				'It prints #1b1b1b',
+				'The program stops with an error at the second line',
+			],
+			answer: 2,
+			explanation:
+				'const means the name keeps the value it was given. Assigning to it again is a TypeError and the program stops there, so nothing gets printed at all. If a value genuinely needs to change, declare it with let.',
+		},
+		{
+			q: 'Which of these is a boolean?',
+			options: ['"true"', 'true', '1'],
+			answer: 1,
+			explanation:
+				'true without quotes is the boolean. With quotes it is a string that happens to spell the word, and 1 is a number. The distinction matters as soon as you start making decisions with these values, which is the next lesson.',
+		},
+	]}
+/>
+
+Next: [making a decision](/ares_materials_estudi/javascript/conditionals/).

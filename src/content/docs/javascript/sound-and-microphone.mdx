@@ -1,0 +1,241 @@
+---
+title: Sound and the microphone
+description: Making a tone with the Web Audio API, then taking live microphone input and using its level to drive a canvas.
+sidebar:
+  order: 11
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+Creative Coding Foundations names the microphone specifically as an input to work with. It is a
+good choice for a first physical input: everybody has one, it needs no wiring, and a room full
+of sound is more interesting to design against than a mouse.
+
+Sound goes in two directions and the browser handles them separately. Making a noise is easy.
+Listening is easy too, once you have dealt with permission.
+
+:::caution[These examples do not run on this page]
+The sketch boxes on this site run in a locked-down frame with no access to your microphone and
+no access to the network. That restriction is what makes it safe to run strangers' code inside
+a lesson, and it means the audio code below has to be run from your own file.
+
+Make a folder, put an `index.html` in it, open it in VS Code, and start the **Live Server**
+extension. It serves your folder at a `localhost` address. That matters: browsers only allow
+microphone access on a page served over `https` or from `localhost`. A file opened directly
+from your file manager has a `file://` address, which browsers treat inconsistently — some
+refuse the microphone outright.
+:::
+
+## The Web Audio API
+
+The **Web Audio API** is the browser's sound engine. It works like a modular synth: you create
+small nodes — a tone generator, a volume control — and connect them into a chain that ends at
+`destination`, which is the speakers.
+
+The three pieces you need for a beep:
+
+- an **AudioContext**, the workspace everything else is created in
+- an **oscillator**, a node that produces a single steady tone at a given frequency
+- a **gain** node, which is a volume knob
+
+```html
+<button id="beep">Beep</button>
+
+<script>
+	let audio;
+
+	document.querySelector("#beep").addEventListener("click", () => {
+		if (!audio) audio = new AudioContext();
+
+		const osc = audio.createOscillator();
+		const gain = audio.createGain();
+
+		osc.frequency.value = 440;    // hertz — 440 is a concert A
+		gain.gain.value = 0.2;        // 0 is silent, 1 is full and unpleasant
+
+		osc.connect(gain);            // tone into volume
+		gain.connect(audio.destination);   // volume into speakers
+
+		osc.start();
+		osc.stop(audio.currentTime + 0.3); // stop 0.3 seconds from now
+	});
+</script>
+```
+
+Two rules hidden in that snippet.
+
+**A page cannot make a sound until the visitor has interacted with it.** Browsers enforce this
+to stop pages ambushing you with audio. Creating the `AudioContext` inside the click handler,
+as above, satisfies it. If you create it as the page loads it starts *suspended* and your first
+sounds go nowhere.
+
+**An oscillator is single-use.** Once stopped it cannot be started again — you create a new one
+each time, which is cheap and expected.
+
+To play an actual sound file rather than a tone, an ordinary `<audio>` element and
+`element.play()` is enough, and needs none of this.
+
+## Listening
+
+`navigator.mediaDevices.getUserMedia()` asks for the microphone. It returns a **stream**: live
+audio, arriving continuously, which you feed into an **analyser** node. The analyser does not
+make any sound; it lets you read what is passing through it.
+
+```js
+async function startMic() {
+	const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+	const audio = new AudioContext();
+	const source = audio.createMediaStreamSource(stream);
+	const analyser = audio.createAnalyser();
+	analyser.fftSize = 512;
+	source.connect(analyser);
+	// note: not connected to destination, so you do not hear yourself
+
+	const data = new Uint8Array(analyser.fftSize);
+
+	// Returns roughly 0 (silence) to 1 (loud).
+	return function level() {
+		analyser.getByteTimeDomainData(data);
+		let sum = 0;
+		for (const sample of data) {
+			sum = sum + (sample - 128) * (sample - 128);
+		}
+		return Math.sqrt(sum / data.length) / 128;
+	};
+}
+```
+
+`await` is new here. `getUserMedia` cannot answer immediately — it has to show a prompt and wait
+for a human — so it hands back a placeholder for the answer. `await` means "stop here until the
+real value arrives", and it only works inside a function marked `async`. The
+[next lesson](/ares_materials_estudi/javascript/fetching-data/) takes this properly.
+
+The `level` function is the useful part. `getByteTimeDomainData` fills the array with the
+waveform as numbers from 0 to 255, where 128 is silence. Squaring the distance from 128,
+averaging, and taking the square root gives one number for loudness. Divide by 128 and you have
+a value between 0 and 1, which is a convenient thing to multiply anything by.
+
+## Drawing a level
+
+That single number is the interface between sound and picture. Once you have it, the drawing is
+the canvas work you already did. The box below is real — it uses an invented number instead of a
+microphone, so it runs anywhere.
+
+<LiveCode title="A level meter driven by a fake number" height={320} code={`<canvas id="c" width="300" height="140" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+  let t = 0;
+
+  // Stands in for the microphone: a number between 0 and 1.
+  function fakeLevel() {
+    t = t + 0.04;
+    return Math.abs(Math.sin(t)) * (0.4 + Math.random() * 0.6);
+  }
+
+  function draw() {
+    const level = fakeLevel();
+
+    ctx.clearRect(0, 0, 300, 140);
+
+    ctx.fillStyle = "#eee";
+    ctx.fillRect(20, 40, 260, 24);
+
+    ctx.fillStyle = "#1b1b1b";
+    ctx.fillRect(20, 40, 260 * level, 24);
+
+    ctx.beginPath();
+    ctx.arc(150, 105, 10 + level * 25, 0, Math.PI * 2);
+    ctx.fillStyle = "#ffe100";
+    ctx.fill();
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+</script>`} />
+
+In your own file, the only change is where the number comes from:
+
+```js
+const level = await startMic();   // ask once, at the top
+
+function draw() {
+	const value = level();          // read it every frame
+	// …the same drawing code
+	requestAnimationFrame(draw);
+}
+draw();
+```
+
+Anything that took a number can now take that one: a radius, a colour, a rotation, how many
+shapes appear. That substitution is the whole technique.
+
+## About the permission prompt
+
+Be honest with yourself about this part, because it is part of the design of your piece.
+
+- The browser shows its own prompt. You cannot style it, move it, pre-answer it or skip it. It
+  appears at the moment you call `getUserMedia` and not before.
+- The visitor can say no. Then the promise **rejects** and your code throws an error. Wrap the
+  call in `try` / `catch` and show something honest, rather than a page that appears broken.
+- If they refuse, the prompt does not come back by itself. They have to reopen it from the
+  padlock or camera icon in the address bar. Tell them that, in words, on the page.
+- While the microphone is live the tab shows a recording indicator. People notice, and they are
+  right to.
+- When you are finished, release it: `stream.getTracks().forEach((track) => track.stop())`.
+
+```js
+try {
+	const level = await startMic();
+	// …
+} catch (error) {
+	document.querySelector("#status").textContent =
+		"No microphone. Allow it from the icon in the address bar and reload.";
+}
+```
+
+Everything either node can do is on
+[MDN](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API). One oscillator and one
+analyser will carry an entire first-semester project.
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'Your beep works when triggered by a button, but the version that plays automatically as the page loads is silent. Why?',
+			options: [
+				'Oscillators only work inside event handlers',
+				'Browsers block audio until the visitor has interacted with the page',
+				'The frequency defaults to zero',
+			],
+			answer: 1,
+			explanation:
+				'An AudioContext created before any interaction starts suspended, so nothing reaches the speakers. Creating it — or resuming it — inside a click handler is the accepted way round, and the restriction exists for a good reason.',
+		},
+		{
+			q: 'What does the analyser node produce?',
+			options: [
+				'An amplified copy of the sound for the speakers',
+				'Numbers describing the audio passing through it, which your code can read',
+				'A recording saved to a file',
+			],
+			answer: 1,
+			explanation:
+				'It is a measuring point, not an effect. It makes no sound of its own — you read arrays of numbers out of it each frame and decide what to do with them.',
+		},
+		{
+			q: 'You open your microphone sketch by double-clicking the HTML file in your folder and nothing happens. What is the most likely cause?',
+			options: [
+				'The page has a file:// address, and microphone access needs https or localhost',
+				'The microphone is broken',
+				'Canvas cannot be used with audio',
+			],
+			answer: 0,
+			explanation:
+				'Microphone access is restricted to secure contexts. Serving the folder with the Live Server extension in VS Code gives you a localhost address, which qualifies.',
+		},
+	]}
+/>

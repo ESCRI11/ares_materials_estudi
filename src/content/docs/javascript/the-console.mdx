@@ -1,0 +1,221 @@
+---
+title: The console
+description: The browser has a place where you can type a line of code and get an answer back. Opening it, running your first expression, and printing with console.log.
+sidebar:
+  order: 1
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+**JavaScript** is the programming language every web browser understands. You do not have to
+install it, buy it, or set it up: it is already sitting inside Chrome, Firefox, Safari and
+Edge, and it has been there the whole time you have been using them.
+
+It also comes with somewhere to type. Every browser has a **console** — a panel where you
+write one line of code, press Enter, and the computer answers. That is where this section
+starts, because it is the shortest distance between you and a running program.
+
+## Opening it
+
+Find any ordinary web page, then:
+
+- **Chrome, Edge, Brave** — `F12`, or `Ctrl+Shift+J` on Windows and Linux, `Cmd+Option+J` on macOS.
+- **Firefox** — `Ctrl+Shift+K` on Windows and Linux, `Cmd+Option+K` on macOS.
+- **Safari** — the console is hidden until you ask for it. Open Safari's settings, go to
+  **Advanced**, and tick the option about showing features for web developers. A **Develop**
+  menu appears in the menu bar, and `Cmd+Option+C` then opens the console.
+
+Right-clicking a page and choosing **Inspect** works everywhere too — the console is one of
+the tabs in the panel that opens.
+
+You are looking for a mostly empty area with a `>` at the left edge, waiting for you to type.
+The rest of that panel is the browser's **developer tools**, a set of instruments for looking
+inside a web page. You will meet the others later. For now you want the tab labelled
+**Console**.
+
+:::tip[Nothing you type here can break anything]
+The console runs your code against the page as it currently sits in your browser. Refresh and
+every trace of it is gone. It is not connected to the real website, and the people who made
+the site never find out.
+:::
+
+## Ask it something
+
+Click next to the `>`, type this, and press Enter:
+
+```js
+2 + 2
+```
+
+The console answers `4`.
+
+That is worth pausing on. You wrote a piece of code, and it produced a **value** — a single
+piece of data. `2 + 2` is an **expression**: any piece of code that produces a value. The
+console's whole job at the prompt is to work out the expression you typed and show you what
+came back.
+
+Try a few more, one at a time:
+
+```js
+10 * 3
+100 / 7
+(16 * 1.5) + 4
+```
+
+Now something that is not arithmetic:
+
+```js
+"Interaction" + " " + "Design"
+```
+
+You get back `'Interaction Design'`. Text in JavaScript is called a **string** — a run of
+characters with quote marks around it. The quotes are how JavaScript knows where the text
+starts and stops; they are not part of the text itself. `+` between two strings glues them
+together rather than adding anything up.
+
+## Printing on purpose
+
+The prompt is generous: it shows you the value of whatever you type. A real program is not.
+A program runs from top to bottom in silence and tells you nothing unless you ask it to.
+
+Asking it to is `console.log`. It takes whatever you put between its brackets and writes it
+out where you can see it.
+
+```js
+console.log("still alive")
+```
+
+The name comes from a ship's log — a running record of what happened and when. You will type
+it more than any other line of code in your life. When a program does something you did not
+expect, `console.log` is how you find out what it actually thought it was doing.
+
+Here is a running one. The panel underneath the code is the output.
+
+<LiveCode
+	title="Your first program"
+	height={120}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  console.log(2 + 2);
+</script>`}
+/>
+
+Edit the code and press **Run** (or `Ctrl+Enter`) to see your version. **Reset** puts back the
+original, so experiment freely.
+
+Two of those lines are scaffolding you can ignore for now. `<pre id="out"></pre>` makes the
+grey output panel, and the line reassigning `console.log` redirects the printing into that
+panel — this page cannot show you the browser's own console, so the snippets bring the output
+to you. Every snippet in this section starts with those two lines. Your code goes underneath.
+
+## Printing more than once
+
+Each `console.log` prints on its own line, in the order the lines run.
+
+<LiveCode
+	title="Three lines, top to bottom"
+	height={140}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  console.log("Ana");
+  console.log("Type size:", 16);
+  console.log("Total:", 16 * 1.5);
+</script>`}
+/>
+
+Notice the commas: `console.log` will take several values at once and print them separated by
+spaces. Notice also that `16 * 1.5` was worked out before it was printed. Anywhere JavaScript
+expects a value, you can put an expression that produces one.
+
+## Notes to yourself
+
+A line starting with `//` is a **comment**: JavaScript ignores it completely. Comments are for
+the human reading the code, which is usually you, three weeks later.
+
+```js
+// the base size of the type scale
+console.log(16);
+```
+
+Commenting a line out — putting `//` in front of it to switch it off without deleting it — is
+one of the most useful debugging habits there is.
+
+## When it goes wrong
+
+Type this and press Enter:
+
+```js
+console.log(nam)
+```
+
+You get a red error: something like `Uncaught ReferenceError: nam is not defined`. JavaScript
+is telling you it has never heard of anything called `nam`.
+
+Red text in the console is not a telling-off. It is the most useful information you will get
+all day, and it is usually specific: which kind of mistake, and which line. Two you will meet
+constantly:
+
+- **SyntaxError** — the code is not valid JavaScript. A missing bracket or quote, most often.
+- **ReferenceError** — you used a name the program does not know.
+
+Read the *first* line of the error, then look at the line number. Guessing is slower than
+reading.
+
+## Semicolons
+
+You may have noticed the `;` at the end of some lines and not others. JavaScript mostly copes
+without them. Put them at the end of each instruction anyway — it is what your lecturers, and
+nearly all the code you will read, will do.
+
+## Evaluation
+
+Change the snippet below so that it prints your own name and the year you will start the
+master, on two separate lines.
+
+<LiveCode
+	title="Make it yours"
+	height={140}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  console.log("change me");
+</script>`}
+/>
+
+<Quiz
+	questions={[
+		{
+			q: 'What does console.log("2" + 2) print?',
+			options: ['4', '22', 'An error, because you cannot add text to a number'],
+			answer: 1,
+			explanation:
+				'"2" is a string — text — because of the quotes, and + between a string and anything else glues them together instead of adding. You get the two characters 2 and 2 side by side. This is the single most common surprise for people starting out, and the next lesson is about the types that cause it.',
+		},
+		{
+			q: 'A program has three lines, in this order: console.log("a"); then // console.log("b"); then console.log("c"); — what gets printed?',
+			options: ['a, b and c', 'a and c', 'Only a, because the // stops the program'],
+			answer: 1,
+			explanation:
+				'A line starting with // is a comment: JavaScript skips it entirely and carries on with the next line. Commenting a line out is how you switch something off without losing it.',
+		},
+		{
+			q: 'You type 5 * 5 at the console prompt and see 25. The same line inside a program prints nothing. Why?',
+			options: [
+				'A program cannot do arithmetic',
+				'The console shows you the value of whatever you type; a program only shows what you explicitly print',
+				'The line needs a semicolon to work inside a program',
+			],
+			answer: 1,
+			explanation:
+				'The prompt is a conversation, so it answers. A program is a set of instructions carried out silently — the value is calculated and then discarded unless something does with it, such as console.log.',
+		},
+	]}
+/>
+
+Next: [storing a value and giving it a name](/ares_materials_estudi/javascript/variables/).

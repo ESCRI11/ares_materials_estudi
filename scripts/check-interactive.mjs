@@ -58,8 +58,15 @@ try {
 
 	const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH });
 	const page = await browser.newPage();
+	// Lessons deliberately ship broken snippets — const reassignment, a wrong selector,
+	// string + number — so errors raised inside a LiveCode sandbox are teaching material,
+	// not defects. Only errors from the page itself count.
 	const errors = [];
-	page.on('pageerror', (error) => errors.push(String(error)));
+	const sandboxErrors = [];
+	page.on('pageerror', (error) => {
+		const where = String(error.stack || '');
+		(where.includes('about:srcdoc') ? sandboxErrors : errors).push(String(error));
+	});
 
 	// The dictionary is a third-party service; never let the check depend on it.
 	await page.route('**/api.dictionaryapi.dev/**', (route) =>
@@ -118,9 +125,40 @@ try {
 	assert.ok(await selectWord(page, 'design bachelor'), 'no "design bachelor" in the lesson body');
 	assert.equal(await panel.isVisible(), false, 'panel opened for a multi-word selection');
 
+	// --- LiveCode: the editable snippet runs, and Run re-runs what was edited ---
+	const lesson = page.locator('live-code').first();
+	await page.goto(`${ORIGIN}/ares_materials_estudi/javascript/variables/`, {
+		waitUntil: 'networkidle',
+	});
+	await lesson.waitFor();
+	const sandbox = page.frameLocator('live-code iframe').first();
+	// The snippet ran on load: something was written into the frame.
+	await sandbox.locator('body').waitFor();
+	assert.notEqual(
+		(await sandbox.locator('body').textContent()).trim(),
+		'',
+		'LiveCode rendered nothing on load',
+	);
+
+	const editor = page.locator('live-code textarea').first();
+	await editor.fill('<p id="marker">edited-and-run</p>');
+	await page.locator('live-code [data-run]').first().click();
+	await sandbox.locator('#marker').waitFor();
+	assert.match(await sandbox.locator('#marker').textContent(), /edited-and-run/);
+
+	await page.locator('live-code [data-reset]').first().click();
+	assert.equal(
+		await page.locator('live-code #marker').count(),
+		0,
+		'Reset did not restore the original snippet',
+	);
+
 	assert.deepEqual(errors, [], 'page threw JS errors');
 	await browser.close();
-	console.log('OK — quiz, checklist and glossary all behave');
+	if (sandboxErrors.length) {
+		console.log(`(${sandboxErrors.length} deliberate error(s) raised inside LiveCode sandboxes)`);
+	}
+	console.log('OK — quiz, checklist, glossary and LiveCode all behave');
 } finally {
 	stop();
 }

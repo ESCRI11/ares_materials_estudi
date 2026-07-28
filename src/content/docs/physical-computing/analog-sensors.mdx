@@ -1,0 +1,207 @@
+---
+title: Analog sensors
+description: Reading a continuous value with machine.ADC, what a converter actually does, and turning a raw number into something useful.
+sidebar:
+  order: 7
+---
+
+import Quiz from '@components/Quiz.astro';
+
+A button has two states. Most of the world does not. How bright the room is, how far away
+someone is standing, how hard a surface is being pressed — these are quantities, not
+switches, and reading them is where sensors get interesting.
+
+## What an analog-to-digital converter does
+
+A **sensor** that measures a quantity gives you a voltage that slides smoothly between 0 V and
+the supply. The chip cannot hold a voltage; it holds numbers. The piece of hardware that
+bridges the two is the **analog-to-digital converter**, or **ADC**.
+
+Its job is a measurement: it compares the voltage on the pin against a fixed reference — the
+supply, 3.3 V on most of these boards — and reports a proportional number. Half the reference
+gives you half the range. That is all.
+
+Two consequences worth knowing before your first reading looks wrong:
+
+**Not every pin can do it.** The converter is wired to a few specific pins. On a Raspberry Pi
+Pico they are `GP26`, `GP27` and `GP28`. On another board they are somewhere else entirely,
+and using the wrong pin gives you an error or a constant zero. The pinout tells you which.
+
+**The resolution is finite.** The converter has a fixed number of steps — commonly 4096 of
+them, which is called 12-bit — so it cannot report a value between two adjacent steps. In
+MicroPython you do not see that number directly, because the language deliberately hides it.
+
+## Reading a value
+
+```python
+from machine import ADC, Pin
+
+knob = ADC(Pin(26))
+
+print(knob.read_u16())
+```
+
+`read_u16()` returns a whole number from **0 to 65535**, where 0 means 0 V and 65535 means the
+reference voltage. That range is the same on every board MicroPython runs on, whatever the
+underlying converter's real resolution is — a 12-bit converter's readings are scaled up to fit.
+This is deliberate: your code moves between boards unchanged.
+
+The side effect is that a 12-bit converter's values step in jumps of 16, so the last digits of
+the number are not real precision. Do not read meaning into them.
+
+## A potentiometer
+
+A **potentiometer** — everyone says *pot* — is a knob you turn, and it is the clearest possible
+demonstration because you can see the cause. Inside is a strip of resistive material with a
+contact, the **wiper**, sliding along it. It has three legs:
+
+| Leg | Connect to |
+|---|---|
+| one outer leg | `3V3` |
+| the other outer leg | `GND` |
+| the middle leg (wiper) | `GP26` |
+
+The two outer legs put the full supply voltage across the strip. The wiper picks off a voltage
+somewhere between the two ends, depending on where you turned it. Turn it fully one way and
+the pin sees 0 V; fully the other, 3.3 V; halfway, about 1.65 V. The ADC turns that into a
+number.
+
+Swapping the two outer legs reverses the direction the knob works in. That is a legitimate fix
+for a knob that feels backwards, and so is doing it in software.
+
+```python
+from machine import ADC, Pin
+import time
+
+knob = ADC(Pin(26))
+
+while True:
+    print(knob.read_u16())
+    time.sleep(0.2)
+```
+
+Press play in Wokwi, drag the knob, and watch the numbers move in the serial panel at the
+bottom. The next lesson explains that panel properly; for now it is where `print()` lands.
+
+## A light sensor
+
+A **photoresistor**, also called an **LDR** (light-dependent resistor), is a component whose
+resistance drops as light falls on it. On its own it produces a resistance, not a voltage, so
+it is paired with a fixed resistor to make the same kind of divider the potentiometer has
+inside it. Modules sold for this purpose have that resistor built in and give you an analog
+output pin directly — wire that pin to `GP26`, and power and ground to `3V3` and `GND`.
+
+In Wokwi, add a photoresistor part and you can change the light level while the simulation
+runs, which is the whole point of a simulator.
+
+Read it exactly the same way. That is the good news about analog input: every sensor of this
+type — light, temperature, pressure, bend, soil moisture — is the same three lines of code.
+What differs is what the number means.
+
+## Turning a raw reading into something useful
+
+`43821` is not a brightness. It is a measurement of a voltage that happens to correlate with
+one. Making it useful means rescaling it into a range you care about — 0 to 100, or 0 to 180
+degrees for a servo.
+
+Python has no built-in for this, so write one:
+
+```python
+def rescale(x, in_min, in_max, out_min, out_max):
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+```
+
+Then:
+
+```python
+percent = rescale(knob.read_u16(), 0, 65535, 0, 100)
+print(round(percent), "%")
+```
+
+Now the important part, and the reason this is not only arithmetic.
+
+**Calibrate against what the sensor actually does, not against the theory.** A potentiometer
+rarely reaches 0 or 65535 at its ends. A photoresistor in your room might swing between 8000
+in shadow and 30000 under a lamp — nowhere near the full range, so mapping from `0, 65535`
+gives you a value that barely moves.
+
+The fix is to measure the real limits and use those:
+
+```python
+DARK = 8000      # measured: the reading with the sensor covered
+BRIGHT = 30000   # measured: the reading under the light in this room
+
+level = rescale(reading, DARK, BRIGHT, 0, 100)
+```
+
+Print the raw values first, cover the sensor, hold it to a lamp, write down what you saw, and
+put those two numbers in. Every physical-computing project has a couple of constants like
+these, arrived at by looking. Leave them named and near the top of the file so they can be
+adjusted when the room changes — because the room will change.
+
+:::tip[Values that jitter]
+Real analog readings wobble by a few hundred even when nothing is happening. If a value is
+driving something visible, average the last few readings instead of using each one raw:
+
+```python
+history = []
+
+def smoothed(value):
+    history.append(value)
+    if len(history) > 10:
+        history.pop(0)
+    return sum(history) / len(history)
+```
+
+Slower to respond, far calmer to look at. Ten is a starting point, not a rule.
+:::
+
+## Confirm it works
+
+In a new Raspberry Pi Pico MicroPython project on [wokwi.com](https://wokwi.com):
+
+- [ ] I added a potentiometer, wired its outer legs to `3V3` and `GND` and its wiper to `GP26`
+- [ ] Printing `read_u16()` in a loop shows numbers that change as I turn the knob
+- [ ] I noted the reading at each extreme and they were not exactly 0 and 65535
+- [ ] I used `rescale()` to print 0 to 100 instead, using the values I actually measured
+- [ ] I wired the pot to a pin that has no ADC and saw what the failure looks like
+- [ ] I replaced the pot with a photoresistor and read that with the same three lines of code
+- [ ] I combined this with lesson 5: the LED blinks faster when the knob is turned up
+
+<Quiz
+	questions={[
+		{
+			q: 'What does read_u16() return?',
+			options: [
+				'The voltage on the pin, in volts',
+				'A number from 0 to 65535, proportional to the voltage between 0 V and the reference',
+				'A number whose range depends on the converter in your particular chip',
+			],
+			answer: 1,
+			explanation:
+				'MicroPython normalises every ADC to the same 0–65535 range so your code moves between boards unchanged. A 12-bit converter underneath gets scaled up, which is why its readings step in jumps of 16 rather than by 1.',
+		},
+		{
+			q: 'Your photoresistor reads between 8000 and 30000 in the room you are working in, but you map from 0 to 65535. What goes wrong?',
+			options: [
+				'Nothing — the mapping is mathematically correct',
+				'The output only uses a small part of its range, so the result barely changes',
+				'The ADC reports an error',
+			],
+			answer: 1,
+			explanation:
+				'The arithmetic is right and the result is useless: an input that only spans 12 to 46 percent of the assumed range produces an output that only spans 12 to 46 percent of yours. Measure the real limits and map from those.',
+		},
+		{
+			q: 'You wire a potentiometer to a pin that is not connected to the ADC. What should you expect?',
+			options: [
+				'It works, but with lower resolution',
+				'An error or a meaningless constant reading — only certain pins reach the converter',
+				'The board reads it as a digital input instead',
+			],
+			answer: 1,
+			explanation:
+				'The analog-to-digital converter is wired to a few specific pins and no others. Which ones is a fact about your particular board, published in its pinout, and worth checking rather than guessing.',
+		},
+	]}
+/>

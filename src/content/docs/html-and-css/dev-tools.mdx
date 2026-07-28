@@ -1,0 +1,188 @@
+---
+title: The browser dev tools
+description: The inspector, live CSS editing and the console — how to read any page on the web and debug your own without guessing.
+sidebar:
+  order: 7
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+Every browser ships with a full set of inspection tools, switched off by default. They let you
+open any page ever made, see exactly how it is built, change it in front of you, and watch the
+result immediately.
+
+For a designer this is the most valuable thing in this section. Every site you admire is now
+readable: the type scale, the exact greys, the spacing system, the breakpoints. Whatever
+someone did, you can look at how, on a page you had nothing to do with.
+
+## Opening them
+
+Two ways, both worth having in your hands:
+
+- **Right-click anything on a page → Inspect** (or *Inspect Element*). This opens the tools
+  with that element already selected, which is almost always what you want.
+- **Keyboard**: `Cmd+Option+I` on macOS, `Ctrl+Shift+I` or `F12` on Windows and Linux.
+
+Safari hides all of this until you enable it: **Settings → Advanced → show the develop or
+web-developer features**, then the same right-click works.
+
+A panel opens along the bottom or the side of the window, split into tabs. There are a dozen;
+you need three. The drag handle between the panel and the page resizes it, and there is a
+setting to move it to the right-hand side, which most people prefer on a wide screen.
+
+## The elements tree
+
+The first tab is called **Elements** in Chrome, Edge and Safari, and **Inspector** in Firefox.
+It shows the HTML of the page as a tree you can fold and unfold — the nesting from the
+[elements lesson](/ares_materials_estudi/html-and-css/html-elements/), made navigable.
+
+Three things to do here immediately:
+
+- **Hover a line in the tree** and the corresponding element highlights on the page, with its
+  padding and margin shaded in different colours. This is the fastest way to answer "which box
+  is that, actually".
+- **Click the arrow-in-a-box icon** at the top-left of the panel, then point at anything on
+  the page. The tree jumps to that element. Same as right-click → Inspect, but you can sweep
+  across a page with it.
+- **Double-click any text or attribute** in the tree to edit it. The page updates as you type.
+
+What you are looking at is not quite your file. It is the browser's live model of the page
+after it has fixed your typos, filled in anything you left out, and applied any changes made
+since load. Usually identical to your HTML; occasionally the explanation for something
+strange.
+
+## The styles pane
+
+Beside the tree is the panel that changes how you work: every CSS rule that applies to the
+selected element, listed in the order the browser resolved them.
+
+- The **winning declarations** are shown plainly, with the file and line number they came from
+  on the right.
+- **Overridden declarations are struck through.** This is the
+  [cascade](/ares_materials_estudi/html-and-css/css-selectors/) drawn for you: your rule is
+  there, it matched, and something more specific beat it. No more guessing why a colour will
+  not change.
+- **Click any value and type a new one.** Arrow keys nudge numbers up and down — hold `Shift`
+  for steps of ten. This is how you find a spacing value: nudge until it looks right, then
+  copy the number into your file.
+- **Every checkbox next to a declaration** switches it off. Excellent for finding out which
+  line is responsible for something.
+- **`element.style` at the top** is an empty box for the selected element. Type new
+  declarations into it to try something the page does not have yet.
+- **Colour swatches open a picker**, with an eyedropper for sampling anything on screen and,
+  for text, the contrast ratio against its background — the accessibility check you would
+  otherwise do by exporting screenshots.
+
+Scroll to the bottom of that pane for the **box model diagram**: content, padding, border and
+margin as four nested rectangles with the real measured numbers in them. Hovering each ring
+highlights that layer on the page. When a gap is the wrong size and you cannot tell whether it
+is padding or margin, this answers it in one look.
+
+Two more buttons in that pane earn their place: **`:hov`** forces a state, so you can inspect
+a hover or focus style without keeping the mouse still, and **Computed** lists the final value
+of every property after everything has been resolved.
+
+## Nothing you do here is saved
+
+Every change you make in the dev tools lives in memory. Reload the page and it is gone.
+
+That is a feature, not a limitation. You can take any site apart with no consequences and no
+way to break anything for anyone. But it does mean the loop is: **experiment in the browser,
+then write the result into your file.** People lose an afternoon's tweaking to a reload once,
+and only once.
+
+## Responsive mode
+
+There is a device-toolbar button — a small phone-and-tablet icon — that renders the page in a
+resizable frame with its width shown in pixels as you drag. Use it to find where your layout
+stops working, then set your breakpoint there. It also lets you type an exact width, which
+makes checking a breakpoint far less fiddly than dragging the whole window.
+
+## The console
+
+The last tab you need is **Console**, and it has two jobs.
+
+**It reports errors.** When something on a page does not work, the explanation is nearly
+always sitting here in red, with the file and line number. Getting into the habit of opening
+the console the moment something misbehaves will save you more time than any other habit in
+this section. A missing image, a stylesheet that failed to load, and every JavaScript error
+show up here.
+
+**It is a place to type.** The console runs JavaScript against the current page. That is the
+next section's subject, but you can see the idea now: type `2 + 2` and press Enter and it
+answers `4`. Type `document.body.style.background = 'crimson'` and the page turns red until
+you reload.
+
+## Try it
+
+Below is a page with a bug you would struggle to find by reading. The heading is supposed to
+be teal and it is not. Right-click the heading **inside the result panel**, choose Inspect,
+find the rule that is struck through, and see what is beating it.
+
+<LiveCode
+	title="Find the bug with the inspector"
+	height={300}
+	code={`<style>
+  body { font-family: Helvetica, Arial, sans-serif; margin: 1.5rem; }
+  h1 { color: teal; }
+  .headline { color: #999; }
+</style>
+
+<h1 class="headline">Why am I grey?</h1>
+<p>Inspect the heading and read the styles pane.</p>`}
+/>
+
+The class rule wins on specificity, exactly as in the selectors lesson — but here you did not
+have to know that in advance. The browser showed you.
+
+## Check yourself
+
+Do these on a real website, not on this one. Pick any site with a layout you like.
+
+- [ ] I opened the dev tools with a right-click and with the keyboard shortcut
+- [ ] I selected a heading and read its `font-family`, `font-size` and `color` from the styles pane
+- [ ] I changed a colour live on a site I do not own, then reloaded and watched it revert
+- [ ] I found a struck-through declaration and worked out which rule was overriding it
+- [ ] I read the box model diagram to tell padding from margin on a real element
+- [ ] I switched on the device toolbar and found a width where the layout changes
+- [ ] I opened the Console tab and looked at what a busy site logs there
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'In the styles pane, a declaration appears with a line through it. What does that mean?',
+			options: [
+				'It contains a syntax error',
+				'It matched the element but was overridden by a more specific or later rule',
+				'It is disabled because the file failed to load',
+			],
+			answer: 1,
+			explanation:
+				'A struck-through declaration is the cascade being shown to you: the rule applied, then lost. Scroll up in the pane to find the rule that beat it. This turns "why is my colour ignored" from guesswork into reading.',
+		},
+		{
+			q: 'You spend twenty minutes perfecting spacing by editing values in the dev tools. Then you reload the page. What happens?',
+			options: [
+				'The changes are saved to your CSS file',
+				'The changes are lost — dev tools edits live in memory only',
+				'The browser asks whether to keep them',
+			],
+			answer: 1,
+			explanation:
+				'Dev tools edit the browser\'s in-memory copy of the page, which is what makes them safe to use on any site. Treat the panel as a sketchpad: find the number there, then type it into your stylesheet.',
+		},
+		{
+			q: 'A page you built shows a blank space where an image should be. Where do you look first?',
+			options: [
+				'The Console tab, for a failed request or an error',
+				'The Elements tree, to add the image again',
+				'The device toolbar, to check the width',
+			],
+			answer: 0,
+			explanation:
+				'The console reports files that failed to load and every script error, with the file and line. A misspelt filename or a wrong folder shows up there in one line, which is faster than re-reading your HTML.',
+		},
+	]}
+/>

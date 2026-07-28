@@ -1,0 +1,222 @@
+---
+title: Buttons and digital input
+description: Reading a pin, why an unconnected input is nonsense, pull-up and pull-down resistors, and why one press registers as five.
+sidebar:
+  order: 6
+---
+
+import Quiz from '@components/Quiz.astro';
+
+Output was the easy direction. A pin set to `OUT` does what you tell it. Input is where the
+physical world starts arguing with you, and a push button — two pieces of metal that touch —
+is the simplest possible argument.
+
+## Reading a pin
+
+Configure the pin as an input and ask it for its value:
+
+```python
+from machine import Pin
+
+button = Pin(14, Pin.IN)
+
+print(button.value())
+```
+
+`value()` returns `1` if the pin is at the board's operating voltage and `0` if it is at
+ground. No middle. The chip decides by comparing against a threshold, and it will pick one of
+the two answers regardless of what is actually there.
+
+Which brings us to the problem.
+
+## A pin connected to nothing reads nonsense
+
+Wire one leg of a button to `GP14` and the other to `GND`. Press it, and the pin is connected
+to ground: it reads `0`. Correct so far. Release it, and the pin is connected to… nothing. Not
+to the supply — the button was the only thing attached to it. Only a short piece of wire
+sticking into the air.
+
+A pin in that state is **floating**. It has no defined voltage, it picks up interference from
+everything around it including your hand, and it reports `1` and `0` more or less at random.
+Your program sees dozens of phantom presses a second.
+
+The pin is not broken and neither is your button. The circuit is genuinely incomplete: you
+told the pin what "pressed" looks like and never told it what "not pressed" looks like.
+
+## Pull-up and pull-down
+
+The fix is a resistor that gently holds the pin at a known voltage whenever nothing else is
+driving it.
+
+A **pull-up resistor** connects the pin to the supply. With the button open, the pin is tied
+to 3.3 V through the resistor and reads `1`. Press the button and the pin is connected
+*directly* to ground, which wins — a direct wire beats a path through a resistor — so it reads
+`0`. The resistor is large enough (tens of kilohms is typical) that the small current wasted
+through it while the button is held does not matter.
+
+A **pull-down resistor** is the mirror image: it connects the pin to ground, so the pin idles
+at `0`, and the button connects it to the supply to make it read `1`.
+
+Both are correct. The consequence to keep in your head:
+
+- With a **pull-up**, released reads `1` and **pressed reads `0`**.
+- With a **pull-down**, released reads `0` and pressed reads `1`.
+
+Pull-up is the more common wiring, so the inverted logic — pressed means zero — is what you
+will meet most often, and it confuses everyone once.
+
+## You do not need the resistor
+
+Microcontrollers have pull-up resistors built into the chip, one per pin, switched off by
+default. Turning one on is an argument:
+
+```python
+button = Pin(14, Pin.IN, Pin.PULL_UP)
+```
+
+Now the pin idles at `1` with no components involved, and the only thing to wire is the
+button, from `GP14` to `GND`. Some chips also offer `Pin.PULL_DOWN`; check whether yours
+does before relying on it.
+
+This is the normal way to read a button, and the reason the exercise below has so little
+wiring in it.
+
+## Polling
+
+Reading an input means asking, over and over, in the main loop. There is no event listener
+here — no `addEventListener`, nothing that calls your function when something happens. You
+ask; that is called **polling**.
+
+```python
+from machine import Pin
+import time
+
+button = Pin(14, Pin.IN, Pin.PULL_UP)
+led = Pin(15, Pin.OUT)
+
+while True:
+    if button.value() == 0:      # pull-up: 0 means pressed
+        led.on()
+    else:
+        led.off()
+    time.sleep_ms(10)
+```
+
+The LED follows the button. The short sleep is not required, but it keeps the loop from
+spinning at full speed for no benefit.
+
+Now try to make the button *toggle* the LED instead — on with one press, off with the next —
+and the trouble starts.
+
+## Why one press counts as five
+
+Change the body to `led.toggle()` while the button is held and the LED strobes, because the
+loop runs hundreds of times per press. The fix for that is to act on the **change** rather
+than the state:
+
+```python
+previous = 1
+while True:
+    current = button.value()
+    if current != previous:
+        if current == 0:
+            led.toggle()
+        previous = current
+    time.sleep_ms(10)
+```
+
+Better, and still not right. Run it and one press will sometimes toggle the LED twice, or
+three times, apparently at random.
+
+The cause is mechanical. The two contacts inside a button do not meet cleanly — they touch,
+bounce apart, touch again, several times over a few milliseconds, exactly like a dropped coin
+settling. This is called **bounce**. Your eye cannot see it. A chip checking the pin every few
+microseconds sees every single one of those touches as a separate press.
+
+**Debouncing** is ignoring the extra ones. The cheapest method that works: after accepting a
+change, refuse to accept another for a few tens of milliseconds. No human presses a button
+twice in 30 ms, so nothing real is lost.
+
+```python
+from machine import Pin
+import time
+
+button = Pin(14, Pin.IN, Pin.PULL_UP)
+led = Pin(15, Pin.OUT)
+
+DEBOUNCE_MS = 30        # raise this if a press still registers twice
+
+previous = 1
+last_change = time.ticks_ms()
+
+while True:
+    current = button.value()
+    if current != previous and time.ticks_diff(time.ticks_ms(), last_change) > DEBOUNCE_MS:
+        previous = current
+        last_change = time.ticks_ms()
+        if current == 0:
+            led.toggle()
+            print("pressed")
+    time.sleep_ms(1)
+```
+
+`time.ticks_ms()` is a millisecond counter that starts when the board does, and
+`time.ticks_diff(a, b)` subtracts two of them safely — the counter eventually wraps back to
+zero, and plain subtraction would give a nonsense answer at that moment. Use `ticks_diff`
+rather than `a - b` and the problem never appears.
+
+`DEBOUNCE_MS` is left as a named value on purpose. Thirty milliseconds suits most buttons;
+a tired switch or a long wire may need more. It is a knob, not a constant of nature.
+
+:::note[The simulator is too clean]
+Wokwi's button does not bounce, so the naive version will look correct there and misbehave on
+the real hardware in class. Write the debounced version anyway. This is the general shape of
+physical computing: the model is tidy and the world is not.
+:::
+
+## Confirm it works
+
+In a new Raspberry Pi Pico MicroPython project on [wokwi.com](https://wokwi.com), add a
+**pushbutton** and wire one side to `GP14` and the other to `GND`. Keep the LED and resistor
+from the last lesson on `GP15`.
+
+- [ ] With `Pin(14, Pin.IN, Pin.PULL_UP)` and the polling program, the LED follows the button
+- [ ] I printed `button.value()` in the loop and watched it read 1 released, 0 pressed
+- [ ] I removed `Pin.PULL_UP` and saw the readings stop making sense
+- [ ] The toggle version turns the LED on with one press and off with the next
+- [ ] I raised `DEBOUNCE_MS` to 500 and confirmed fast repeated presses are now ignored
+- [ ] I can say out loud why a pull-up makes a pressed button read 0
+
+<Quiz
+	questions={[
+		{
+			q: 'With an internal pull-up enabled and a button wired between the pin and GND, what does button.value() return while the button is held down?',
+			options: ['1', '0', 'It alternates'],
+			answer: 1,
+			explanation:
+				'The pull-up holds the pin at the supply voltage — reading 1 — whenever nothing else drives it. Pressing connects the pin directly to ground, and a direct connection beats a path through a resistor, so it reads 0. Pressed means zero.',
+		},
+		{
+			q: 'An input pin with a button to GND and no pull-up reads randomly when the button is released. Why?',
+			options: [
+				'The button is faulty',
+				'The pin is floating — nothing defines its voltage when the button is open, so it picks up interference',
+				'The pin needs to be configured as an output first',
+			],
+			answer: 1,
+			explanation:
+				'You defined what pressed looks like and left released undefined. A floating pin has no fixed voltage and reports whatever electrical noise reaches it. A pull-up or pull-down gives the idle state a definite value.',
+		},
+		{
+			q: 'What is bounce?',
+			options: [
+				'The program checking the pin too often',
+				'The metal contacts inside the switch physically touching and separating several times over a few milliseconds',
+				'Interference from the LED on the same board',
+			],
+			answer: 1,
+			explanation:
+				'It is a mechanical fact about switches, not a software bug. The chip is fast enough to see each contact as a separate press, so the software has to ignore further changes for a few tens of milliseconds after accepting one.',
+		},
+	]}
+/>

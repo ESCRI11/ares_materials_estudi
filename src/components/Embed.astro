@@ -1,0 +1,40 @@
+---
+/**
+ * An external interactive tool, framed and captioned: a Wokwi circuit, a p5.js
+ * sketch, a Fusion 360 viewer. Only pass a URL you have actually opened — a
+ * broken iframe is worse than a link.
+ */
+interface Props {
+	src: string;
+	title: string;
+	height?: number;
+	/** Where "open in a new tab" should go, if it differs from the embed URL. */
+	href?: string;
+}
+
+const { src, title, height = 420, href = src } = Astro.props;
+---
+
+<figure class="embed">
+	<iframe {src} {title} {height} loading="lazy" allow="fullscreen"></iframe>
+	<figcaption>
+		<a {href} target="_blank" rel="noopener">Open “{title}” in a new tab →</a>
+	</figcaption>
+</figure>
+
+<style>
+	.embed {
+		margin: 2rem 0;
+	}
+
+	.embed iframe {
+		width: 100%;
+		border: 1px solid var(--sl-color-gray-5);
+		background: #fff;
+	}
+
+	.embed figcaption {
+		margin-top: 0.5rem;
+		font-size: var(--sl-text-sm);
+	}
+</style>

@@ -1,0 +1,139 @@
+---
+title: VS Code
+description: Installing the editor the coding courses use, and learning its four panels before you write a line of code.
+sidebar:
+  order: 5
+---
+
+import Quiz from '@components/Quiz.astro';
+
+**Visual Studio Code** — everyone says *VS Code* — is a **code editor**: an application for
+writing and editing plain text. It is named explicitly in the Creative Coding Foundations
+course, it is free, and it behaves the same on macOS and Windows.
+
+**Plain text** means characters and nothing else — no fonts, no bold, no page size. Code
+has to be plain text, which is why a word processor is the wrong tool: Word and Pages
+quietly replace your straight quotes with curly ones and your hyphens with dashes, and code
+written with curly quotes does not run. A code editor never touches what you typed.
+
+This lesson installs it and gets you comfortable with the window. No code yet.
+
+## Install it
+
+Download from [code.visualstudio.com](https://code.visualstudio.com) — the site detects
+your system and offers the right build. On macOS you get a `.zip`; unzip it and drag
+*Visual Studio Code* into your Applications folder, which is the step people forget.
+
+Or, now that you have a package manager, do it in one line:
+
+```sh
+brew install --cask visual-studio-code
+```
+
+```powershell
+winget install --id Microsoft.VisualStudioCode -e
+```
+
+Open it. You get a Welcome tab and possibly a colour theme picker; pick whichever you like
+and ignore the rest of that tab.
+
+## Open a folder, not a file
+
+This is the one habit to take from this lesson.
+
+VS Code is built around an open **folder**, which it calls your workspace or project.
+Almost everything useful is scoped to that folder: the file tree, search across every file,
+the built-in terminal, and later on git. Open a single file instead and you have an
+expensive notepad.
+
+Use **File → Open Folder** and choose the `ind-prep` folder you made in the moving-around
+lesson.
+
+You may see a dialog asking whether you **trust the authors of the files in this folder**.
+It is a real safety feature — code in a folder can run when you open it. For folders you
+created yourself, choose the trusting option. For a folder downloaded from a stranger,
+do not.
+
+## The four things you need
+
+Down the left edge is a strip of icons. Four of them matter now.
+
+**Explorer** — the top icon, or Cmd+Shift+E on macOS, Ctrl+Shift+E on Windows. This is the
+file tree of the open folder. Hovering over the folder name gives you icons for *new file*
+and *new folder*. When you create a file here you type its whole name including the
+extension: `index.html`, not `index`.
+
+**Search** — Cmd+Shift+F or Ctrl+Shift+F. Searches every file in the folder at once. The
+day you cannot remember where you wrote something, this is the answer.
+
+**Extensions** — Cmd+Shift+X or Ctrl+Shift+X. An **extension** is an add-on that teaches
+the editor something new: a language, a formatter, a preview pane. Resist installing a pile
+of them today. Each section of this site names the ones it actually needs, and an editor
+full of unexplained extensions is harder to learn in, not easier.
+
+**The integrated terminal** — View → Terminal, or Ctrl and the backtick key (the one above
+Tab, to the left of the 1). A terminal opens in the bottom half of the window, and here is
+the payoff: it starts **already inside the folder you have open**. Try it:
+
+```sh
+pwd
+```
+
+It prints the path to `ind-prep` without you having typed a single `cd`. From now on this
+is where you will run commands, with your files visible above them.
+
+## The command palette
+
+Press Cmd+Shift+P on macOS or Ctrl+Shift+P on Windows and a text box drops from the top.
+Every command in VS Code is in there, searchable by name — faster than reading menus, and
+the way documentation will tell you to do things.
+
+Two worth knowing now:
+
+- Type `terminal` to find *View: Toggle Terminal*.
+- On macOS only, type `shell command` and run **Shell Command: Install 'code' command in
+  PATH**. That lets you type `code .` in any terminal to open the current folder in the
+  editor — remember that `.` means "the folder I am in". On Windows the installer sets this
+  up for you.
+
+## One setting to change
+
+**File → Auto Save.** Tick it. Otherwise you will eventually spend twenty minutes debugging
+a file you forgot to save, which is a rite of passage worth skipping.
+
+## Check yourself
+
+- [ ] VS Code is installed and opens
+- [ ] I opened the `ind-prep` **folder** with File → Open Folder, not a single file
+- [ ] I can see the file tree in the Explorer panel
+- [ ] I created a file called `notes.md` from the Explorer and typed a sentence in it
+- [ ] I opened the integrated terminal and `pwd` printed the path to `ind-prep`
+- [ ] I found the Extensions panel without installing anything
+- [ ] I opened the command palette and turned Auto Save on
+
+<Quiz
+	questions={[
+		{
+			q: 'Why does VS Code want you to open a folder rather than a single file?',
+			options: [
+				'Single files cannot be edited in VS Code',
+				'The file tree, search across files, the built-in terminal and git support are all scoped to the open folder',
+				'It makes the editor start faster',
+			],
+			answer: 1,
+			explanation:
+				'You can open a lone file, and sometimes that is what you want. But the features that make the editor worth using need a project to work on, and a terminal that starts in the right folder saves a cd every single time.',
+		},
+		{
+			q: 'You have the ind-prep folder open and you run pwd in the integrated terminal. What does it print?',
+			options: [
+				'Your home folder, as a plain terminal would',
+				'The path to ind-prep — the terminal starts in the open folder',
+				'Nothing, since the integrated terminal has no working directory',
+			],
+			answer: 1,
+			explanation:
+				'The integrated terminal opens with the workspace folder as its working directory. That is most of the reason to run commands from inside the editor: no navigating before you can do anything.',
+		},
+	]}
+/>

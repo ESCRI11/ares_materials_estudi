@@ -1,0 +1,257 @@
+---
+title: Making decisions
+description: if, else if and else. Comparing values, why === and not ==, and combining conditions with and and or.
+sidebar:
+  order: 3
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+So far your programs have run every line, top to bottom, every time. A **conditional** is how
+a program takes one path or another: run this block of code, but only if something is true.
+
+Dark text on a light background, light text on a dark one. Show the error message only when
+there is an error. Turn the fan on above 30 degrees. All the same shape.
+
+## if
+
+<LiveCode
+	title="One decision"
+	height={140}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const brightness = 20;
+
+  if (brightness < 50) {
+    console.log("use light text");
+  }
+
+  console.log("done");
+</script>`}
+/>
+
+Three parts:
+
+- `if` — the keyword.
+- `(brightness < 50)` — the **condition**, in round brackets. It is an expression that produces
+  `true` or `false`, the boolean type from the last lesson.
+- `{ … }` — the **block**, in curly brackets. Everything inside runs only when the condition is
+  `true`. Skipped entirely when it is `false`.
+
+Change `brightness` to `80` and press Run: the first message disappears and `done` still
+prints, because that line is outside the block.
+
+The indentation inside the block is for you, not for JavaScript — the curly brackets are what
+mark the boundary. Indent anyway. Code where the shape on screen matches the logic is code you
+can read in six months.
+
+## else and else if
+
+`else` catches everything the `if` did not.
+
+<LiveCode
+	title="Two paths"
+	height={160}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const brightness = 80;
+
+  if (brightness < 50) {
+    console.log("use light text");
+  } else {
+    console.log("use dark text");
+  }
+</script>`}
+/>
+
+Exactly one of those two blocks runs. Never both, never neither.
+
+For more than two outcomes, chain with `else if`. JavaScript tries each condition in order,
+runs the **first** one that is true, and ignores the rest.
+
+<LiveCode
+	title="A chain"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const width = 700;
+
+  if (width < 600) {
+    console.log("phone");
+  } else if (width < 1000) {
+    console.log("tablet");
+  } else {
+    console.log("desktop");
+  }
+</script>`}
+/>
+
+Order matters, and it is where the bugs live. If you put `width < 1000` first, a 400-pixel
+screen would be called a tablet — it satisfies that condition too, and the chain stops at the
+first match. Write the narrowest condition first.
+
+## Comparing values
+
+The condition is nearly always a comparison. There are six you need:
+
+- `===` — is exactly the same as
+- `!==` — is not the same as
+- `>` — greater than
+- `<` — less than
+- `>=` — greater than or equal to
+- `<=` — less than or equal to
+
+Each of these produces a boolean, which you can print like any other value.
+
+<LiveCode
+	title="Comparisons are values"
+	height={160}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  console.log(16 > 12);
+  console.log(16 === 16);
+  console.log("Ana" === "ana");
+  console.log("Ana" !== "ana");
+</script>`}
+/>
+
+Strings compare character by character, capitals included — `"Ana"` and `"ana"` are not the
+same string.
+
+## Three equals signs, not one, not two
+
+This trips up everyone, so learn it once, now:
+
+- `=` **assigns**. `size = 16` puts 16 into `size`. It is an instruction, not a question.
+- `===` **compares**. `size === 16` asks whether they are the same and answers `true` or
+  `false`.
+- `==` also compares, but it converts the types first, so `"16" == 16` is `true`.
+
+That last one sounds convenient and is not. `==` follows a set of conversion rules nobody
+remembers correctly, and it hides exactly the bug you most want to see — a number that is
+secretly a string. **Always write `===` and `!==`.** If two things really should count as
+equal despite being different types, convert one of them yourself, on purpose, where the next
+reader can see it.
+
+<LiveCode
+	title="The difference"
+	height={140}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  console.log("16" == 16);
+  console.log("16" === 16);
+</script>`}
+/>
+
+## Truthiness, briefly
+
+`if` will accept any value, not only a boolean, and decide whether it counts as true. Almost
+everything counts as true. The short list that does not — the **falsy** values — is:
+
+`false`, `0`, `""` (an empty string), `null`, `undefined`, and `NaN` (the result of failed
+arithmetic, "not a number").
+
+So `if (name)` reads as "if `name` has something in it", which is handy for checking that a
+field was filled in. It is also the cause of the odd bug where a perfectly valid `0` is
+treated as missing. Use it for "is there anything here", and use a real comparison for
+everything else.
+
+## Combining conditions
+
+- `&&` means **and** — true only when both sides are true.
+- `||` means **or** — true when either side is true.
+- `!` means **not** — it flips a boolean over.
+
+<LiveCode
+	title="And, or, not"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const age = 24;
+  const consented = true;
+
+  if (age >= 18 && consented) {
+    console.log("include this response");
+  }
+
+  if (!consented) {
+    console.log("this one is excluded");
+  }
+</script>`}
+/>
+
+Note `consented` on its own inside the condition. It is already a boolean, so comparing it to
+`true` would add nothing: `consented === true` and `consented` mean the same thing, and the
+shorter one reads better. `!consented` is how you say "if they did not consent".
+
+A common mistake is writing what you would say in English: `if (size === 16 || 24)`. That is
+not what it means — JavaScript reads it as "`size === 16`, or else the number 24", and 24 is
+truthy, so the whole thing is always true. Each side of `||` needs to be a full comparison:
+`if (size === 16 || size === 24)`.
+
+## Evaluation
+
+Change the snippet so that a `contrast` below 4.5 prints `fails`, between 4.5 and 7 prints
+`ok for large text`, and 7 or above prints `passes`. Test all three by changing the number.
+
+<LiveCode
+	title="Three outcomes"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const contrast = 5.2;
+
+  if (contrast < 4.5) {
+    console.log("fails");
+  } else {
+    console.log("passes");
+  }
+</script>`}
+/>
+
+<Quiz
+	questions={[
+		{
+			q: 'const size = 20; if (size < 16) { console.log("small"); } else if (size < 24) { console.log("medium"); } else { console.log("large"); } — what is printed?',
+			options: ['small', 'medium', 'medium and large'],
+			answer: 1,
+			explanation:
+				'20 is not below 16, so the first block is skipped. It is below 24, so the second block runs — and a chain stops at the first condition that is true, so the else is never reached. At most one block in a chain ever runs.',
+		},
+		{
+			q: 'What does console.log("5" === 5) print?',
+			options: ['true', 'false', 'An error'],
+			answer: 1,
+			explanation:
+				'=== compares the type as well as the contents. "5" is a string and 5 is a number, so they are not the same value. == would have said true by converting one to the other first, which is exactly the sort of silent conversion you want to avoid.',
+		},
+		{
+			q: 'A response should be counted only when the person is 18 or over AND ticked the consent box. Which condition says that?',
+			options: [
+				'if (age >= 18 || consented)',
+				'if (age >= 18 && consented)',
+				'if (age >= 18 && consented === "true")',
+			],
+			answer: 1,
+			explanation:
+				'&& is and: both sides must be true. || is or, which would let through anyone over 18 who refused consent. The third option compares a boolean against the string "true", which is a different value and never matches.',
+		},
+	]}
+/>
+
+Next: [repeating work](/ares_materials_estudi/javascript/loops/).

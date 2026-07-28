@@ -1,0 +1,154 @@
+---
+title: The terminal
+description: What a terminal is, why it still exists, and how to open one and type your first command.
+sidebar:
+  order: 2
+---
+
+The terminal has a reputation it does not deserve. Films use it as shorthand for hacking;
+tutorials show a wall of black text with no explanation of where any of it came from. What
+it actually is: a window where you type instructions instead of clicking them.
+
+That is the whole idea. Everything else is vocabulary.
+
+## Why it still exists
+
+A button cannot be written down. You cannot paste it into a message to a classmate, put it
+in a bug report, or ask a machine to press it four hundred times tonight while you sleep.
+
+A command is text. It can be copied, shared, saved in a file, run again a year later, and
+read by someone who wants to know exactly what you did. That is why every lesson on this
+site can hand you a command that works, and why no lesson can hand you a click.
+
+There is a second, blunter reason: most of the tools you are about to meet — the thing that
+installs software, the thing that records versions of your work, the thing that puts an
+Arduino program onto a board — were built by people who live in a terminal, and never grew
+a window at all.
+
+## Terminal, shell, command line
+
+Three words for things that sit inside each other:
+
+- The **terminal** is the window — the application with the blinking cursor.
+- The **shell** is the program running inside that window. It reads what you type, works
+  out what you meant, and runs it. On macOS the shell is **zsh**; on Windows it is
+  **PowerShell**.
+- The **command line** is what you are doing: driving the computer by typing lines of text.
+  You will also hear **console** and **CLI** (command-line interface).
+
+Nobody will mind if you use the wrong one of these in conversation.
+
+## Opening one
+
+**macOS.** Press Cmd+Space to open Spotlight, type `terminal`, press Enter. It also lives
+in Applications → Utilities → Terminal — drag it to your Dock now, because you will open
+it most days from here on.
+
+**Windows.** Click Start and type `terminal`. On Windows 11 that opens Windows Terminal;
+on Windows 10 you may only find *Windows PowerShell*, which is fine — the commands in
+these lessons work in both. Right-clicking the Start button gives you the same entry
+without typing.
+
+## The prompt
+
+Before you type anything, the shell has already written a line. It looks roughly like this
+on macOS:
+
+```
+ares@MacBook-Air ~ %
+```
+
+and roughly like this on Windows:
+
+```
+PS C:\Users\ares>
+```
+
+This is the **prompt**, and it is telling you four things: who you are, which machine you
+are on, which folder you are currently standing in (`~` is your home folder), and — by
+ending with `%` or `>` and a cursor — that it is waiting for you.
+
+:::note[The dollar sign in tutorials]
+Documentation everywhere writes commands like `$ whoami`. The `$` stands for "here is a
+prompt", meaning "type the rest of this line". Never type the `$` itself. The code blocks
+on this site leave it out, so you can copy them whole.
+:::
+
+## Your first command
+
+Type this and press Enter:
+
+```sh
+whoami
+```
+
+It prints your username. Now try:
+
+```sh
+date
+```
+
+Nothing about that was dangerous, and both work identically on macOS and Windows. You have
+now used a terminal, which was the only real hurdle.
+
+## How a command is put together
+
+```sh
+ls -l Documents
+```
+
+Three parts, separated by spaces:
+
+- `ls` is the **command** — the verb, the thing to do.
+- `-l` is a **flag** (also called an option): a switch that changes how the command
+  behaves. Flags start with a dash.
+- `Documents` is an **argument**: what the command should act on.
+
+This shape almost never changes, whatever tool you are using. Once you can see the verb,
+the switches and the target in a line of text, most commands stop looking like noise.
+
+## Silence means it worked
+
+The strangest convention for a newcomer: a command that succeeds usually prints nothing at
+all. You press Enter, a new prompt appears, and that is the applause. Output is reserved
+for things you asked to see and for problems.
+
+Errors, by contrast, are loud and literal:
+
+```
+zsh: command not found: gti
+```
+
+That is the shell saying it has no idea what `gti` is — in this case because the word is
+`git` and the letters were transposed. Read error messages slowly. They are terse, but
+they are almost never cryptic.
+
+## What you can and cannot break
+
+Nothing you type in these lessons can damage your machine. Two things are worth knowing
+anyway:
+
+- **`sudo`** at the start of a command means "run this with administrator powers". It asks
+  for your password, and as you type it **nothing appears** — no dots, no stars. The
+  terminal has not frozen; that is deliberate. Type it and press Enter.
+- **Never paste a command you do not understand** from a forum, a chat window or an AI
+  answer. This is the one genuine risk. A command has the same power over your files that
+  you do.
+
+## Keys that make it bearable
+
+- **Up arrow** brings back the previous command, and again for the one before it. You will
+  use this constantly.
+- **Ctrl+C** stops whatever is currently running. Your escape hatch.
+- **`clear`** wipes the window when the scrollback gets messy. Nothing is lost.
+- **Copy and paste**: Cmd+C / Cmd+V on macOS. In Windows Terminal, Ctrl+C copies when text
+  is selected and otherwise means "stop" — right-click also pastes.
+
+## Check yourself
+
+- [ ] I have a terminal open, and on macOS I have pinned it to the Dock
+- [ ] I ran `whoami` and it printed my username
+- [ ] I ran `date` and got today's date
+- [ ] I can point at the prompt and say which folder it says I am in
+- [ ] I typed a deliberate nonsense word, pressed Enter, and read the error instead of panicking
+- [ ] I brought a previous command back with the Up arrow

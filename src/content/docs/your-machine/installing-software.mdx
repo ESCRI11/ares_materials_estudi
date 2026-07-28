@@ -1,0 +1,192 @@
+---
+title: Installing software from the terminal
+description: What a package manager is, why it beats hunting for installers, and setting up Homebrew or winget for real.
+sidebar:
+  order: 4
+---
+
+import Quiz from '@components/Quiz.astro';
+
+You know one way to install software: find the website, download the installer, drag it to
+Applications or click Next four times. It works. For the tools this master needs, it stops
+working, for four reasons.
+
+- **You have to find the right website.** Search for a developer tool and the top results
+  are often mirrors, ad-funded download portals and outright fakes. This is a genuine and
+  common route for malware.
+- **Nothing tells you when it is out of date.** Twenty tools mean twenty update habits you
+  will not keep.
+- **Many of these tools have no installer.** They are not applications with a window; they
+  are commands, and there is nothing to drag anywhere.
+- **You cannot write it down.** "Download these six things" is not something you can send a
+  classmate, or run again on a new laptop, or paste into a lesson.
+
+## What a package manager is
+
+A **package manager** is a program that installs other programs. It holds a catalogue,
+knows which version fits your machine, downloads it, puts it where it belongs, and can
+update or remove everything it installed with one command.
+
+A **package** is one piece of software plus the information about it: its name, its
+version, and its **dependencies** — the other packages it needs in order to run. The
+package manager reads that list and installs those too, which is the part that used to eat
+whole evenings.
+
+You have already used one: the App Store is a package manager with pictures. Homebrew and
+winget are the same idea, driven by text, with a catalogue aimed at people who build
+things.
+
+The payoff is that installing becomes one line you can copy, and this site can hand you
+that line instead of a paragraph of clicking.
+
+## macOS: Homebrew
+
+Homebrew is not preinstalled. Get the install command from its own homepage,
+[brew.sh](https://brew.sh) — the whole command sits in a box at the top of the page. At the
+time of writing it is:
+
+```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Copy it from the site rather than from here, so you get whatever is current. Then paste it
+into a terminal and press Enter. Three things will happen, and all three are normal:
+
+1. It asks for your password. Nothing appears as you type it — see the terminal lesson.
+2. It may install Apple's Command Line Tools first. That is a large download and can take
+   ten minutes or more. Let it finish.
+3. When it is done it prints a short **Next steps** section with one or two commands to
+   run. **Run them.** They add Homebrew to your `PATH`.
+
+:::note[What PATH is]
+`PATH` is the list of folders your shell searches when you type a command name. If a
+program is not in one of those folders, the shell answers "command not found" even though
+the program is sitting on your disk. Installers that print instructions at the end are
+almost always asking you to add themselves to `PATH`.
+:::
+
+Check that it worked:
+
+```sh
+brew --version
+```
+
+A version number means you are set. "command not found" means the Next steps commands were
+skipped, or that this terminal window was open before they ran — close it and open a new
+one.
+
+The four commands you will actually use:
+
+```sh
+brew search node        # is it in the catalogue, and what is it called
+brew install git        # install a command-line tool
+brew install --cask figma   # install an application with a window (a "cask")
+brew upgrade            # update everything Homebrew installed
+```
+
+## Windows: winget
+
+Windows ships with a package manager called **winget**, part of a component named *App
+Installer*. On Windows 11 and up-to-date Windows 10 it is already there. Check:
+
+```powershell
+winget --version
+```
+
+If that fails, open the Microsoft Store, search for *App Installer*, and install or update
+it.
+
+The equivalent four commands:
+
+```powershell
+winget search node
+winget install --id Git.Git -e
+winget upgrade --all
+winget uninstall --id Git.Git -e
+```
+
+Every package has an **id** — `Git.Git`, `Microsoft.VisualStudioCode` — which is the
+unambiguous name for it. The `-e` flag means *exact*: match that id and nothing else, so
+you install the package you meant rather than something with a similar name.
+
+## Practice: install git
+
+Time to install something real. **Git** is the tool that records versions of your work and
+is how every course will expect you to hand things in; a whole section of this site is
+about it. Right now you only need it on your machine.
+
+```sh
+brew install git
+```
+
+```powershell
+winget install --id Git.Git -e
+```
+
+Then check:
+
+```sh
+git --version
+```
+
+You should see something like `git version 2.45.0` — the exact number does not matter.
+
+:::caution[If it says command not found]
+Open a **new** terminal window and try again. A shell reads `PATH` when it starts, so a
+window that was already open does not know about anything installed since. This will catch
+you at least twice more in your life; the fix is always the same.
+:::
+
+## One rule about install commands
+
+Only paste an install command that came from the tool's own documentation or from a lesson
+here. Installing software is exactly the moment when a command has power over your machine,
+and a plausible-looking one-liner from a forum post or a chatbot is the easiest thing in
+the world to get wrong.
+
+## Do this on your machine
+
+- [ ] I installed Homebrew (macOS) or confirmed winget is present (Windows)
+- [ ] `brew --version` or `winget --version` prints a version number
+- [ ] I ran the Next steps commands the Homebrew installer printed, if it printed any
+- [ ] I installed git through the package manager
+- [ ] `git --version` prints a version number
+- [ ] I searched the catalogue for something I already use, to see what is in there
+
+<Quiz
+	questions={[
+		{
+			q: 'What is the main practical advantage of installing a tool with a package manager rather than an installer from a website?',
+			options: [
+				'The software runs faster',
+				'One catalogue, one update command, and an install step you can write down and share',
+				'It avoids having to agree to a licence',
+			],
+			answer: 1,
+			explanation:
+				'Speed is identical — it is the same software. What changes is that you never hunt for a download page, everything updates together, and the install becomes a line of text a classmate or a future you can run.',
+		},
+		{
+			q: 'You install a tool, then type its name in the same terminal window and get "command not found". What is the first thing to try?',
+			options: [
+				'Reinstall the tool with administrator rights',
+				'Close the window and open a new terminal',
+				'Restart the computer',
+			],
+			answer: 1,
+			explanation:
+				'A shell reads PATH — the list of folders it searches for commands — once, when it starts. A window opened before the install has an outdated copy. A fresh window picks up the new one, and it is a lot faster than a reboot.',
+		},
+		{
+			q: 'In winget install --id Git.Git -e, what is the -e for?',
+			options: [
+				'It matches the id exactly, so you get that package and not one with a similar name',
+				'It runs the installer with elevated permissions',
+				'It installs the newest experimental version',
+			],
+			answer: 0,
+			explanation:
+				'-e is short for exact. Without it, winget searches loosely and may offer several near matches, or install the wrong one silently. Naming the id and demanding an exact match is the reliable form.',
+		},
+	]}
+/>

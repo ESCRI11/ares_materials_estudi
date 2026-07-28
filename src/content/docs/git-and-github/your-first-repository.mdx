@@ -1,0 +1,177 @@
+---
+title: Your first repository
+description: Install git, turn a folder into a repository, and make your first commits.
+sidebar:
+  order: 2
+---
+
+This lesson is done in the terminal — the window where you type commands to your computer
+instead of clicking. Every command below is meant to be copied and pasted one at a time.
+Nothing here touches the internet.
+
+## Install git
+
+Check whether you already have it:
+
+```bash
+git --version
+```
+
+If you get a version number, you are done. If not:
+
+- **macOS** — running the command above pops up a dialog offering to install the developer
+  command line tools. Accept it; that installs git.
+- **Windows** — download the installer from [git-scm.com/downloads](https://git-scm.com/downloads)
+  and accept every default. It also gives you a terminal called Git Bash, which is a good
+  place to run these commands.
+- **Linux** — `sudo apt install git` on Debian and Ubuntu, or your distribution's equivalent.
+
+## Tell git who you are, once
+
+Git stamps your name and email onto every commit, so it needs them before your first one.
+This is a one-off for the whole machine, not per project:
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+```
+
+Use the email you will use for GitHub later. It is written into the history in plain text,
+so pick one you are comfortable making public.
+
+While you are here, set the name of the first branch git creates. A **branch** is a line of
+commits; you get one automatically and can ignore it for now, but the conventional name for
+it changed a few years ago and git nags about it if you leave it unset:
+
+```bash
+git config --global init.defaultBranch main
+```
+
+## Make a repository
+
+Create a folder to experiment in, move into it, and turn it into a repository:
+
+```bash
+mkdir git-practice
+cd git-practice
+git init
+```
+
+`git init` creates the hidden `.git` folder. That is the whole ceremony — the folder is now
+a repository, and everything you do inside it can be recorded.
+
+Put something in it. Any file will do:
+
+```bash
+echo "# Git practice" > notes.md
+```
+
+## Look before you commit
+
+```bash
+git status
+```
+
+`git status` is the command you will run most. Right now it tells you that `notes.md` is
+**untracked** — the file is sitting in the folder, but git has been given no instruction to
+record it. Git never records anything you did not ask it to.
+
+## The two-step save
+
+Saving to history takes two commands, and the reason is worth understanding.
+
+```bash
+git add notes.md
+```
+
+`git add` moves the file into the **staging area**: a tray of changes you are proposing to
+save together. Nothing is in the history yet. The tray exists so that you can commit three
+related changes and leave a fourth unfinished one out.
+
+```bash
+git commit -m "Add a notes file"
+```
+
+`git commit` takes whatever is in the tray and writes it into the history as one snapshot.
+`-m` supplies the message inline; leave it out and git opens a text editor, which is
+disorienting the first time it happens.
+
+Run `git status` again and it reports a clean working tree — no changes waiting.
+
+### What a commit actually contains
+
+Five things:
+
+1. **The state of every tracked file** at that moment.
+2. **A message** — your description of what changed.
+3. **Author and date**, from the config you set above.
+4. **A pointer to the commit before it**, which is what makes the history a chain rather
+   than a pile.
+5. **A hash** — a forty-character identifier like `a3f9c1e...`, calculated from the content.
+   It is how git refers to that exact snapshot forever. In practice you use the first seven
+   characters.
+
+Commits are cheap. Make them small and often rather than saving up a day of work.
+
+## Read the history
+
+Edit `notes.md`, then do a second round so there is a history to read:
+
+```bash
+git add notes.md
+git commit -m "Add a line about the staging area"
+git log --oneline
+```
+
+`git log` shows your commits, newest first. Plain `git log` gives the full entries and opens
+them in a pager, which fills your terminal and appears to freeze it — **press `q` to get
+out**. `--oneline` gives one commit per line and no pager, which is what you want most days.
+
+To add every changed file at once instead of naming them:
+
+```bash
+git add .
+```
+
+The `.` means "this folder and everything in it". Convenient, and worth a glance at
+`git status` first so you know what you are sweeping up.
+
+## Writing a commit message worth reading
+
+The message is the only part of a commit a human reads. In six months it is the only thing
+telling you why the layout changed.
+
+- Write it as an instruction: *Add contact page*, *Fix overlapping labels*, not
+  *added stuff* or *changes*.
+- Keep the first line under about fifty characters. It is a title, not a paragraph.
+- Say **what and why**, never how. The how is visible in the change itself.
+- If the message needs the word "and", it is probably two commits.
+
+Compare:
+
+```
+No  — update
+No  — asdf
+No  — fixed the thing that was broken yesterday
+Yes — Increase card padding for readability on mobile
+Yes — Remove unused typeface files
+```
+
+:::note[Undoing things]
+Git can recover almost anything you have committed, which is exactly why committing early
+matters. The commands for going back are worth learning later; for now, commit often, and
+know that a bad commit is a recoverable mistake rather than a lost afternoon.
+:::
+
+## Do this now
+
+Work in the `git-practice` folder you made above.
+
+- [ ] `git --version` prints a version number
+- [ ] `git config --global user.name` and `user.email` are set to my details
+- [ ] I made a folder and ran `git init` in it
+- [ ] I ran `git status` and understood what "untracked" meant
+- [ ] I made a first commit with `git add` and `git commit -m`
+- [ ] I changed a file, committed again, and saw both commits in `git log --oneline`
+- [ ] I know that `q` gets me out of the pager
+- [ ] I can say what the difference between `git add` and `git commit` is, in my own words

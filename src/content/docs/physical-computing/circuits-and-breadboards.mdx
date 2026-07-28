@@ -1,0 +1,150 @@
+---
+title: Circuits and breadboards
+description: What a circuit is, how the holes in a breadboard are secretly connected, and how to read a wiring diagram.
+sidebar:
+  order: 2
+---
+
+import Quiz from '@components/Quiz.astro';
+
+A **circuit** is a loop. Current leaves the positive side of a supply, passes through
+whatever you put in its way, and returns to ground. Loop complete, things happen. Loop
+broken anywhere, nothing happens anywhere — not "less", not "half". Nothing.
+
+That is the whole idea, and it explains most of what goes wrong.
+
+## Closed, open, and the useful gap
+
+A **closed circuit** is a complete loop: current flows. An **open circuit** has a gap in it:
+current does not flow. A wire that has fallen out is an open circuit. So is a component
+plugged into the wrong hole.
+
+A **switch** is a gap you control on purpose. A push button is two pieces of metal that touch
+while your finger is down and spring apart when you let go. That is genuinely all it is.
+
+The failure mode at the other end is a **short circuit**: an unintended path of almost no
+resistance straight from the supply back to ground, bypassing the thing that was supposed to
+be there. `I = V / R` with a very small R gives a very large I. Wires get hot, boards shut
+down, parts die. Nearly every short circuit a beginner makes is a wire in the wrong hole of a
+breadboard, which is why the next section matters more than it looks.
+
+## Series and parallel, briefly
+
+Two components in **series** sit one after the other on a single path. The same current goes
+through both, and the supply voltage divides between them. An LED and its resistor are in
+series — that is why the resistor can control the LED's current.
+
+Two components in **parallel** sit on separate branches between the same two points. Both see
+the same voltage, and the current splits between them. Two LEDs in parallel, each with its
+own resistor, both light at full brightness.
+
+The practical version: **in series, they share the voltage; in parallel, they share the
+current.** Which side of a component the resistor goes on does not matter, because in a
+series loop the current is the same everywhere in it.
+
+## How a breadboard is wired inside
+
+A **breadboard** is a plastic slab full of holes, with metal clips underneath that grip the
+legs you push in. It exists so you can build a circuit without soldering and pull it apart
+five minutes later.
+
+The holes are not independent. Underneath, they are joined into groups, and **the single most
+common beginner mistake is not knowing which**:
+
+- **The long rails along each edge**, usually marked with a red `+` line and a blue or black
+  `−` line, run the *whole length* of the board. Every hole in one rail is the same electrical
+  point. You put your supply into one rail and your ground into the other, and then power is
+  available everywhere along the edge.
+- **The main field in the middle** is joined in short **columns of five holes**, running across
+  the board, not along it. All five holes in one column are the same point. The column beside
+  it is a completely separate point.
+- **The channel down the centre** — the ravine — separates the left half from the right half.
+  A five-hole column on the left is *not* connected to the five-hole column facing it on the
+  right.
+
+So there are two mistakes waiting for you, and they are opposites:
+
+1. **Both legs of a component in the same five-hole column.** The two legs are now the same
+   point, so the component is bypassed entirely. An LED wired this way stays dark; a resistor
+   wired this way does nothing at all, which is how a short circuit gets built by accident.
+2. **Two legs that should meet, in different columns.** They look adjacent on the board, but
+   electrically they are strangers, and the loop is open.
+
+The habit that prevents both: before powering anything, put your finger on each connection in
+turn and say out loud which group it lands in. It feels ridiculous and it works.
+
+:::note[Why five holes]
+Five is enough to plug in the leg of a component plus a wire or two heading somewhere else,
+and no more. The channel is that width because chips are built to straddle it, one row of
+legs each side, so that each leg lands in its own private column.
+:::
+
+## Reading a wiring diagram
+
+You will meet two styles, and they are not the same document.
+
+A **pictorial diagram** draws the actual parts on an actual breadboard, with coloured wires.
+It tells you exactly where to push things. It is easy to follow and useless for understanding,
+because it hides the loop under the layout.
+
+A **schematic** throws away physical position and draws only the connections, using standard
+symbols: a resistor as a rectangle or a zigzag, an LED as a triangle with an arrow leaving it,
+ground as a small stack of shrinking horizontal lines. The rules that matter:
+
+- A line is a wire — any length, any bend. Length means nothing.
+- Lines that meet with a **dot** are connected.
+- Lines that cross **without** a dot are not connected. They are two wires passing in space.
+- Every `GND` symbol on the page is the same point, even though no line is drawn between them.
+  This is a convention to keep the drawing readable, and it catches people out once.
+
+Wire colour is also a convention, not a rule: red for power, black for ground, anything else
+for signals. The circuit cannot see the colour. Future you, debugging at midnight, can.
+
+## In the simulator
+
+You do not own a breadboard yet — the kit is handed out during the course. For everything in
+this section you will use **Wokwi**, a simulator that runs in your browser at
+[wokwi.com](https://wokwi.com). It draws the same parts, connects the same way, and blows up
+nothing when you get it wrong.
+
+Wokwi lets you drag a wire from one pin straight to another without a breadboard at all,
+which is faster for small circuits. The rules above still apply the moment you add a
+breadboard part, and they apply to the real one you get in class.
+
+<Quiz
+	questions={[
+		{
+			q: 'You push both legs of an LED into holes 12a and 12b of a breadboard — same column, same half. What happens when you power the circuit?',
+			options: [
+				'The LED lights normally',
+				'Nothing lights, because both legs are now the same electrical point',
+				'The LED lights at half brightness',
+			],
+			answer: 1,
+			explanation:
+				'All five holes in one column are joined underneath. Putting both legs there connects the LED to itself, so current takes the metal path and ignores the component. The same mistake with a resistor is how accidental short circuits get built.',
+		},
+		{
+			q: 'On a schematic, two lines cross but there is no dot at the crossing. What does that mean?',
+			options: [
+				'They are connected — the dot is optional',
+				'They are not connected; they are two separate wires drawn over each other',
+				'The diagram has an error',
+			],
+			answer: 1,
+			explanation:
+				'A dot means a junction. No dot means the wires pass without touching. This convention is the difference between reading a schematic and guessing at one.',
+		},
+		{
+			q: 'An LED and its current-limiting resistor are wired in series. What does that tell you?',
+			options: [
+				'Each one gets the full supply voltage',
+				'The same current flows through both, and the supply voltage divides between them',
+				'The resistor only works if it comes before the LED',
+			],
+			answer: 1,
+			explanation:
+				'Series means one path: identical current everywhere along it, with the voltage shared out between the components. Because the current is the same throughout, it makes no difference whether the resistor sits before or after the LED.',
+		},
+	]}
+/>

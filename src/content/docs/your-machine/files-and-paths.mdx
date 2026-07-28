@@ -1,0 +1,179 @@
+---
+title: Files, folders and paths
+description: What a file really is, how folders nest, and how to write the address of anything on your computer.
+sidebar:
+  order: 1
+---
+
+import Quiz from '@components/Quiz.astro';
+
+You have been using files since you were a child. The gap is not what a file is — it is
+that programming tools never hand you a Finder window. They ask you to *name* the file, in
+writing, exactly. Almost every error you will meet in the next two years says some version
+of "file not found", and almost every one of them is a sentence written in a grammar nobody
+ever taught you.
+
+This lesson is that grammar.
+
+## A file is a name and some data
+
+A **file** is a lump of data with a name attached — a photograph, a paragraph, a song, a
+program. A **folder** is a container for files and other folders. Programmers usually call
+a folder a **directory**; the two words mean the same thing, and both will be said in
+class.
+
+Folders inside folders make a tree, and everything on your machine lives somewhere in that
+tree. Nothing floats loose. A file "on the desktop" is in a folder called Desktop.
+
+## The extension
+
+The bit after the last dot in a name — `.pdf`, `.png`, `.js` — is the **file extension**.
+It is a label, not a conversion. Renaming `notes.txt` to `notes.js` translates nothing; it
+only changes what programs assume about the contents. That assumption still matters,
+because it decides which application opens the file and how a browser reads it.
+
+Both macOS and Windows hide extensions by default, which is exactly the wrong setting for
+you. Turn them on now:
+
+- **macOS** — Finder, then Finder → Settings (Cmd+,) → Advanced → tick *Show all filename
+  extensions*.
+- **Windows** — open File Explorer, then the View menu → Show → tick *File name
+  extensions*.
+
+From now on you can see the difference between `logo.png` and `logo.png.jpg`, which is the
+kind of thing that eats an afternoon.
+
+## A path is an address
+
+A **path** is the written address of a file or folder: the list of folders you would open,
+in order, to reach it.
+
+```
+/Users/ares/Documents/thesis/poster.pdf
+```
+
+Read it left to right. Each `/` means "go into". So: the root of the disk, then `Users`,
+then `ares`, then `Documents`, then `thesis`, and inside that a file called `poster.pdf`.
+
+The two operating systems write this differently, and the difference is only cosmetic:
+
+| | macOS and Linux | Windows |
+|---|---|---|
+| Separator | `/` | `\` (a backslash) |
+| Where the tree starts | one root, `/` | one root per drive, `C:\` |
+| Your personal folder | `/Users/ares` | `C:\Users\ares` |
+
+That personal folder is your **home folder**: your Desktop, Documents, Downloads and
+everything else you own live inside it. It has a shorthand, `~` (tilde), which both
+systems understand in most places. So `~/Downloads` means `/Users/ares/Downloads` on a Mac
+and `C:\Users\ares\Downloads` on Windows.
+
+:::note[Where downloads go]
+Your browser puts everything in `~/Downloads` unless you tell it otherwise. "I downloaded
+it but I cannot find it" nearly always means "it is in Downloads and I did not look".
+:::
+
+## Absolute and relative
+
+An **absolute path** starts at the root or at your home folder. It is the full postal
+address, and it means the same thing typed from anywhere on the machine.
+
+```
+/Users/ares/Documents/thesis/poster.pdf
+```
+
+A **relative path** starts from wherever you currently are — your **working directory**,
+the folder a program is "standing in" at the moment. It is "second door on the left":
+correct only if you are standing in the right corridor.
+
+```
+images/logo.png
+```
+
+Two special names appear in relative paths, and they are worth memorising:
+
+- `.` means "the folder I am in right now"
+- `..` means "the folder one level up" — the **parent folder**
+
+So `../images/logo.png` reads as: go up one level, then into `images`, then the file.
+
+## Why programmers care about this at all
+
+Three reasons, all of them practical.
+
+**Tools take paths as text.** A terminal command, a line of code, a configuration file —
+none of them can point at something with a mouse. If the address is wrong by one
+character, nothing happens.
+
+**Projects move.** A website you build on your laptop has to keep working when it is
+uploaded to a server where nobody has a folder called `/Users/ares`. Relative paths
+survive the move; absolute ones break. This is why a webpage refers to its own image like
+this:
+
+```html
+<img src="images/logo.png">
+```
+
+and never with the full address from your disk.
+
+**Errors are usually path errors.** Long before you write a real bug, you will spend hours
+on a program that cannot find a file that is definitely, visibly there — under a slightly
+different name, or one folder over.
+
+## Name files so they do not fight you
+
+A habit worth starting today, because it costs nothing and saves a lot:
+
+- **No spaces.** Use hyphens: `final-poster.pdf`, not `final poster.pdf`. In a terminal a
+  space is how one instruction is separated from the next, so `my file.txt` reads as two
+  separate things.
+- **Lowercase.** Machines differ on whether `Logo.png` and `logo.png` are the same file.
+  Your laptop probably says yes; the server your work ends up on says no.
+- **No accents or special characters.** `piñata.png` will work most of the time and fail
+  memorably once.
+- **Dates as `2026-07-28`.** Written that way they sort correctly on their own.
+
+## Do this on your machine
+
+- [ ] Filename extensions are now visible in Finder or File Explorer
+- [ ] I can write out the absolute path of my Downloads folder from memory
+- [ ] I copied the full path of a real file (macOS: hold Option, right-click the file, choose *Copy … as Pathname*. Windows: hold Shift, right-click, choose *Copy as path*)
+- [ ] I renamed one file to lowercase-with-hyphens
+
+<Quiz
+	questions={[
+		{
+			q: 'You are standing in the folder /Users/ares/projects/site. What does the relative path ../notes.txt point to?',
+			options: [
+				'/Users/ares/projects/site/notes.txt',
+				'/Users/ares/projects/notes.txt',
+				'/Users/ares/notes.txt',
+			],
+			answer: 1,
+			explanation:
+				'Two dots mean one level up. From /Users/ares/projects/site that is /Users/ares/projects, and the file sits directly inside it. Two levels up would be written ../../notes.txt.',
+		},
+		{
+			q: "You rename a file from portrait.png to portrait.jpg. What have you changed?",
+			options: [
+				'The image is now compressed as a JPEG',
+				'Only the label — the data inside is untouched, and programs may now misread it',
+				'Nothing at all, extensions are decoration',
+			],
+			answer: 1,
+			explanation:
+				'An extension is a claim about the contents, not a conversion. The bytes are still a PNG, but software that trusts the name will try to read them as a JPEG and fail. Converting means re-exporting from an image program.',
+		},
+		{
+			q: 'Why does a website use images/logo.png rather than /Users/ares/site/images/logo.png?',
+			options: [
+				'It is shorter to type',
+				'Absolute paths are forbidden in HTML',
+				'The relative path still works once the project is copied to another machine or a server',
+			],
+			answer: 2,
+			explanation:
+				'A relative path describes the position of the file inside the project, so the whole folder can be moved, zipped, or uploaded and the link still resolves. The absolute path names a folder that exists only on your laptop.',
+		},
+	]}
+/>

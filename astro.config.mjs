@@ -66,6 +66,14 @@ export default defineConfig({
 			// Order here is the order the reader learns in, so it is deliberate, not alphabetical.
 			sidebar: [
 				{ label: 'Start Here', items: [{ autogenerate: { directory: 'start-here' } }] },
+				{ label: 'Your Machine', items: [{ autogenerate: { directory: 'your-machine' } }] },
+				{ label: 'Git & GitHub', items: [{ autogenerate: { directory: 'git-and-github' } }] },
+				{ label: 'HTML & CSS', items: [{ autogenerate: { directory: 'html-and-css' } }] },
+				{ label: 'JavaScript', items: [{ autogenerate: { directory: 'javascript' } }] },
+				{
+					label: 'Physical Computing',
+					items: [{ autogenerate: { directory: 'physical-computing' } }],
+				},
 			],
 		}),
 	],

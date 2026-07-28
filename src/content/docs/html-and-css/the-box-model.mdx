@@ -1,0 +1,206 @@
+---
+title: The box model
+description: Content, padding, border and margin — why every element on a page is a rectangle, and why width rarely means what you assumed.
+sidebar:
+  order: 4
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+Every element the browser draws is a rectangle. A heading is a rectangle. A paragraph is a
+rectangle. A single word wrapped in a `span` is a rectangle. Even a circle is a rectangle with
+its corners rounded away.
+
+Once you can see the rectangles, layout stops being mysterious. This is the lesson where most
+designers get their first "oh, *that* is why" — the browser was never doing anything strange,
+it was following a rule you had not been told.
+
+## Four layers, from the inside out
+
+Each of those rectangles is built from four concentric layers.
+
+| Layer | What it is | In a page layout program |
+|---|---|---|
+| **content** | the text or image itself | the text inside the frame |
+| **padding** | space between the content and the border, inside the box | text inset |
+| **border** | a line drawn around the padding | the frame's stroke |
+| **margin** | space outside the border, pushing other elements away | space before and after |
+
+The distinction that matters: **padding is inside the box and takes the background colour;
+margin is outside it and is always transparent.** Give an element a grey background and the
+padding turns grey, the margin does not.
+
+<LiveCode
+	title="The four layers, made visible"
+	height={320}
+	code={`<style>
+  body { font-family: Helvetica, Arial, sans-serif; background: #eee; }
+  .box {
+    background: white;
+    padding: 20px;
+    border: 3px solid crimson;
+    margin: 30px;
+  }
+</style>
+
+<div class="box">Padding is the white space inside the red line.</div>
+<div class="box">Margin is the grey gap between the two red lines.</div>`}
+/>
+
+Set `padding` to `0` and watch the text meet the border. Set `margin` to `0` and watch the two
+boxes touch. Those two properties account for most of the spacing decisions you will ever
+make.
+
+## Writing the values
+
+`padding: 20px` puts 20 pixels on all four sides. You can be more particular, and there are
+two notations for it:
+
+```css
+padding: 20px;                /* all four sides */
+padding: 10px 20px;           /* top and bottom, then left and right */
+padding: 10px 20px 30px 40px; /* top, right, bottom, left — clockwise from the top */
+
+padding-top: 10px;            /* or name one side at a time */
+padding-left: 40px;
+```
+
+`margin` and `border` follow the same pattern. The two-value form is the one you will use
+constantly, because vertical and horizontal spacing are almost never the same number.
+
+A border needs three pieces of information — thickness, style, colour — in one declaration:
+`border: 1px solid #333`. Other styles exist (`dashed`, `dotted`), and `border-radius`
+rounds the corners.
+
+## Why your 300px box is 342px wide
+
+Here is the rule nobody guesses correctly. By default, `width` sets the width of the
+**content** only. Padding and border are then added *outside* that number.
+
+So a box with `width: 300px`, `padding: 20px` and `border: 1px solid` occupies
+300 + 20 + 20 + 1 + 1 = **342 pixels** on screen. Put two of them side by side in a 600-pixel
+column and they overflow, for reasons that are invisible until someone explains this.
+
+<LiveCode
+	title="Same width, two different boxes"
+	height={340}
+	code={`<style>
+  body { font-family: Helvetica, Arial, sans-serif; }
+  div { width: 300px; padding: 20px; border: 3px solid crimson; margin-bottom: 12px; background: #f4f4f4; }
+  .fixed { box-sizing: border-box; }
+</style>
+
+<div>width: 300px — but I take up 346px</div>
+<div class="fixed">width: 300px with box-sizing: border-box — I take up exactly 300px</div>`}
+/>
+
+The fix is one property. `box-sizing: border-box` tells the browser that `width` means the
+whole visible box, border included, with padding eating into the content instead of adding to
+it. That is what you meant when you typed 300, and what every design tool does.
+
+Because you always want it, put this at the top of every stylesheet you write and never think
+about it again:
+
+```css
+* {
+  box-sizing: border-box;
+}
+```
+
+The `*` is the universal selector: every element on the page.
+
+## Block and inline
+
+Elements come in two flavours, and this decides whether the box model applies fully.
+
+**Block** elements — `div`, `p`, `h1`, `ul`, `section` — start on a new line and take the full
+width available, however little content they hold. Stack three paragraphs and they run down
+the page. Width, height, and vertical margins all work on them.
+
+**Inline** elements — `span`, `a`, `em`, `strong` — flow along inside a line of text like a
+word does. They accept horizontal padding and margin, but `width`, `height` and vertical
+margins do nothing at all to them.
+
+<LiveCode
+	title="Why width does nothing here"
+	height={280}
+	code={`<style>
+  body { font-family: Helvetica, Arial, sans-serif; }
+  span { width: 300px; background: yellow; }
+  .fixed { display: inline-block; }
+</style>
+
+<p>The <span>span here</span> ignores its width.</p>
+<p>The <span class="fixed">span here</span> obeys it, because display changed.</p>`}
+/>
+
+`display` is the property that switches between the two, and `inline-block` is the useful
+hybrid: it flows inline with its neighbours but accepts dimensions like a block. The next
+lesson changes `display` to something far more powerful.
+
+## One oddity worth knowing
+
+Vertical margins between stacked block elements **collapse**: a 30px bottom margin meeting a
+20px top margin produces a 30px gap, not 50. The larger of the two wins, rather than the two
+adding up.
+
+This is deliberate, dates from CSS's document-formatting origins, and is the source of a lot
+of confused measuring. Horizontal margins never collapse, and neither do margins inside a flex
+layout — which is one more reason the next lesson exists.
+
+## Try it
+
+Make the box below 200 pixels wide, centred on the page, with comfortable padding and a thin
+grey border. Two hints: `box-sizing: border-box` so the number means what you want, and
+`margin: 0 auto` — `auto` on the left and right splits the leftover space evenly, which is
+how you centre a block.
+
+<LiveCode
+	title="Challenge — 200px, centred"
+	height={300}
+	code={`<style>
+  body { font-family: Helvetica, Arial, sans-serif; background: #eee; }
+  .box {
+    background: white;
+    /* your rules here */
+  }
+</style>
+
+<div class="box">Centre me.</div>`}
+/>
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'You give an element a grey background, 20px of padding and 20px of margin. Which of the two gaps is grey?',
+			options: [
+				'Both — background fills the whole box',
+				'The padding only; margin is always transparent',
+				'The margin only; padding sits under the content',
+			],
+			answer: 1,
+			explanation:
+				'Padding is inside the element, so the background reaches it. Margin is space outside the element, and whatever is behind it shows through. That is the quickest way to tell which one you are looking at on a real page.',
+		},
+		{
+			q: 'A div has width: 400px, padding: 24px and a 2px border, with default box-sizing. How much horizontal space does it occupy?',
+			options: ['400px', '424px', '452px'],
+			answer: 2,
+			explanation:
+				'By default width describes the content box only, so padding and border are added on top: 400 + 24 + 24 + 2 + 2 = 452. Adding box-sizing: border-box makes the same declaration mean 400px in total, which is what you almost always want.',
+		},
+		{
+			q: 'You set width: 300px on a span and nothing changes. Why?',
+			options: [
+				'The span needs a class before width applies',
+				'Inline elements ignore width and height; you need display: block or inline-block',
+				'Width only works on images',
+			],
+			answer: 1,
+			explanation:
+				'A span is inline, so it flows inside a line of text like a word and takes its size from its content. Switching display to inline-block keeps it in the line but lets it accept dimensions and vertical spacing.',
+		},
+	]}
+/>

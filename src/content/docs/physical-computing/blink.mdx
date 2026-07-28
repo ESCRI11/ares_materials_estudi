@@ -1,0 +1,175 @@
+---
+title: Blink
+description: Your first program on a board — digital output with machine.Pin, running in the Wokwi simulator.
+sidebar:
+  order: 5
+---
+
+import Quiz from '@components/Quiz.astro';
+
+Blinking an LED is the "hello world" of hardware. It is a small thing that proves a large
+chain works: your code was accepted, the board is running it, a pin is changing voltage, and
+something in the physical world responds. When a project stops working, you come back here to
+find out which link broke.
+
+You do not need a board for this. You need a browser.
+
+## Setting up in Wokwi
+
+**Wokwi** is a simulator: it runs the same MicroPython firmware in software and draws the
+circuit on screen. Wires that would be loose are never loose, and nothing burns.
+
+1. Open [wokwi.com/micropython](https://wokwi.com/micropython).
+2. Start the **Raspberry Pi Pico MicroPython** template. You get two panels: a code editor
+   with a file called `main.py`, and a diagram with a board in it.
+3. `main.py` is the file the board runs on start-up. That name is not decorative — the
+   MicroPython firmware looks for exactly that file and executes it when power arrives.
+4. The green play button starts the simulation. The red stop button ends it.
+
+:::note[Why the Pico and not an Arduino board]
+Wokwi's MicroPython template uses a Raspberry Pi Pico, and the course will hand you an Arduino
+board that also runs MicroPython. The language, the modules and every line below are identical
+on both. What differs is the pin numbering — so when you move to the real board, you change the
+numbers and nothing else. Look them up on that board's pinout rather than reusing these.
+:::
+
+## The circuit
+
+Add two parts to the diagram, using the `+` button in the diagram panel: an **LED** and a
+**resistor**. Set the resistor to 220 Ω. Then draw two wires:
+
+| From | To |
+|---|---|
+| Pico `GP15` | one end of the resistor |
+| other end of the resistor | LED anode (`A`, the long leg) |
+| LED cathode (`C`, the short leg) | any Pico `GND` pin |
+
+That is the loop from the first lesson: out of a pin, through a current-limiting resistor,
+through the LED, back to ground.
+
+## The program
+
+Replace everything in `main.py` with this:
+
+```python
+from machine import Pin
+import time
+
+led = Pin(15, Pin.OUT)
+
+while True:
+    led.value(1)
+    time.sleep(0.5)
+    led.value(0)
+    time.sleep(0.5)
+```
+
+Press play. The LED blinks twice a second.
+
+## Line by line
+
+```python
+from machine import Pin
+import time
+```
+
+`machine` is the module that reaches the hardware inside the chip; `Pin` is the part of it
+you want. `time` gives you delays. Two imports, and you have everything this program needs.
+
+```python
+led = Pin(15, Pin.OUT)
+```
+
+This creates an object representing one physical pin and configures it. `15` means `GP15` on
+this board — the number in the code refers to the chip's own numbering, which is why it is
+board-specific. `Pin.OUT` declares the direction: this pin will **drive** a voltage rather than
+listen for one. Naming the variable `led` is for you; the pin has no idea what is attached.
+
+```python
+led.value(1)
+```
+
+Set the pin high — hold it at the board's operating voltage, 3.3 V here. `led.value(0)` sets
+it low, at 0 V. High means current can flow through your LED to ground; low means both ends
+sit at the same voltage, so nothing flows and the LED is dark.
+
+Three spellings do the same job, and you will see all of them:
+
+```python
+led.value(1)   # explicit
+led.on()       # shorter
+led.toggle()   # flip to whatever it is not
+```
+
+```python
+time.sleep(0.5)
+```
+
+Stop and do nothing for half a second. The argument is in **seconds**, and it takes decimals.
+For short waits there is `time.sleep_ms(500)`, which takes milliseconds and reads more clearly
+when the numbers get small.
+
+Without the sleeps the loop still runs — millions of times a second — and the LED sits at a
+constant dim glow rather than blinking, because your eye averages it. That is a real technique,
+and lesson 8 uses it on purpose.
+
+```python
+while True:
+```
+
+Forever. There is no operating system to hand control back to, so a program that should keep
+working has to keep looping. If you remove the `while` and leave the four lines, the LED
+blinks once and the program ends — and you land in the interactive prompt, which lesson 9 is
+about.
+
+## Confirm it works
+
+- [ ] I opened wokwi.com/micropython and started the Raspberry Pi Pico MicroPython template
+- [ ] I added an LED and a 220 Ω resistor and wired them between `GP15` and `GND`
+- [ ] I pasted the program into `main.py`, pressed play, and the LED blinks
+- [ ] I changed both `0.5` values to `0.1` and the LED blinks visibly faster
+- [ ] I changed only the *first* sleep to `0.05` and the blink became a short flash with a long gap
+- [ ] I rewrote the loop body using `led.toggle()` and one sleep, and it still blinks
+- [ ] I moved the wire and the number in the code to a different GPIO pin, and it still works
+- [ ] I deliberately broke it — wrong pin number in the code — and saw the LED stay dark
+
+That last one matters more than the rest. Knowing what a specific fault looks like is most of
+debugging hardware.
+
+<Quiz
+	questions={[
+		{
+			q: 'What does Pin.OUT do in Pin(15, Pin.OUT)?',
+			options: [
+				'Tells the board the LED is connected on the outside of the circuit',
+				'Configures the pin to drive a voltage rather than to listen for one',
+				'Sets the pin high immediately',
+			],
+			answer: 1,
+			explanation:
+				'A GPIO pin can be an input or an output, and it has to be told which. OUT means your program sets its voltage and it supplies current to whatever is attached. It does not set an initial state — that is what value() is for.',
+		},
+		{
+			q: 'You delete both time.sleep(0.5) lines. What do you see?',
+			options: [
+				'The LED blinks much faster but still visibly',
+				'The LED appears constantly on but dim, because it switches faster than the eye can follow',
+				'The program crashes',
+			],
+			answer: 1,
+			explanation:
+				'The loop runs millions of times a second, so the LED is on half the time in flickers far too short to perceive. Your eye averages them into a steady dim glow — which is exactly the trick behind PWM dimming later in this section.',
+		},
+		{
+			q: 'Why does the program end in while True rather than running the four lines once?',
+			options: [
+				'Because MicroPython requires every program to contain a loop',
+				'Because there is no operating system to return to — when the code runs out, nothing happens next',
+				'Because the pin resets itself after each command',
+			],
+			answer: 1,
+			explanation:
+				'On a microcontroller your program is the only thing running. Reaching the end means there is nothing left to do, so anything meant to keep working must keep looping until the power is removed.',
+		},
+	]}
+/>

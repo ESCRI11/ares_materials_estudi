@@ -1,0 +1,138 @@
+---
+title: Markdown and the README
+description: Formatted text written in plain characters, and the file that acts as the front page of a repository.
+sidebar:
+  order: 5
+---
+
+**Markdown** is a way of writing formatted text using ordinary characters. You type `#` for
+a heading and `**bold**` for bold; the file stays plain text, and anything that understands
+Markdown renders it as a proper page.
+
+It exists because plain text survives. A `.docx` needs Word, a Figma comment needs Figma,
+but a Markdown file opens in anything, is readable even unrendered, and — the reason it
+belongs in this section — git can show you exactly which words changed between two versions.
+Git can do that for any text file. It cannot do it for a `.docx` or a `.psd`, which it can
+only tell you are different.
+
+You will meet Markdown constantly: GitHub, documentation, Notion, Discord, most note apps.
+Every page on this site is a Markdown file.
+
+## The syntax, in full
+
+There is not much of it, which is the point.
+
+````md
+# A heading
+## A smaller heading
+### A smaller one still
+
+Plain paragraphs need no marking. Leave a blank line between them.
+
+**Bold** and *italic*.
+
+- A bullet list
+- Another item
+  - Indent two spaces for a sub-item
+
+1. A numbered list
+2. Second item
+
+[A link](https://github.com)
+
+![A picture](images/prototype.jpg)
+
+`inline code` for a filename, a command, or a value
+
+```
+A fenced block, for several lines of code.
+```
+
+> A quotation, or a note worth setting apart.
+
+---
+
+- [ ] An unticked task
+- [x] A ticked one
+````
+
+A few things that trip people up:
+
+- **A blank line is significant.** Two lines of text with no blank line between them render
+  as one paragraph.
+- **Headings need the space** after the `#`.
+- **The image line is the link line with a `!` in front.** The text in the square brackets is
+  the alt text — what a screen reader announces and what shows if the image fails.
+- **Image paths are relative to the file.** `images/prototype.jpg` means a folder called
+  `images` next to your Markdown file. Commit the image itself; a link to a file only on
+  your laptop shows a broken icon to everyone else.
+- **Do not go past `###`.** If you need a fourth level of heading, the document wants
+  splitting.
+
+## The README
+
+**README.md** is the front page of a repository. GitHub finds a file with that name in the
+top folder and renders it underneath the file list, so it is the first thing any visitor
+reads — a lecturer, a studio, or you in a year.
+
+The name matters: capitals, and the `.md` extension.
+
+A README that does its job answers four questions in the first screenful:
+
+1. **What is this?** One or two sentences. Assume the reader arrived from a search and knows
+   nothing.
+2. **What does it look like?** An image or a screen recording. You are a designer; this is
+   the part everyone else does badly.
+3. **How do I run it?** The exact commands, in a fenced block, in order.
+4. **What is it made of?** Tools, libraries, hardware.
+
+A skeleton to steal:
+
+````md
+# Project name
+
+One sentence on what it does and who it is for.
+
+![The prototype running](images/preview.jpg)
+
+## Running it
+
+```
+git clone https://github.com/USERNAME/REPOSITORY.git
+cd REPOSITORY
+```
+
+Open `index.html` in a browser.
+
+## Built with
+
+- Plain HTML, CSS and JavaScript
+- An Arduino board reading a distance sensor
+
+## Status
+
+Coursework for Creative Coding Foundations, MA Interaction Design, SUPSI.
+````
+
+An empty repository with a good README reads as considered. A finished project with none
+reads as abandoned, however good the code is.
+
+:::tip[Write it in the editor, check it on GitHub]
+Rendering differs slightly between tools. GitHub is where yours will be read, so glance at
+the rendered page after pushing. You can also edit any Markdown file directly on GitHub with
+the pencil icon, which commits the change for you — handy for a typo, and a good way to see
+the syntax and the result side by side.
+:::
+
+## Do this now
+
+Use the practice repository from the previous lessons.
+
+- [ ] I created a file called `README.md` in the top folder of my repository
+- [ ] It has a heading, a paragraph, a list, and a link
+- [ ] It answers "what is this" in the first two sentences
+- [ ] It includes a fenced code block showing how to run or open the project
+- [ ] I committed it and pushed it
+- [ ] I looked at the repository page on GitHub and saw it rendered below the file list
+- [ ] I added an image to the repository and displayed it in the README
+- [ ] I fixed something using the pencil icon on GitHub, then ran `git pull` locally

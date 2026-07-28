@@ -1,0 +1,225 @@
+---
+title: When it breaks
+description: Reading an error message, using the stack trace and console.log, and recognising the five mistakes everybody makes at the start.
+sidebar:
+  order: 13
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+Code does not work the first time. Not for you, not for your lecturers, not for anyone who has
+been doing this for twenty years. The difference between a beginner and an experienced
+programmer is not how often things break — it is how long they stay broken.
+
+This lesson is about shortening that.
+
+## Errors are not on the page
+
+When JavaScript fails, the page usually looks fine and nothing happens. The explanation is in
+the **console**, and it is the first place to look, every time, before forming any theory.
+
+Open the developer tools: `F12` on Windows and Linux, `Option` + `Cmd` + `I` on macOS, or
+right-click the page and choose Inspect. Then the **Console** tab. Reload the page with it open,
+because messages printed before you opened it are gone.
+
+## Reading the message
+
+A typical one:
+
+```
+Uncaught TypeError: Cannot read properties of null (reading 'textContent')
+    at sketch.js:4
+```
+
+Four separate pieces of information, and each is worth having.
+
+- **Uncaught** — nothing in your code handled this, so the script stopped here. Everything after
+  this line never ran, which is why several things appear broken at once.
+- **TypeError** — the category. A value was not the kind of thing the operation needed.
+- **Cannot read properties of null (reading 'textContent')** — the actual complaint, and it is
+  precise. Something was `null`, and you asked it for `textContent`.
+- **at sketch.js:4** — file and line number. Click it and the browser opens that line.
+
+Read it as a sentence: *on line 4 of sketch.js, I tried to get `textContent` out of something
+that turned out to be nothing.* Which means `querySelector` found no element. That is a complete
+diagnosis, and it came free.
+
+:::tip[The message is not an insult]
+It is a report, written by a program that has no opinion about you. Beginners skim errors
+because they read as scolding; experienced people read them word by word because they are
+usually the answer. Try reading yours out loud once.
+:::
+
+## The stack trace
+
+When the failure happens inside a function called by another function, you get several `at`
+lines instead of one. That list is the **stack trace**: the chain of calls that led here, most
+recent first.
+
+```
+Uncaught TypeError: size.toFixed is not a function
+    at drawCircle (sketch.js:22)
+    at draw (sketch.js:9)
+    at sketch.js:31
+```
+
+Read from the top and stop at the first line in a file you wrote. Here that is line 22, inside
+`drawCircle`. The lines below it are the route that got you there — useful when the same
+function is called from three places and you need to know which call was the bad one.
+
+## console.log
+
+The console is not only where errors land. `console.log()` prints anything you like, whenever
+you like, and it remains the most used debugging tool in the profession.
+
+Use it to check your assumptions rather than your conclusions. Not "the drawing is wrong", but
+"is `x` the number I think it is at this moment".
+
+```js
+console.log("x is", x);              // always label it, or you get a column of bare numbers
+console.log("x is", x, typeof x);    // typeof tells you string vs number
+console.log("element:", el);          // logging an element shows the real element, or null
+```
+
+Put one at the top of a function to check it runs at all, and one after the line you suspect. If
+the first prints and the second does not, the fault is between them. Delete them when you are
+done; a console full of your own noise hides the next real message.
+
+## The five that get everyone
+
+| What you see | What it usually means |
+| --- | --- |
+| `Uncaught SyntaxError: Unexpected token` | A missing bracket, brace or quote. The line number is where the browser *noticed*, often a line or two after the real mistake. |
+| `ReferenceError: total is not defined` | The name is spelled differently from where you declared it, or it was declared inside a different pair of braces. |
+| `TypeError: Cannot read properties of null` | `querySelector` matched nothing: wrong selector, or the script ran before the element existed. |
+| `TypeError: x is not a function` | A method name is misspelled, or the value is not what you assumed. `getElementByID` is not a thing; `getElementById` is. |
+| Nothing happens, no error at all | The listener is on the wrong element or the event name is wrong, or the function was defined but never called. |
+
+Two words that turn up constantly and are not the same thing. **`null`** means deliberately
+empty — `querySelector` returns it when it finds nothing. **`undefined`** means never given a
+value — a variable you declared but did not fill, or a property that does not exist on an
+object. Both fail if you try to read a property from them, and the error tells you which one it
+was, which tells you where to look.
+
+## Wrong selector
+
+<LiveCode title="Fix this one" height={230} code={`<style>
+  body { font-family: sans-serif; }
+</style>
+
+<h1 id="headline">Hello</h1>
+
+<script>
+  document.querySelector("#title").textContent = "Changed by JavaScript";
+</script>`} />
+
+Press Run: the heading stays as it is. Open the console and you get
+`Cannot read properties of null (reading 'textContent')`. The id in the HTML is `headline`; the
+selector asks for `title`. Fix the selector and Run again.
+
+In these boxes the error names the file as `about:srcdoc`, because the code has no file of its
+own. In your own project it will name your file and line.
+
+## Script before element
+
+<LiveCode title="Same error, different cause" height={230} code={`<style>
+  body { font-family: sans-serif; }
+</style>
+
+<script>
+  document.querySelector("#note").textContent = "Set by the script.";
+</script>
+
+<p id="note">Not set yet.</p>`} />
+
+The selector is right this time and the element exists — but the script runs while the browser
+is still reading the file, before that paragraph has been built. So `querySelector` still finds
+nothing. Move the `<script>` block below the paragraph and Run.
+
+This is why every example on this site puts scripts at the end. When you move to a separate file,
+`<script src="sketch.js" defer></script>` gives you the same guarantee wherever the tag sits.
+
+## Wrong type, no error
+
+The nastiest failures do not raise anything at all.
+
+<LiveCode title="Why is it 34" height={240} code={`<style>
+  body { font-family: sans-serif; }
+</style>
+
+<p id="out"></p>
+
+<script>
+  const a = "3";      // a string, perhaps from an input field
+  const b = 4;
+
+  console.log("a is", a, typeof a);
+  console.log("b is", b, typeof b);
+
+  document.querySelector("#out").textContent = "a + b = " + (a + b);
+</script>`} />
+
+`"3" + 4` gives `"34"`, because `+` joins strings as happily as it adds numbers, and one string
+in the sum makes it a joining job. No error, only a wrong answer. The two `console.log` lines
+show you the types in the console; `Number(a) + b` is the fix. Every value read from an input
+field or a URL arrives as a string.
+
+## Getting unstuck
+
+- **Narrow it down before you change anything.** Comment out half the code. Still broken? The
+  fault is in the other half. Repeat. Three rounds of this beats an hour of staring.
+- **Change one thing at a time**, and run after each. Two changes at once and you no longer know
+  which one helped.
+- **Search the message, not your situation.** Paste the error text with your own variable names
+  removed. Somebody has had it.
+- **Explain the code out loud**, line by line, to a person, a duck or an AI. The bug frequently
+  surfaces mid-sentence, before anyone answers.
+- **Stop after forty minutes.** Being stuck longer than that stops being productive. Sleep on it;
+  the answer is often obvious the next morning, which is annoying but reliable.
+
+:::tip[This never fully goes away]
+Professionals get stuck weekly. What changes is the vocabulary — after a semester you will read
+`is not a function` and know where to look without thinking. That recognition is built by
+meeting each error a few times, so the ones you hit this week are not wasted time. They are the
+curriculum.
+:::
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'The console says "Uncaught TypeError: Cannot read properties of null (reading \'style\')" at line 12. What do you look at first?',
+			options: [
+				'Whether the CSS file is loading',
+				'Whether the querySelector on or before line 12 actually matched an element',
+				'Whether the browser supports style',
+			],
+			answer: 1,
+			explanation:
+				'null means the lookup found nothing. Either the selector does not match anything in the HTML, or the script ran before the element existed. Both are fixed by looking at that one line and the tag it refers to.',
+		},
+		{
+			q: 'A stack trace lists five "at" lines. Which one do you read first?',
+			options: [
+				'The last one, where the program started',
+				'The top one, and then down to the first line in a file you wrote',
+				'They are printed in random order',
+			],
+			answer: 1,
+			explanation:
+				'The trace is most-recent-first: the top is where the failure happened. The lines beneath it are the route that got there, which tells you which call was the bad one when a function is used in several places.',
+		},
+		{
+			q: 'Your page does exactly nothing when you click the button, and the console is empty. What is that a sign of?',
+			options: [
+				'A syntax error somewhere in the file',
+				'Something wired to the wrong place — wrong selector, wrong event name, or a function that is never called',
+				'A browser that needs updating',
+			],
+			answer: 1,
+			explanation:
+				'Silence means no code threw. Something perfectly valid is attached to the wrong thing or never invoked. A console.log at the top of the handler settles it in ten seconds: if it does not print, the handler is not running.',
+		},
+	]}
+/>

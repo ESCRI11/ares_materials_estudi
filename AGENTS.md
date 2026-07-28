@@ -61,13 +61,18 @@ Three formats, in order of preference:
   test ("install this", "push your first commit"). Use for git, terminal, Figma, CAD.
   Markdown renders these disabled, so a script in `astro.config.mjs` re-enables them and
   persists ticks to `localStorage` per page. Nothing to import.
-- **`<P5Embed>`** — `import P5Embed from '@components/P5Embed.astro'`, then
-  `<P5Embed src="https://editor.p5js.org/<user>/embed/<sketchId>" title="…" />`. Get that
-  URL from the p5.js editor's share dialog. It's the editor they'll use in class, and it
-  costs us nothing to maintain.
+- **`<LiveCode>`** — `import LiveCode from '@components/LiveCode.astro'`, then
+  `<LiveCode title="…" code={\`<p>hello</p>\`} />`. An editable HTML/CSS/JS snippet that
+  runs in the page, with Run and Reset. The code prop is the single source: it fills the
+  editor and the first render, so don't repeat the snippet in a markdown fence above it.
+  Include `<style>` and `<script>` tags inside the string as needed. Sandboxed to scripts
+  only, so a snippet cannot reach this page or the network as us.
+- **`<Embed>`** — `import Embed from '@components/Embed.astro'`, then
+  `<Embed src="…" title="…" />` for an external tool: a Wokwi circuit, a p5 sketch.
+  **Only pass a URL you have actually opened.** A dead iframe is worse than a link.
 
-**Do not build an in-page code sandbox** (CodeMirror + live preview). It was considered and
-deliberately deferred. Revisit only if the p5 embed proves inadequate.
+**Do not add a syntax-highlighting code editor** to `<LiveCode>`. A plain textarea is
+enough for snippets this size; CodeMirror was considered and deliberately declined.
 
 ## The glossary
 
@@ -119,32 +124,55 @@ come out in the brand palette automatically. Don't hardcode a hex in a component
 - Short lessons. One concept per page, 5–10 minutes to read.
 - Every technical claim the reader must act on gets a copy-pasteable command or a screenshot.
 - Prefer showing the smallest thing that works over the complete API surface.
+- **Never invent a URL.** Link only to pages you are certain exist — the tool's own
+  documentation root, MDN, the product download page. A confident dead link costs the
+  reader more than a missing one. The same goes for `<Embed src>`.
+- Don't promise a screenshot you cannot produce. Describe what the reader will see instead.
 
-## Content map (provisional — derived from the syllabus course list)
+## Content map
 
-| Section | Covers | Syllabus course |
-|---|---|---|
-| Getting Started | Machine setup, accounts, what these tools are for | — |
-| Terminal & Files | Shell basics, paths, installing things | baseline |
-| Git & GitHub | Repos, commits, branches, PRs, Pages | Documentation and Communication (ID131.02, ID162.01) |
-| Markdown & Docs | Markdown, documenting a project | Documentation and Communication |
-| JavaScript Basics | Variables, loops, functions, the browser console | Creative Coding Foundations (ID102.01) |
-| Creative Coding | p5.js, canvas, animation, interaction | Creative Coding Foundations |
-| Physical Computing | Breadboards, sensors, actuators, circuits | Creating Tangible Interfaces (ID140.01) |
-| Arduino | Arduino C++, serial communication | Programming Interactive Objects (ID140.02) |
-| Digital Fabrication | CAD, vectors for laser cutting, 3D printing/slicers | Digitally Designed Objects (ID120.01) |
-| Design Tools | Figma, components, prototyping | Designing Digital Experiences (ID111.01) |
-| Data | Spreadsheets, CSV/JSON, basic visualisation | Making Sense of Data (ID190.01) |
-| AI as a Material | LLM/ML concepts, prompting, APIs, ethics | Intelligence as a Material (ID131.02) |
+Scope is **semester 1 only**. Taken from the per-course pages of the syllabus (pp. 18–39),
+cross-checked against maind.supsi.ch. Folder names are the directories under
+`src/content/docs/`; sidebar order in `astro.config.mjs` follows this table.
+
+| # | Folder | Covers | Syllabus course |
+|---|---|---|---|
+| 1 | `your-machine` | Files and paths, the terminal, package managers, VS Code | baseline — no course teaches this |
+| 2 | `git-and-github` | Version control, commits, branches, PRs, Markdown, Pages | ID102.01 names both as required tools |
+| 3 | `html-and-css` | Elements, selectors, box model, flexbox, responsive, dev tools | Creative Coding Foundations (ID102.01) |
+| 4 | `javascript` | Console, variables, loops, functions, **DOM**, events, **Canvas**, **microphone**, **fetch/APIs**, debugging | Creative Coding Foundations (ID102.01) |
+| 5 | `physical-computing` | Electricity, circuits, breadboards, **Arduino + MicroPython**, sensors, actuators, serial | Creating Tangible Interfaces (ID140.01) |
+| 6 | `digital-fabrication` | **Fusion 360**, parametric modelling, laser cutting, 3D printing, slicers | Digitally Designed Objects (ID120.01) |
+| 7 | `ai-as-a-material` | LLM fundamentals, prompting, cloud APIs, **local models**, ethics | Intelligence as a Material (ID131.02) |
+| 8 | `data` | Data in design, CSV/JSON, structuring, visual models, ML training vs prompting | Making Sense of Data (ID190.01) |
+| 9 | `design-methods` | Design Thinking, research plans, insights, **flow and customer-experience mapping**, adaptive/agentic vocabulary | ID111.01, ID180.01, ID170.02 |
+
+Two facts that are easy to get wrong, because the obvious guess is the wrong one:
+
+- **Creative Coding is plain JavaScript, HTML, CSS and Canvas in VS Code — not p5.js.**
+- **Physical Computing is Arduino boards with MicroPython — not Arduino C++.**
+
+Deliberately out of scope: **Documentation and Communication** (ID120.02, ID140.02 — video,
+product photography, schematics, portfolio). Excluded by the author. Do not add it back
+without being asked. Semesters 2–4 are also out of scope.
+
+Physical Computing states the only explicit prerequisite in the syllabus — *"basic knowledge
+of programming and code structures"* — which is why §4 comes before §5, and why §5 opens
+with a bridge from JavaScript to MicroPython rather than teaching Python from scratch.
+
+The Arduino kit is handed out during the course, so **electronics exercises must not assume
+the reader owns hardware**. Use the Wokwi browser simulator.
 
 ## Deploy
 
 Push to `main` → `.github/workflows/deploy.yml` builds and publishes to
 https://escri11.github.io/ares_materials_estudi. Project-page deploy, so `astro.config.mjs`
 must keep both `site` and `base` set — dropping `base` silently breaks every asset URL in
-production while working fine locally. Internal links written by hand (hero actions in
-`index.mdx`, for instance) need the `/ares_materials_estudi` prefix; links inside markdown
-prose get it automatically.
+production while working fine locally. **Every internal link needs the `/ares_materials_estudi`
+prefix written out** — in hero actions, in MDX components, and in ordinary markdown prose
+alike. Astro does not add it for you, and a link without it 404s in production while working
+perfectly on localhost. `npm run build` does not catch this; the link checker in
+`scripts/check-links.mjs` does.
 
 Run `npm run build` before committing. It catches broken links, bad frontmatter, and
 malformed component props.

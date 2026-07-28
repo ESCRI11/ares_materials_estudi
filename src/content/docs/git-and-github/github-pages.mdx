@@ -1,0 +1,106 @@
+---
+title: Publishing with GitHub Pages
+description: Turn a repository into a live website for free — for coursework, documentation, or a portfolio.
+sidebar:
+  order: 6
+---
+
+**GitHub Pages** takes the files in a repository and serves them as a website at a public
+address, free, with no server to rent and nothing to configure. Push a change and the live
+site updates itself.
+
+That makes it the cheapest way to hand in something a lecturer can click, and a perfectly
+respectable place to keep a portfolio. The site you are reading is published this way.
+
+## What it can and cannot host
+
+Pages serves **static** files: HTML, CSS, JavaScript, images, PDFs. **Static** means the
+files are sent to the visitor exactly as they sit in the repository — the server does no
+thinking.
+
+That covers almost everything you will make in the first semester: a page, a sketch running
+in the browser, project documentation, a portfolio.
+
+What it cannot do is run code on the server. No database, no PHP, no login system, no
+private form submissions. If a tutorial tells you to install something "on the server",
+Pages is not the tool. JavaScript still runs normally — it runs in the visitor's browser,
+which is where your sketches run anyway.
+
+## Publish a folder
+
+You need one file called `index.html` in the top folder of the repository. That name is not
+a convention you can ignore: it is the page served when someone visits the address with
+nothing after it.
+
+```html
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>My first published page</title>
+	</head>
+	<body>
+		<h1>It works</h1>
+	</body>
+</html>
+```
+
+Commit it and push it. Then, on the repository page on GitHub:
+
+1. Open the **Settings** tab, along the top of the repository.
+2. Choose **Pages** in the sidebar on the left.
+3. Under **Build and deployment**, set **Source** to *Deploy from a branch*.
+4. Choose branch `main` and folder `/ (root)`, then **Save**.
+
+GitHub starts a build. It takes a minute or two the first time — reload the Pages settings
+page and the address appears at the top once it is live. A `404` in the first minute means
+"not finished yet", not "broken".
+
+Your address follows one of two patterns:
+
+- **A project site**, which is what you have made: `USERNAME.github.io/REPOSITORY`.
+- **A user site**: name a repository exactly `USERNAME.github.io` and it publishes at
+  `USERNAME.github.io` with nothing after it. One per account, and the natural home for a
+  portfolio.
+
+From then on, every push to `main` republishes the site. There is no separate upload step.
+
+:::caution[Paths with a leading slash break on project sites]
+A project site lives in a subfolder of the domain, so `/style.css` points at the top of
+`USERNAME.github.io` — not at your project — and the file is not found. Write paths relative
+to the page instead: `style.css`, `images/photo.jpg`, `../about.html`. This works locally
+*and* published, which absolute paths do not.
+:::
+
+## Things worth knowing before you rely on it
+
+- **The site is public even when you might not expect it.** Anything committed to the
+  repository is served. Never commit a password, a token, or an API key; assume anything in
+  the folder can be read.
+- **Publishing from a private repository needs a paid plan.** Public repositories publish
+  for free, which is the normal arrangement for coursework.
+- **Changes are not instant.** Give it a minute, then reload with a hard refresh — hold
+  `Shift` while reloading — because your browser caches aggressively.
+- **A build can fail**, and when it does the site keeps serving the last good version. The
+  **Actions** tab of the repository shows each publish attempt and whether it worked.
+
+For anything past this — custom domains, custom error pages, the alternative workflow-based
+publishing — GitHub documents Pages thoroughly at
+[docs.github.com/en/pages](https://docs.github.com/en/pages).
+
+:::tip[Point it at your work early]
+A published address is a link you can put in an email, a message to a lecturer, or an
+application. Get one working now, with something small on it, rather than at the point where
+a deadline depends on it behaving.
+:::
+
+## Do this now
+
+- [ ] I created a repository with an `index.html` in its top folder
+- [ ] I pushed it to GitHub
+- [ ] I turned Pages on: Settings, Pages, deploy from branch `main`, folder `/ (root)`
+- [ ] I waited, reloaded, and opened my live address in a browser
+- [ ] I changed the page, committed, pushed, and saw the live site update
+- [ ] I added a CSS file and linked it with a relative path, no leading slash
+- [ ] I added an image and checked it loads on the published site, not only locally
+- [ ] I saved the address somewhere I will find it again

@@ -1,0 +1,252 @@
+---
+title: From JavaScript to MicroPython
+description: You already know how to program. This is a costume change — the same ideas in different clothes.
+sidebar:
+  order: 4
+---
+
+import Quiz from '@components/Quiz.astro';
+
+The boards you will use in *Creating Tangible Interfaces* are programmed in **MicroPython**:
+a version of the Python language cut down to fit on a microcontroller, with extra parts for
+talking to pins. It is the reason the course lists "basic knowledge of programming and code
+structures" as its only prerequisite. You have that now.
+
+So this lesson is not a Python course. It is a translation table. Variables are still
+variables, a loop is still a loop, a function is still a function — the concepts you learned
+in the JavaScript section transfer whole. What changes is punctuation and a handful of names.
+
+## The five differences that matter
+
+1. **Indentation replaces braces.** Where JavaScript wraps a block in `{` and `}`, Python
+   marks it by moving it to the right. The indentation is not style; it is the syntax. Get it
+   wrong and the program is wrong.
+2. **A colon opens a block.** Every line that starts a block — `if`, `for`, `while`, `def` —
+   ends in `:`.
+3. **No semicolons**, and no `let`, `const` or `var`. You name a variable by assigning to it.
+4. **`print()` instead of `console.log()`.**
+5. **Capital letters where you did not expect them:** `True`, `False`, and `None` in place of
+   `null`.
+
+Everything below is a consequence of those.
+
+## Side by side
+
+Variables and printing:
+
+```js
+// JavaScript
+let count = 0;
+const name = "sensor";
+count = count + 1;
+console.log(name, count);
+```
+
+```python
+# MicroPython
+count = 0
+name = "sensor"
+count = count + 1
+print(name, count)
+```
+
+Comments start with `#`, not `//`. There is no separate "constant" keyword — a name written
+in capitals, like `MAX_BRIGHTNESS`, is the convention for "do not change this", and it is
+honoured by agreement rather than enforced.
+
+Conditions:
+
+```js
+// JavaScript
+if (value > 500) {
+  console.log("bright");
+} else if (value > 100) {
+  console.log("dim");
+} else {
+  console.log("dark");
+}
+```
+
+```python
+# MicroPython
+if value > 500:
+    print("bright")
+elif value > 100:
+    print("dim")
+else:
+    print("dark")
+```
+
+`else if` becomes `elif`, and the brackets around the condition are gone. The comparison
+operators are the same, except that Python has no `===` — `==` already compares values without
+converting types, so it does the job of the strict one you were told to prefer.
+
+Loops:
+
+```js
+// JavaScript
+for (let i = 0; i < 10; i++) {
+  console.log(i);
+}
+
+while (true) {
+  // forever
+}
+```
+
+```python
+# MicroPython
+for i in range(10):
+    print(i)
+
+while True:
+    pass  # forever
+```
+
+`range(10)` produces 0 to 9, the same numbers the three-part JavaScript loop gives you, with
+less to get wrong. `pass` is a placeholder meaning "deliberately nothing here" — Python needs
+a block to contain something, and this is how you say it contains nothing yet.
+
+Functions:
+
+```js
+// JavaScript
+function brightness(raw) {
+  return raw / 65535;
+}
+```
+
+```python
+# MicroPython
+def brightness(raw):
+    return raw / 65535
+```
+
+`function` becomes `def`. Calling is identical: `brightness(3200)`.
+
+Lists:
+
+```js
+// JavaScript
+const readings = [12, 40, 7];
+readings.push(99);
+console.log(readings.length, readings[0]);
+```
+
+```python
+# MicroPython
+readings = [12, 40, 7]
+readings.append(99)
+print(len(readings), readings[0])
+```
+
+What JavaScript calls an array, Python calls a **list**. Square brackets and zero-based
+indexing are the same. `push` becomes `append`, and length is `len(readings)` rather than
+`readings.length` — a function you apply to the thing, rather than a property of it. That
+pattern repeats across the language.
+
+## The rest of the translation table
+
+| JavaScript | MicroPython |
+|---|---|
+| `console.log(x)` | `print(x)` |
+| `// comment` | `# comment` |
+| `let` / `const` / `var` | nothing — assign the name |
+| `true` / `false` | `True` / `False` |
+| `null` / `undefined` | `None` |
+| `&&` / `\|\|` / `!` | `and` / `or` / `not` |
+| `===` | `==` |
+| `!==` | `!=` |
+| `array.length` | `len(list)` |
+| `array.push(x)` | `list.append(x)` |
+| `` `total: ${n}` `` | `f"total: {n}"` |
+| `function f() {}` | `def f():` |
+| `else if` | `elif` |
+| `for (let i = 0; i < n; i++)` | `for i in range(n):` |
+| an object `{ a: 1 }` | a dictionary `{"a": 1}` |
+
+The last row is worth a sentence. A Python **dictionary** is a set of key-and-value pairs,
+the same idea as a JavaScript object used as a bag of data — but the keys are written as
+strings in quotes, and you always reach in with square brackets: `config["speed"]`, not
+`config.speed`.
+
+## Indentation, properly
+
+This is the one that bites. Python decides what belongs to a block purely by how far it is
+indented:
+
+```python
+for i in range(3):
+    print("inside the loop")
+    print("also inside")
+print("outside — runs once")
+```
+
+Move that last line four spaces to the right and it runs three times instead of once. Nothing
+warns you, because both versions are valid programs; they are different ones.
+
+Two rules keep you out of trouble:
+
+- **Four spaces per level.** Not two, not a tab. Every Python editor can be told to insert
+  spaces when you press Tab, and Wokwi and Thonny already do.
+- **Never mix tabs and spaces in one file.** They look identical on screen and the interpreter
+  treats them as different, which produces a confusing `IndentationError` at a line that looks
+  perfectly fine.
+
+## What is not coming with you
+
+The JavaScript you wrote lived in a browser and had a browser's furniture: `document`,
+`addEventListener`, `fetch`, a canvas to draw on. None of that exists on a microcontroller,
+because there is no page and no window.
+
+In its place you get modules for the hardware. A **module** is a bundle of ready-made code you
+pull in with `import`, the same idea as a library:
+
+```python
+from machine import Pin
+import time
+```
+
+`machine` is the module that gives you access to the pins and the hardware inside the chip.
+`time` gives you delays and a clock. Between them they cover most of this section. The next
+lesson uses both.
+
+:::tip[Three mistakes you will make in the first hour]
+Forgetting the `:` at the end of an `if` or `for` line. Writing `true` instead of `True`.
+Leaving a stray semicolon, which Python accepts silently and which will confuse you later.
+All three are cheap and all three stop happening within a day.
+:::
+
+The reference for the language and the hardware modules is at
+[micropython.org](https://micropython.org/), and the same site hosts the documentation. Read
+it the way you read MDN: to look one thing up, not front to back.
+
+<Quiz
+	questions={[
+		{
+			q: 'What does indentation do in Python?',
+			options: [
+				'Nothing — it is a style convention, like in JavaScript',
+				'It defines which lines belong to a block, replacing curly braces',
+				'It marks comments',
+			],
+			answer: 1,
+			explanation:
+				'Indentation is the syntax. Moving a line in or out changes which block it belongs to and therefore changes what the program does — without producing an error, because both versions are valid code.',
+		},
+		{
+			q: 'You want to translate `if (a && !b) { ... }` into MicroPython. Which is right?',
+			options: ['if a && !b:', 'if (a and not b) { }', 'if a and not b:'],
+			answer: 2,
+			explanation:
+				'Python spells the logical operators as words — and, or, not — drops the brackets around the condition, ends the line with a colon, and marks the block with indentation instead of braces.',
+		},
+		{
+			q: 'In MicroPython, how do you get the number of items in a list called readings?',
+			options: ['readings.length', 'len(readings)', 'readings.count()'],
+			answer: 1,
+			explanation:
+				'Length is a function applied to the object, not a property of it. That pattern is general: where JavaScript hangs things off the value, Python often provides a built-in function you pass the value to.',
+		},
+	]}
+/>

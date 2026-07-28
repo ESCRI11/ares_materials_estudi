@@ -1,0 +1,239 @@
+---
+title: Functions
+description: Naming a block of instructions so you can run it whenever you like. Parameters, arguments, return values, and the arrow syntax you will see everywhere.
+sidebar:
+  order: 5
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+A **function** is a block of instructions with a name. You write it once, and afterwards you
+run it by writing its name — as many times as you like, from anywhere.
+
+You have already used several. `console.log` is a function someone else wrote; so is
+`Math.pow`. This lesson is about writing your own, which is less a technical step than an
+organisational one. Functions exist so that a program can be read.
+
+## Writing one
+
+<LiveCode
+	title="A function, and two calls"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  function px(size) {
+    return size + "px";
+  }
+
+  console.log(px(16));
+  console.log(px(24));
+</script>`}
+/>
+
+The pieces:
+
+- `function` — the keyword that starts a **declaration**: you are describing what this
+  function does, not doing it. Nothing inside those curly brackets runs at this point.
+- `px` — the name. Same rules and same care as naming a variable.
+- `(size)` — the **parameter**: a name for a value the function will be given when it is used.
+  Inside the block, `size` behaves like an ordinary variable.
+- `return size + "px"` — the value the function hands back to whoever called it.
+
+`px(16)` is a **call**: run the function now, with `16` as its **argument**. Parameter and
+argument are the two halves of the same idea, and the words are worth keeping straight —
+the *parameter* is the name in the declaration, the *argument* is the actual value you pass in
+at the call. Every call can pass something different, which is the whole point.
+
+Note the order things happen: the declaration is skipped over, and the code inside only runs
+when a call reaches it. Reading a program top to bottom, functions are the parts that do not
+happen yet.
+
+## Returning a value
+
+`return` does two things: it decides what the call produces, and it ends the function
+immediately. Anything written after it never runs.
+
+A call to a function that returns a value *is* a value. It can be printed, stored in a
+variable, or passed straight into another call.
+
+<LiveCode
+	title="A call is a value"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  function scale(base, steps) {
+    return base * Math.pow(1.25, steps);
+  }
+
+  const heading = scale(16, 4);
+  console.log(heading);
+  console.log(px(heading));
+
+  function px(size) {
+    return size + "px";
+  }
+</script>`}
+/>
+
+Two things there. First, a function can take more than one parameter — separate them with
+commas, and the arguments line up in the same order. Swap them at the call and you get
+nonsense, silently, with no error.
+
+Second, `px` is used above the line that declares it and it still works. Function declarations
+are hoisted: JavaScript reads the whole file for them before running any of it. You do not
+have to rely on that, and mostly you should not, but it explains code that looks impossible.
+
+A function with no `return` still finishes; it just hands back `undefined`, JavaScript's word
+for "no value here". That is correct and normal for a function whose job is to *do* something
+rather than work something out — printing, drawing, saving.
+
+## Why bother
+
+Two reasons, and cleverness is not one of them.
+
+**Naming.** `contrastRatio(a, b)` says what the six lines inside it are for. A reader — you,
+next month — can trust the name and skip the arithmetic. A program made of well-named
+functions can be read at the level of what it does, dropping into detail only where needed.
+
+**One place to change.** The moment the same calculation appears twice, the two copies start
+drifting apart. Fix the rounding in one and the other quietly stays wrong. Put it in a
+function and there is one copy, one place to fix it.
+
+The trigger for pulling something into a function is not length. It is having to explain, or
+having to copy.
+
+## What happens inside stays inside
+
+A variable declared inside a function exists only inside it. Once the function returns, the
+name is gone.
+
+<LiveCode
+	title="Local names"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  function tidy(name) {
+    const trimmed = name.trim();
+    return trimmed;
+  }
+
+  console.log(tidy("  Ana  "));
+  console.log(typeof trimmed);
+</script>`}
+/>
+
+`typeof trimmed` reports `undefined` — from outside, that name has never existed. This is
+called **scope**, and it is a feature, not a restriction: two functions can both use a
+variable called `i` or `size` without ever interfering with each other.
+
+## Arrow functions
+
+There is a second, shorter way to write a function, and you will meet it in every piece of
+modern JavaScript you read.
+
+<LiveCode
+	title="The same function, twice"
+	height={200}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  function double(n) {
+    return n * 2;
+  }
+
+  const doubleArrow = (n) => n * 2;
+
+  console.log(double(21), doubleArrow(21));
+</script>`}
+/>
+
+An **arrow function** has no `function` keyword and no name of its own — it is a value, so you
+store it in a variable and call it through that. When the body is a single expression you can
+drop the curly brackets and the word `return`: the value of that expression is returned
+automatically.
+
+For a body of several lines, the brackets and `return` come back:
+
+```js
+const px = (size) => {
+	const rounded = Math.round(size);
+	return rounded + "px";
+};
+```
+
+The two forms do very nearly the same thing. There is one real difference, involving a keyword
+called `this` inside objects, which will not affect you for a while. Write whichever reads
+better; be able to read both, because the libraries and examples you will meet are full of
+arrows.
+
+You have been looking at one all along. The scaffolding line at the top of every snippet in
+this section —
+
+```js
+console.log = (...values) => out.textContent += values.join(" ") + "\n";
+```
+
+— is an arrow function stored in `console.log`, replacing the browser's own. `(...values)`
+collects however many arguments were passed into a list, and `join(" ")` glues that list into
+one string with spaces between. That line is why `console.log("a", "b")` prints `a b`.
+
+## Evaluation
+
+Write the body of `initials` so that `initials("Ana", "Blanco")` returns `"AB"`. The piece you
+need: `word[0]` gives the first character of a string.
+
+<LiveCode
+	title="Fill in the body"
+	height={200}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  function initials(first, last) {
+    return "??";
+  }
+
+  console.log(initials("Ana", "Blanco"));
+  console.log(initials("Bruno", "Kessler"));
+</script>`}
+/>
+
+<Quiz
+	questions={[
+		{
+			q: 'function shout(word) { console.log(word + "!"); } — then const result = shout("hey"); console.log(result); What does the second line print?',
+			options: ['hey!', 'undefined', 'Nothing at all'],
+			answer: 1,
+			explanation:
+				'shout prints, but it has no return, so the call itself produces undefined and that is what lands in result. Printing and returning are different jobs: one shows a human, the other hands a value back to the code.',
+		},
+		{
+			q: 'function area(w, h) { return w * h; } — a program calls area(3, 4) and then area(4, 3). What happens?',
+			options: [
+				'Both calls return 12',
+				'The second call is an error, because the arguments are in the wrong order',
+				'The second call returns 12 but with a warning',
+			],
+			answer: 0,
+			explanation:
+				'Arguments are matched to parameters by position, and nothing checks whether the order made sense — here multiplication makes both 12. That silence is why parameter names matter: with area(width, height) a reader can see which is which at the call.',
+		},
+		{
+			q: 'Which of these is the same as function half(n) { return n / 2; }?',
+			options: ['const half = (n) => n / 2;', 'const half = (n) => { n / 2; };', 'const half = n / 2;'],
+			answer: 0,
+			explanation:
+				'An arrow with a single expression as its body returns that expression automatically. Adding curly brackets, as in the second option, makes it a block — and a block with no return hands back undefined. The third stores a calculation, not a function.',
+		},
+	]}
+/>
+
+Next: [lists and labelled collections](/ares_materials_estudi/javascript/arrays-and-objects/).

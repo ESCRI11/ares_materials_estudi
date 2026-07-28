@@ -1,0 +1,213 @@
+---
+title: Events
+description: Making a page react — addEventListener, clicks, typing, keys, and why the code you write runs later.
+sidebar:
+  order: 8
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+Everything you have written so far runs once, top to bottom, the moment the page loads, and
+then the program is over. Interaction is the opposite: nothing happens until somebody does
+something. This lesson is how you write code for a moment that has not arrived yet.
+
+## Something happened
+
+An **event** is the browser's announcement that something occurred: a click, a key pressed, a
+value typed, the page finishing loading, the mouse moving. The browser fires hundreds of them
+and ignores all of them unless you have asked to be told.
+
+Asking is `addEventListener`. You call it on an element, and you pass two things: the name of
+the event, and a function to run when it happens.
+
+```js
+button.addEventListener("click", function () {
+	// runs on every click, never before
+});
+```
+
+That function is a **callback** — a function you hand to someone else so they can call it back
+later. You are not calling it. You are leaving it with the browser, like a phone number.
+
+## The first one
+
+<LiveCode title="A button that counts" height={210} code={`<style>
+  body { font-family: sans-serif; }
+</style>
+
+<button id="go">Press me</button>
+<p id="out">Not pressed yet.</p>
+
+<script>
+  const button = document.querySelector("#go");
+  const out = document.querySelector("#out");
+  let count = 0;
+
+  button.addEventListener("click", function () {
+    count = count + 1;
+    out.textContent = "Pressed " + count + " times.";
+  });
+</script>`} />
+
+Two things worth noticing.
+
+The page appears instantly with "Not pressed yet." — the callback has not run. It is waiting.
+
+`count` lives outside the callback but the callback can still see it, and its value survives
+between clicks. A variable declared *inside* the callback would be created fresh on every
+click and would never get past 1.
+
+## The mistake everybody makes once
+
+```js
+button.addEventListener("click", sayHello());   // wrong
+button.addEventListener("click", sayHello);     // right
+```
+
+The brackets mean *run this now*. With brackets, `sayHello` runs immediately as the page loads,
+and whatever it returned — usually nothing — gets registered as the listener. Without brackets
+you are passing the function itself, which is what the browser wants.
+
+The shorter arrow form is the same idea and is what you will mostly see in class:
+
+```js
+button.addEventListener("click", () => {
+	console.log("clicked");
+});
+```
+
+## The event object
+
+The browser passes your callback one argument: an **event object** describing what happened.
+Name it whatever you like — `event` is the convention. What is inside it depends on the event.
+
+- `event.target` — the element the event happened on
+- `event.key` — for keyboard events, which key it was, as text
+- `event.offsetX` and `event.offsetY` — for mouse events, the position inside the element
+
+<LiveCode title="Which key did you press?" height={230} code={`<style>
+  body { font-family: sans-serif; }
+  #out { font-family: monospace; font-size: 20px; }
+</style>
+
+<p>Click inside this box first, then press any key.</p>
+<p id="out">waiting…</p>
+
+<script>
+  const out = document.querySelector("#out");
+
+  document.addEventListener("keydown", (event) => {
+    out.textContent = "key: " + event.key;
+  });
+</script>`} />
+
+Try a letter, then Shift, then an arrow key. `event.key` gives you `"a"`, `"Shift"`,
+`"ArrowLeft"` — a string, so compare it with `===` as you would any other string. The listener
+here is on `document` rather than on one element, because a key press does not belong to any
+particular box.
+
+## Typing: the input event
+
+`click` fires once. `input` fires on every keystroke, and it is how a page updates while
+someone types rather than after they finish. The current contents of a text field or slider
+live in its `value` property.
+
+<LiveCode title="Live preview while typing" height={250} code={`<style>
+  body { font-family: sans-serif; }
+  #preview { font-size: 28px; margin-top: 12px; }
+</style>
+
+<input id="field" type="text" placeholder="Type a name" />
+<input id="size" type="range" min="12" max="60" value="28" />
+<p id="preview">…</p>
+
+<script>
+  const field = document.querySelector("#field");
+  const size = document.querySelector("#size");
+  const preview = document.querySelector("#preview");
+
+  field.addEventListener("input", (event) => {
+    preview.textContent = event.target.value;
+  });
+
+  size.addEventListener("input", (event) => {
+    preview.style.fontSize = event.target.value + "px";
+  });
+</script>`} />
+
+Note that `value` is always a **string**, even from a number slider. `"28" + "px"` gives
+`"28px"`, which is what CSS wants here. When you need to do arithmetic with it, convert first
+with `Number(event.target.value)`.
+
+## Events you will actually use
+
+| Event | Fires when |
+| --- | --- |
+| `click` | an element is clicked or tapped |
+| `input` | the value of a field or slider changes |
+| `change` | a select or checkbox is committed |
+| `keydown` | a key goes down |
+| `mousemove` | the pointer moves over the element |
+| `pointerdown` | mouse, touch, or pen goes down — the one to use for drawing |
+
+One element can have as many listeners as you like, including several for the same event. They
+all run, in the order you added them.
+
+The full list is on
+[MDN](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener); six of
+them cover most of a semester.
+
+## Your turn
+
+The button below does nothing. Make it toggle the `dark` class on the `body` element, so
+pressing it flips the page between light and dark. `classList.toggle` from the previous lesson
+does the work in one line.
+
+<LiveCode title="Challenge" height={230} code={`<style>
+  body { font-family: sans-serif; background: #f7f7f7; color: #1b1b1b; }
+  body.dark { background: #1b1b1b; color: #f7f7f7; }
+</style>
+
+<button id="flip">Flip the lights</button>
+
+<script>
+  const flip = document.querySelector("#flip");
+
+  // Add a click listener that toggles the "dark" class on document.body
+</script>`} />
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'Why does the counter example put "let count = 0" outside the click callback?',
+			options: [
+				'Variables cannot be declared inside a function',
+				'So the value survives between clicks instead of being recreated each time',
+				'Because callbacks run before the rest of the page',
+			],
+			answer: 1,
+			explanation:
+				'Everything declared inside the callback is created fresh on every click and thrown away at the end of it. The count has to live somewhere that outlasts a single click.',
+		},
+		{
+			q: 'What is wrong with button.addEventListener("click", start())?',
+			options: [
+				'Nothing — this is the standard form',
+				'The brackets run start immediately and register its return value instead of the function',
+				'"click" should be "onclick"',
+			],
+			answer: 1,
+			explanation:
+				'Brackets mean "run this now". You want to hand the browser the function itself so it can call it later, so the name goes in without brackets.',
+		},
+		{
+			q: 'A range slider fires an input event and you read event.target.value. What type is it?',
+			options: ['A number', 'A string', 'A boolean'],
+			answer: 1,
+			explanation:
+				'Form field values are always strings. Concatenating one with "px" works by accident; adding it to a number does not. Wrap it in Number() before doing arithmetic.',
+		},
+	]}
+/>

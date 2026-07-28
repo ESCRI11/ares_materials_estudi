@@ -1,0 +1,174 @@
+---
+title: Moving around from the keyboard
+description: pwd, ls, cd and tab completion — walking your folder tree without a mouse, on macOS and on Windows.
+sidebar:
+  order: 3
+---
+
+import Quiz from '@components/Quiz.astro';
+
+A terminal is always standing somewhere. There is one folder it considers "here", and
+every command you type acts on that folder unless you say otherwise. That folder is the
+**working directory**, and this lesson is entirely about seeing it, listing it, and
+changing it.
+
+Three commands do the job. You will use them every day for the rest of the master.
+
+## Where am I
+
+```sh
+pwd
+```
+
+Short for *print working directory*. It answers with an absolute path — the full address
+of the folder you are in. Works on macOS and in PowerShell.
+
+When a tool says it cannot find a file that you can clearly see, `pwd` is the first thing
+to type. Nine times out of ten you are standing in the wrong place.
+
+## What is in here
+
+```sh
+ls
+```
+
+Lists the files and folders in the working directory. The output looks different on the
+two systems — macOS gives you bare names in columns, PowerShell gives you a table with
+dates and sizes — but the question being asked is the same.
+
+Two useful variants:
+
+| | macOS | Windows PowerShell |
+|---|---|---|
+| Long listing with sizes and dates | `ls -l` | `ls` already does this |
+| Include hidden files | `ls -a` | `ls -Force` |
+
+**Hidden files** are ones whose name starts with a dot, like `.git` or `.gitignore`. They
+are not secret; the convention exists to keep configuration out of your way. You will meet
+several of them in the git section, and they are invisible until you ask.
+
+## Going somewhere else
+
+```sh
+cd Documents
+```
+
+Short for *change directory*. Afterwards, `pwd` will show you one level deeper. The
+important moves:
+
+```sh
+cd Documents      # go into a folder that is here
+cd ..             # go up one level, to the parent folder
+cd ../..          # up two levels
+cd ~              # go home, from anywhere
+cd ~/Desktop      # straight to an absolute location, from anywhere
+```
+
+Everything after `#` in those lines is a comment for you, not part of the command — leave
+it out when you type.
+
+The argument to `cd` is a path, exactly as described in the paths lesson: relative if it
+starts with a folder name or with `..`, absolute if it starts with `/`, `C:\` or `~`. This
+is the moment that lesson pays for itself.
+
+:::note[Windows accepts both slashes]
+PowerShell understands `cd Documents/thesis` as well as `cd Documents\thesis`. Where these
+lessons show a forward slash, you can type it as written.
+:::
+
+## Tab completion, the habit that matters most
+
+Type the first two or three letters of a name and press **Tab**. The shell finishes it for
+you.
+
+```sh
+cd Doc      # press Tab here
+```
+
+becomes `cd Documents/` on its own. This is not only about typing speed:
+
+- If Tab completes the name, that folder **definitely exists**, spelled that way.
+- If nothing happens, what you typed matches nothing — or matches several things, and
+  pressing Tab a second time lists them.
+- Names with spaces get escaped or quoted correctly, which is fiddly to do by hand.
+
+Learn to press Tab reflexively after every few characters. People who look fluent in a
+terminal are mostly people who never type a full filename.
+
+If you do need to type a name with a space in it yourself, wrap it in quotes — this works
+on both systems:
+
+```sh
+cd "Design Research"
+```
+
+## Two shortcuts worth stealing
+
+**Drag a folder into the terminal window** and its full path is pasted at the cursor. Handy
+when the folder is somewhere deep and you have it open in a window anyway. This works in
+macOS Terminal and in Windows Terminal; if nothing appears on Windows, hold Shift,
+right-click the folder in File Explorer, and choose *Copy as path* instead.
+
+**Up arrow** to bring back the last command, then edit it, rather than retyping.
+
+## Making a folder
+
+```sh
+mkdir ind-prep
+```
+
+*Make directory*. Same command on both systems. Do this in your home folder now — it is
+where everything from these lessons will live.
+
+```sh
+cd ~
+mkdir ind-prep
+cd ind-prep
+pwd
+```
+
+Four lines, and you have created a project folder and walked into it. That last `pwd`
+should print something ending in `ind-prep`.
+
+:::caution[Treat capital letters as different letters]
+Your Mac or Windows machine will usually let `Ind-Prep` and `ind-prep` refer to the same
+folder. Linux servers and GitHub will not. A project that works on your laptop and breaks
+after upload is very often one capital letter. Use lowercase and stop thinking about it.
+:::
+
+## Do this on your machine
+
+- [ ] I ran `pwd` and understood the path it printed
+- [ ] I listed the contents of my home folder with `ls`
+- [ ] I saw hidden files with `ls -a` (macOS) or `ls -Force` (Windows)
+- [ ] I moved into a folder with `cd`, then back up with `cd ..`
+- [ ] I got somewhere in one move with `cd ~/Desktop`
+- [ ] I completed a folder name with the Tab key
+- [ ] I created `ind-prep` in my home folder and `pwd` confirms I am inside it
+
+<Quiz
+	questions={[
+		{
+			q: 'pwd prints /Users/ares/projects/site. You type cd .. and press Enter. What does pwd print now?',
+			options: [
+				'/Users/ares/projects',
+				'/Users/ares/projects/site',
+				'/Users/ares',
+			],
+			answer: 0,
+			explanation:
+				'Two dots move you to the parent folder — one level up, no more. Getting to /Users/ares from there would take a second cd .. or a single cd ~.',
+		},
+		{
+			q: 'You press Tab after typing cd Desk and nothing happens. What is the most likely explanation?',
+			options: [
+				'Tab completion is switched off in your terminal',
+				'There is nothing here whose name starts with Desk — you are probably in the wrong folder',
+				'The folder is hidden, so Tab refuses to complete it',
+			],
+			answer: 1,
+			explanation:
+				'Tab completes against the contents of the working directory. Silence means no match, which is a free spell-check and a free existence check. Run ls to see what is actually there, or cd ~ to get home first.',
+		},
+	]}
+/>

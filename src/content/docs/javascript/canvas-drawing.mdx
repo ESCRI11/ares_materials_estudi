@@ -1,0 +1,226 @@
+---
+title: Drawing on canvas
+description: The 2D context, a coordinate system that runs downwards, rectangles, arcs, paths, fill and stroke.
+sidebar:
+  order: 9
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+The DOM lets you rearrange a page. Canvas lets you draw one. It is a rectangle of pixels your
+code can paint into, and it is what Creative Coding Foundations means by generative or
+interactive graphics.
+
+## Getting a surface to draw on
+
+Two parts: a `<canvas>` element in the HTML, and a **context** in the JavaScript. The context
+is the object holding every drawing command — think of it as the brush, where the canvas is the
+paper.
+
+```html
+<canvas id="c" width="300" height="200"></canvas>
+<script>
+	const canvas = document.querySelector("#c");
+	const ctx = canvas.getContext("2d");
+</script>
+```
+
+`"2d"` is the flat drawing context. (There is a 3D one, WebGL, which you will not need this
+semester.) `ctx` is the conventional name and everybody uses it.
+
+:::caution[Set the size in the HTML, not the CSS]
+`width` and `height` as *attributes* set how many pixels the canvas actually has. The same
+values in CSS set how big it looks on screen, and if the two disagree the browser stretches the
+pixels, exactly as if you had scaled up a JPEG. Set the attributes; leave the CSS alone unless
+you want that effect.
+:::
+
+## Y goes down
+
+The origin `0, 0` is the **top-left** corner. X grows to the right, as you would expect. Y grows
+**downwards**, so `y = 100` is a hundred pixels *below* the top edge.
+
+This trips up everyone who has done maths, and it matches what Figma, Illustrator and every
+screen layout tool already do — so as a designer you have the easier time here. Units are
+pixels, and nothing stops you drawing outside the rectangle — those pixels are not visible, and
+no error is reported.
+
+<LiveCode title="Where the corners are" height={280} code={`<canvas id="c" width="300" height="200" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  ctx.fillStyle = "#1b1b1b";
+  ctx.fillRect(0, 0, 60, 40);        // x, y, width, height — the top-left corner
+
+  ctx.fillStyle = "#ffe100";
+  ctx.fillRect(240, 160, 60, 40);    // the bottom-right corner
+
+  ctx.fillStyle = "#888";
+  ctx.fillRect(140, 90, 20, 20);     // the middle
+</script>`} />
+
+Change the third pair of numbers and press Run until the position stops surprising you.
+
+## Fill and stroke
+
+Every shape can be filled, outlined, or both. Four properties cover it:
+
+- `ctx.fillStyle` — the colour a fill uses
+- `ctx.strokeStyle` — the colour an outline uses
+- `ctx.lineWidth` — outline thickness in pixels
+- and any CSS colour is valid: `"red"`, `"#ffe100"`, `"rgb(27 27 27)"`, `"hsl(50 100% 50%)"`
+
+These are **settings, not arguments**. Set `fillStyle` once and every fill after it uses that
+colour until you change it again. This is the single most common source of "why is everything
+yellow".
+
+## Rectangles and circles
+
+`fillRect(x, y, width, height)` draws a filled rectangle. `strokeRect` outlines one.
+
+Circles have no dedicated command. You draw an **arc** — a slice of a circle — and to get the
+whole circle you ask for a slice that goes all the way round, which in radians is `Math.PI * 2`.
+
+`ctx.arc(x, y, radius, startAngle, endAngle)`, where x and y are the **centre**.
+
+<LiveCode title="A circle, filled and outlined" height={280} code={`<canvas id="c" width="300" height="200" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  ctx.beginPath();
+  ctx.arc(150, 100, 60, 0, Math.PI * 2);
+
+  ctx.fillStyle = "#ffe100";
+  ctx.fill();
+
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = "#1b1b1b";
+  ctx.stroke();
+</script>`} />
+
+## Paths
+
+A **path** is a shape you describe point by point before deciding what to do with it. Three
+commands and a decision:
+
+- `ctx.beginPath()` — start a new shape
+- `ctx.moveTo(x, y)` — lift the pen and put it down here
+- `ctx.lineTo(x, y)` — draw a line from where the pen is to here
+- then `ctx.stroke()` to trace it, or `ctx.fill()` to fill it, or both
+
+Forgetting `beginPath()` is the second most common canvas bug: without it, each new shape joins
+the previous one and every `stroke()` redraws everything you have already drawn.
+
+<LiveCode title="A path with three corners" height={280} code={`<canvas id="c" width="300" height="200" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  ctx.beginPath();
+  ctx.moveTo(40, 170);
+  ctx.lineTo(150, 30);
+  ctx.lineTo(260, 170);
+  ctx.closePath();          // back to the start
+
+  ctx.fillStyle = "#eee";
+  ctx.fill();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#1b1b1b";
+  ctx.stroke();
+</script>`} />
+
+## Canvas is paint, not objects
+
+This is the important mental shift. In Figma or Illustrator a circle stays a circle: you can
+select it, move it, restyle it a week later. On canvas, drawing a circle changes some pixels
+and nothing else is kept. There is no list of shapes, nothing to select, no undo.
+
+If you want a circle to move, you clear the canvas and draw it again somewhere else — which is
+exactly what the [next lesson](/ares_materials_estudi/javascript/canvas-animation/) does, sixty
+times a second.
+
+The practical consequence: keep the *data* in your variables and treat the canvas as output.
+The position of a shape lives in an `x` variable that you own; the pixels are a consequence.
+
+## A loop of shapes
+
+Loops and canvas together are where this starts to be worth doing. One `for` loop, one shape
+per turn, and the numbers do the composition.
+
+<LiveCode title="Twelve circles" height={300} code={`<canvas id="c" width="300" height="220" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  for (let i = 0; i < 12; i++) {
+    ctx.beginPath();
+    ctx.arc(30 + i * 20, 110, 5 + i * 3, 0, Math.PI * 2);
+    ctx.strokeStyle = "#1b1b1b";
+    ctx.stroke();
+  }
+</script>`} />
+
+## Your turn
+
+Below is one row of squares. Turn it into a grid by wrapping a second loop around the first —
+one counter for the column, one for the row. Then make the fill colour depend on the counters.
+
+<LiveCode title="Challenge" height={320} code={`<canvas id="c" width="300" height="240" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+  const size = 30;
+
+  for (let col = 0; col < 10; col++) {
+    ctx.fillStyle = "#1b1b1b";
+    ctx.fillRect(col * size, 0, size - 4, size - 4);
+  }
+
+  // Wrap this in a second loop over rows, and use row * size as the y.
+</script>`} />
+
+The complete command list is in the
+[MDN canvas tutorial](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial).
+Rectangles, arcs and paths will carry you a long way before you need anything else.
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'ctx.fillRect(0, 0, 50, 50) draws a square where?',
+			options: [
+				'In the centre of the canvas',
+				'At the bottom-left corner',
+				'At the top-left corner',
+			],
+			answer: 2,
+			explanation:
+				'The origin 0,0 is the top-left, and y grows downwards. The same convention Figma uses, and the opposite of a maths graph.',
+		},
+		{
+			q: 'You draw two circles and both come out yellow, although you set strokeStyle to black before the second one. What happened?',
+			options: [
+				'fillStyle is still yellow from the first circle, and you filled both',
+				'Canvas only supports one colour at a time',
+				'arc() ignores strokeStyle',
+			],
+			answer: 0,
+			explanation:
+				'fillStyle and strokeStyle are settings that stay in force until reassigned. Setting one does not clear the other, and every fill() after it uses whatever fillStyle currently holds.',
+		},
+		{
+			q: 'You want a shape already drawn on the canvas to move ten pixels to the right. What do you do?',
+			options: [
+				'Select it and change its x property',
+				'Clear the canvas and draw it again at the new position',
+				'Call ctx.move(10, 0)',
+			],
+			answer: 1,
+			explanation:
+				'Canvas keeps pixels, not shapes. Nothing on it can be selected or edited afterwards. Movement means clearing and redrawing, which is what animation is.',
+		},
+	]}
+/>

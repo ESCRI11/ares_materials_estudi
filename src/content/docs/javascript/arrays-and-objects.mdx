@@ -1,0 +1,286 @@
+---
+title: Arrays and objects
+description: Holding many values in one variable. Lists with an order, collections with labels, and the nesting of the two that JSON is made of.
+sidebar:
+  order: 6
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+Every value so far has been a single thing: one number, one string, one `true`. Real material
+does not arrive that way. A palette is several colours. A survey is several hundred responses.
+A person is a name *and* an age *and* an answer.
+
+JavaScript has two shapes for holding many values in one variable, and almost all the data you
+will ever touch is made of these two, nested inside each other.
+
+- An **array** is a list, in order, reached by position.
+- An **object** is a collection with labels, reached by name.
+
+## Arrays
+
+Square brackets, values separated by commas.
+
+<LiveCode
+	title="A list of colours"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const palette = ["#1b1b1b", "#f7f7f7", "#ffe45c"];
+
+  console.log(palette[0]);
+  console.log(palette[2]);
+  console.log(palette.length);
+</script>`}
+/>
+
+`palette[0]` is the **index** — the position of an item, counting from zero. The first item is
+`0`, the second is `1`, the third is `2`. This is the same counting-from-zero you met in the
+loops lesson, and now you can see why the two conventions match: a `for` loop starting at 0
+lands exactly on the first item.
+
+`.length` is how many items there are. Note it is not an index — a list of three has a length
+of 3 and a last index of 2. The last item is therefore `palette[palette.length - 1]`, a phrase
+you will write often enough to stop noticing.
+
+Asking for an index that does not exist is not an error. You get `undefined`, quietly, and the
+problem shows up somewhere else entirely. Off-by-one again.
+
+## Changing a list
+
+<LiveCode
+	title="Adding and replacing"
+	height={200}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const sizes = [12, 16, 24];
+
+  sizes.push(32);
+  sizes[0] = 14;
+
+  console.log(sizes);
+  console.log(sizes.length);
+</script>`}
+/>
+
+The output panel above flattens a whole list into its values separated by commas. The browser's
+own console is better at this: it draws `[14, 16, 24, 32]` and lets you fold objects open to
+look inside. Printing a whole list or object to check what is in it is a habit worth having.
+
+`.push()` adds an item to the end. Assigning to an index replaces the item there. And notice
+that `sizes` was declared with `const` — yet the list changed.
+
+That is not a contradiction. `const` fixes what the *name* points at: `sizes` will always be
+this list. It says nothing about what is inside the list. You cannot write `sizes = [1, 2]`,
+because that would be a different list; you can push into it and edit it all day. The same
+will be true of objects in a moment.
+
+There are dozens of other array methods — `pop`, `slice`, `map`, `filter`, `includes`. You do
+not need them yet. `push`, `length` and an index will carry you a long way, and the rest are
+easy to look up on MDN once you know what you are looking for.
+
+## Going through a list
+
+Two ways, and the choice is about whether you need the position.
+
+<LiveCode
+	title="Each item"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const palette = ["#1b1b1b", "#f7f7f7", "#ffe45c"];
+
+  for (const colour of palette) {
+    console.log(colour);
+  }
+</script>`}
+/>
+
+<LiveCode
+	title="Each item, numbered"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const palette = ["#1b1b1b", "#f7f7f7", "#ffe45c"];
+
+  for (let i = 0; i < palette.length; i++) {
+    console.log(i, palette[i]);
+  }
+</script>`}
+/>
+
+`i < palette.length` rather than `i < 3`: the loop then keeps working when the list grows,
+which it will. Never write the count by hand.
+
+Use `for...of` unless you need `i`. It cannot run off the end, and it says what it means.
+
+## Objects
+
+An array is the wrong shape for a person. Position is meaningless — nobody remembers that item
+1 was the age — and the values are not the same kind of thing. What you want is labels.
+
+Curly brackets, and `label: value` pairs separated by commas.
+
+<LiveCode
+	title="One response"
+	height={200}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const response = {
+    name: "Ana",
+    age: 24,
+    consented: true,
+  };
+
+  console.log(response.name);
+  console.log(response.age);
+</script>`}
+/>
+
+Each label is a **property**, and you reach one with a dot: `response.name`. Property names
+follow the same rules as variable names — no spaces, camelCase by convention.
+
+The trailing comma after the last pair is allowed and normal. It keeps the diff clean when
+somebody adds a line, which git will make you grateful for.
+
+Reading a property that was never set gives `undefined` rather than an error, exactly like an
+array index that is out of range.
+
+## Changing an object
+
+<LiveCode
+	title="Editing properties"
+	height={200}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const style = { size: 16, weight: 400 };
+
+  style.size = 24;
+  style.lineHeight = 1.4;
+
+  console.log(style.size, style.lineHeight);
+</script>`}
+/>
+
+Assigning to a property that exists replaces it; assigning to one that does not adds it. As
+with arrays, `const` does not stand in the way — it only stops the name being pointed at a
+different object.
+
+## Nesting, which is what JSON is
+
+Objects can hold arrays. Arrays can hold objects. Nothing stops at one level, and this is where
+the two shapes stop being a syntax lesson and start being how data actually looks.
+
+<LiveCode
+	title="A list of responses"
+	height={220}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const responses = [
+    { name: "Ana", age: 24, tools: ["Figma", "Arduino"] },
+    { name: "Bruno", age: 31, tools: ["Figma"] },
+  ];
+
+  for (const person of responses) {
+    console.log(person.name, "knows", person.tools.length, "of the tools");
+  }
+
+  console.log(responses[0].tools[1]);
+</script>`}
+/>
+
+`responses[0].tools[1]` reads left to right: the first response, its `tools` list, the second
+item of that. Long chains like this are ordinary. When one goes wrong, print the pieces
+separately — `responses[0]` on its own, then `responses[0].tools` — and you will see which
+step returned `undefined`.
+
+An array of objects, each with the same properties, is a table: the objects are rows and the
+properties are columns. That is what a spreadsheet exported as data becomes, and it is the
+shape almost everything you fetch from the internet arrives in.
+
+Written out as plain text, that notation is **JSON** — JavaScript Object Notation. It is
+JavaScript's arrays and objects, minus the code, used as a universal format for moving data
+between programs that have nothing else in common. Two small differences when you meet it:
+every property name is in double quotes, and there are no trailing commas.
+
+```json
+{
+	"name": "Ana",
+	"tools": ["Figma", "Arduino"]
+}
+```
+
+You already know how to read it. That was the point of this lesson.
+
+## Evaluation
+
+Make the loop below print only the responses from people who consented, using what you know
+about `if`.
+
+<LiveCode
+	title="Filter by hand"
+	height={220}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const responses = [
+    { name: "Ana", consented: true },
+    { name: "Bruno", consented: false },
+    { name: "Chiara", consented: true },
+  ];
+
+  for (const person of responses) {
+    console.log(person.name);
+  }
+</script>`}
+/>
+
+<Quiz
+	questions={[
+		{
+			q: 'const tools = ["Figma", "Arduino", "Fusion"]; console.log(tools[1], tools.length); — what is printed?',
+			options: ['Figma 3', 'Arduino 3', 'Arduino 2'],
+			answer: 1,
+			explanation:
+				'Indexes count from zero, so tools[1] is the second item. Length counts items in the ordinary way, so a three-item list has length 3 — and its last index is 2. Those two numbers are always one apart.',
+		},
+		{
+			q: 'const style = { size: 16 }; style.size = 24; console.log(style.size); — what happens?',
+			options: [
+				'It prints 24',
+				'It prints 16',
+				'An error, because style was declared with const',
+			],
+			answer: 0,
+			explanation:
+				'const fixes what the name points at, not the contents of what it points at. Editing a property is allowed; only style = { size: 24 } — pointing the name at a whole new object — would be an error.',
+		},
+		{
+			q: 'const people = [{ name: "Ana" }, { name: "Bruno" }]; console.log(people[1].name); — what is printed?',
+			options: ['Ana', 'Bruno', 'undefined'],
+			answer: 1,
+			explanation:
+				'Read it left to right: take item 1 of the array — the second object, counting from zero — then take its name property. Chains like this are how nested data is reached, and printing each step separately is how you debug one that fails.',
+		},
+	]}
+/>
+
+That is the language itself. The rest of this section puts it to work on a web page: reading
+and changing what is on screen, responding to clicks and keys, drawing, sound, and fetching
+data from the internet.

@@ -1,0 +1,233 @@
+---
+title: Responsive design
+description: A page has no fixed canvas — relative units, the viewport meta tag and media queries let one layout work at any width.
+sidebar:
+  order: 6
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+Every layout you have made until now started with a canvas: A4, 1920×1080, a Figma frame at
+some agreed size. A web page has no such thing. It is drawn into whatever window the reader
+happens to have open — a phone held in one hand, a laptop, a projector, a browser dragged to
+a third of the screen while something else plays beside it.
+
+**Responsive design** is building one page that works across that whole range, instead of
+designing for a width and hoping. The course names it explicitly, and it is the part of CSS
+that most changes how you think about a layout.
+
+The mental shift: you are not placing things at coordinates. You are describing relationships
+— this column is at most 40 characters wide, this row wraps when it runs out of room, this
+image never exceeds its container — and letting the browser resolve them at whatever size it
+finds itself.
+
+## The viewport meta tag
+
+Start here, because without it nothing else works on a phone.
+
+The **viewport** is the visible area of the page inside the browser window. Mobile browsers
+have an old habit: unless told otherwise, they pretend to be about 980 pixels wide, render a
+desktop layout at that size, then shrink the whole thing down. The result is a readable-ish
+miniature that you have to pinch to use — and your media queries never fire, because the page
+believes it is on a wide screen.
+
+One line in the `head` of the document turns that off:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1">
+```
+
+It says: treat the viewport as the real width of this device, and start at 100% zoom. Put it
+in every page you make. This is the single most common reason a site "works on desktop but is
+broken on mobile".
+
+## Relative units
+
+Fixed pixel widths are what break at other sizes. CSS has units that describe a relationship
+instead of a measurement.
+
+| Unit | Relative to | Use it for |
+|---|---|---|
+| `%` | the parent element's size | widths inside a container |
+| `rem` | the root font size, normally 16px | almost everything: type, padding, gaps |
+| `em` | the current element's font size | spacing that should scale with its own text |
+| `ch` | the width of one character | line length, where `60ch` is a good measure |
+| `vw` / `vh` | 1% of viewport width / height | full-bleed sections, hero heights |
+
+`rem` deserves the most attention. One `rem` equals the browser's base font size — 16px unless
+the reader has changed it, and some readers have, for reasons you should respect. Build your
+whole spacing scale in `rem` (`0.5rem`, `1rem`, `1.5rem`, `2rem`) and the entire page scales
+with someone's accessibility setting instead of ignoring it.
+
+The other habit worth forming now: **`max-width` instead of `width`**.
+
+<LiveCode
+	title="width versus max-width"
+	height={320}
+	code={`<style>
+  body { font-family: Helvetica, Arial, sans-serif; margin: 1rem; }
+  div { background: #eee; padding: 1rem; margin-bottom: 10px; }
+  .rigid { width: 600px; }
+  .fluid { max-width: 600px; }
+</style>
+
+<div class="rigid">width: 600px — I stay 600px wide and overflow when there is less room.</div>
+<div class="fluid">max-width: 600px — I am 600px at most, and narrower when I have to be.</div>`}
+/>
+
+`max-width: 600px` reads as "600 pixels, or the space available, whichever is smaller". Almost
+every fixed width in a layout wants to be a max-width. The same applies to images, where
+`max-width: 100%` stops a large photo from pushing the page sideways:
+
+```css
+img {
+  max-width: 100%;
+  height: auto;
+}
+```
+
+For text, cap the measure in `ch` rather than pixels: `max-width: 65ch` gives roughly 65
+characters per line at any type size, which is the same judgement you would make setting body
+copy anywhere else.
+
+## Media queries
+
+Relative units and wrapping handle a surprising amount on their own. When you genuinely need a
+different arrangement — a sidebar that becomes a stacked block, three columns that become one
+— you use a **media query**: a block of CSS that only applies when a condition about the
+screen is true.
+
+```css
+.layout {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 40rem) {
+  .layout {
+    flex-direction: row;
+  }
+}
+```
+
+Read it as: lay this out in a column always; from 40rem (640px) upwards, use a row instead.
+The width at which the rule kicks in is a **breakpoint**.
+
+<LiveCode
+	title="A layout that changes shape"
+	height={380}
+	code={`<style>
+  body { font-family: Helvetica, Arial, sans-serif; margin: 1rem; }
+  * { box-sizing: border-box; }
+  .layout { display: flex; flex-direction: column; gap: 1rem; }
+  .main { background: #f4f4f4; padding: 1rem; }
+  .side { background: #1b1b1b; color: white; padding: 1rem; }
+
+  @media (min-width: 34rem) {
+    .layout { flex-direction: row; }
+    .side { width: 30%; }
+  }
+</style>
+
+<div class="layout">
+  <div class="main">Main column. Narrow your browser window and watch the sidebar move
+  underneath this block.</div>
+  <div class="side">Sidebar</div>
+</div>`}
+/>
+
+Narrow the browser window until this result panel drops below 34rem and the layout switches.
+If your window will not go that narrow, change `34rem` to a larger number and press Run — the
+breakpoint is a number you choose, not one handed to you.
+
+## Mobile first
+
+Notice the order in that example: the narrow layout is written as the plain rule, and the wide
+one arrives inside `min-width`. That is **mobile-first**, and it is the convention.
+
+It is not fashion. Writing the simplest arrangement — one column, everything stacked — as the
+base means the fallback is always sound, and each media query adds complexity as space allows.
+The reverse (`max-width` queries stripping a desktop layout back) means every small screen
+depends on you having remembered to undo everything, and something always survives.
+
+Choose breakpoints where **your** layout stops looking right, not from a list of device sizes.
+Drag the window slowly, watch for the width where the line length gets uncomfortable or the
+cards get too thin, and put the breakpoint there. Device dimensions change every year; your
+content does not.
+
+## What you already have
+
+Two things from the previous lessons were doing responsive work before the term appeared:
+
+- `flex-wrap: wrap` with a `min-width` on the items reflows a row into several rows with no
+  media query at all.
+- `max-width` with `margin: 0 auto` gives you a centred column that shrinks on its own.
+
+Between them and one or two breakpoints, most pages are done. Reach for a media query when
+the arrangement must genuinely change, not for every adjustment.
+
+## Try it
+
+The row below is rigid: fixed widths, no wrapping, and it overflows when there is not enough
+room. Make it responsive — cards that wrap, a gap, and no fixed widths.
+
+<LiveCode
+	title="Challenge — make it survive a narrow window"
+	height={340}
+	code={`<style>
+  body { font-family: Helvetica, Arial, sans-serif; margin: 1rem; }
+  * { box-sizing: border-box; }
+  .cards { display: flex; gap: 1rem; }
+  .card {
+    width: 260px;
+    background: #f4f4f4;
+    padding: 1rem;
+  }
+</style>
+
+<div class="cards">
+  <div class="card">One</div>
+  <div class="card">Two</div>
+  <div class="card">Three</div>
+</div>`}
+/>
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'Your layout is correct on a laptop but appears as a shrunken desktop page on a phone, and none of your media queries fire. What is missing?',
+			options: [
+				'The viewport meta tag in the head',
+				'A max-width on the body',
+				'More breakpoints',
+			],
+			answer: 0,
+			explanation:
+				'Without the viewport meta tag a mobile browser pretends to be around 980px wide and scales the result down, so a min-width query for 640px is always true. The one line width=device-width, initial-scale=1 fixes it, and no amount of extra CSS will.',
+		},
+		{
+			q: 'Why is max-width: 600px usually better than width: 600px?',
+			options: [
+				'It renders faster',
+				'It means 600px at most, so the element shrinks rather than overflowing on narrow screens',
+				'It is required for media queries to work',
+			],
+			answer: 1,
+			explanation:
+				'width is a demand; max-width is a ceiling. The element takes 600px where there is room and less where there is not, which removes most of the horizontal scrolling that fixed widths cause.',
+		},
+		{
+			q: 'What does mobile-first mean in practice?',
+			options: [
+				'Designing the phone version in Figma before the desktop one',
+				'Writing the narrow layout as the base CSS and adding wider layouts inside min-width media queries',
+				'Serving a separate site to phones',
+			],
+			answer: 1,
+			explanation:
+				'It is an ordering convention in the stylesheet: the simplest stacked layout is the default, and each breakpoint adds arrangement as space allows. Anything you forget to handle still degrades to something that works.',
+		},
+	]}
+/>

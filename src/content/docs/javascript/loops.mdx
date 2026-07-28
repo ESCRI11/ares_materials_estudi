@@ -1,0 +1,221 @@
+---
+title: Repeating work
+description: for, while and for...of. Counting from zero, the off-by-one error, and the cases where a loop is the wrong tool.
+sidebar:
+  order: 4
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+A **loop** runs the same block of code more than once. Not by copying it out — by describing
+how many times, or under what condition, and letting the computer repeat it.
+
+Twelve columns in a grid. Six steps in a type scale. Two hundred survey rows. Sixty frames a
+second. Repetition is what computers are unreasonably good at, and a loop is how you ask.
+
+## The for loop
+
+<LiveCode
+	title="Counting"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  for (let i = 0; i < 5; i = i + 1) {
+    console.log("column", i);
+  }
+</script>`}
+/>
+
+The head of a `for` loop holds three instructions, separated by semicolons. They are not the
+same kind of thing, which is why the syntax looks so dense the first time:
+
+1. `let i = 0` — **the start.** Runs once, before anything else. It makes a variable to count
+   with, traditionally named `i` for *index*.
+2. `i < 5` — **the condition.** Checked before each pass. While it is `true` the block runs
+   again; the moment it is `false` the loop is over.
+3. `i = i + 1` — **the step.** Runs at the end of each pass, then the condition is checked again.
+
+Inside the block, `i` holds the number for this pass. That is what makes a loop useful rather
+than merely repetitive: each pass can work with a different value.
+
+You will almost always see the step written `i++`, which means exactly the same as
+`i = i + 1`. There is a matching `i--` for counting down.
+
+<LiveCode
+	title="Each pass is different"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const base = 16;
+
+  for (let step = 0; step < 4; step++) {
+    console.log(base * Math.pow(1.25, step));
+  }
+</script>`}
+/>
+
+That is a type scale: four sizes, each 1.25 times the one before. `Math.pow(1.25, step)` raises
+1.25 to the power of `step` — a piece of JavaScript's built-in maths toolkit, mentioned here
+only so the example does something you might actually want.
+
+## Counting from zero
+
+`i` starts at `0`, and the condition is `i < 5` rather than `i <= 5`. The loop runs with `i`
+equal to 0, 1, 2, 3, 4 — five passes, ending one below the number you wrote.
+
+That reads as an oddity now and will be second nature within a week, because everything else
+in JavaScript counts from zero too: the first item in a list is item 0, and lists are the next
+lesson. Learn the pattern as a unit: **start at 0, stop below the count, and you get exactly
+that many passes.**
+
+Getting this wrong by one is so common it has a name — the **off-by-one error**. It is worth
+being able to spot the two shapes it takes:
+
+- `i <= 5` starting from 0 runs **six** times, not five. One too many.
+- `i < 5` starting from 1 runs **four** times. One too few.
+
+When a loop does something a single time too many or too few, look here first.
+
+<LiveCode
+	title="Off by one"
+	height={200}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  for (let i = 0; i <= 5; i++) {
+    console.log(i);
+  }
+</script>`}
+/>
+
+## while
+
+A `for` loop suits a known number of passes. When you cannot say in advance how many, use
+`while` — it takes only a condition, and keeps going while it holds.
+
+<LiveCode
+	title="Until it is small enough"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  let size = 96;
+
+  while (size > 16) {
+    console.log(size);
+    size = size / 2;
+  }
+</script>`}
+/>
+
+Something inside the block has to move the condition towards `false`. Here it is
+`size = size / 2`. Delete that line and `size` stays 96, the condition stays true, and the
+loop never ends: an **infinite loop**. The browser tab freezes, because JavaScript is doing
+exactly what you asked, forever.
+
+:::caution[If a page freezes]
+Close the tab. That is the fix, and it costs you nothing but the code you have not saved.
+Before writing a `while`, look at the condition and say out loud what will eventually make it
+false.
+:::
+
+## for...of
+
+Most loops in real code walk through a list rather than counting. There is a form for exactly
+that, and it needs no counter at all.
+
+A list of values written in square brackets is an **array** — the next lesson covers them
+properly, but you can read one at a glance.
+
+<LiveCode
+	title="Over a list"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const palette = ["#1b1b1b", "#f7f7f7", "#ffe45c"];
+
+  for (const colour of palette) {
+    console.log(colour);
+  }
+</script>`}
+/>
+
+Read it as English: for each colour of the palette, print it. No `i`, no condition, no step,
+and no way to run off the end of the list. When you have a list and want to do something to
+every item, this is the one to reach for.
+
+`const` inside the head is right, oddly enough: `colour` is a fresh name each pass, and nothing
+reassigns it within the block.
+
+## When a loop is the wrong tool
+
+- **When arithmetic will do.** Adding the numbers 1 to 100 with a loop works; multiplying is
+  instant. Repetition is not automatically the answer to "do this many times".
+- **When the repetition is animation.** Drawing sixty frames a second is not a loop that
+  draws sixty times — the browser has to breathe between frames, and a loop never lets it. You
+  hand the browser a block of code and it calls you back before each frame. That is a later
+  lesson; note only that a `for` loop is not how motion is made.
+- **When you are waiting for something.** Looping until the user clicks, or until a file
+  arrives, freezes everything. The browser tells you when it happens instead.
+
+The honest summary: loops are for work you can do right now, all of it, in one go. Anything
+that involves time passing is somebody calling you back.
+
+## Evaluation
+
+Change the loop below so it counts **down** from 5 to 1 instead of up from 1 to 5. You need to
+change all three parts of the head.
+
+<LiveCode
+	title="Turn it around"
+	height={200}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  for (let i = 1; i <= 5; i++) {
+    console.log(i);
+  }
+</script>`}
+/>
+
+<Quiz
+	questions={[
+		{
+			q: 'for (let i = 0; i < 3; i++) { console.log(i); } — what is printed?',
+			options: ['0, 1, 2', '1, 2, 3', '0, 1, 2, 3'],
+			answer: 0,
+			explanation:
+				'The counter starts at 0 and the loop stops as soon as the condition fails, so the last pass is with i equal to 2. Three passes, ending one below the number in the condition — the standard shape.',
+		},
+		{
+			q: 'How many times does the block run in for (let i = 1; i <= 4; i++)?',
+			options: ['3', '4', '5'],
+			answer: 1,
+			explanation:
+				'i takes the values 1, 2, 3 and 4 — four passes. Starting at 1 with <= counts the same number of times as starting at 0 with <. Mixing the two conventions is what produces off-by-one errors, so pick one shape and keep to it.',
+		},
+		{
+			q: 'let n = 10; while (n > 0) { console.log(n); } — what happens?',
+			options: [
+				'It prints 10 down to 1',
+				'It prints 10 once and stops',
+				'It prints 10 forever and freezes the tab',
+			],
+			answer: 2,
+			explanation:
+				'Nothing inside the block changes n, so the condition stays true for ever. A while loop needs its own body to move it towards ending — here a line such as n = n - 1.',
+		},
+	]}
+/>
+
+Next: [naming a block of instructions](/ares_materials_estudi/javascript/functions/).

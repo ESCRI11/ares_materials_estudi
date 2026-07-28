@@ -1,0 +1,220 @@
+---
+title: Actuators
+description: Making things happen — dimming with PWM, moving a servo, sounding a buzzer, and why a motor needs more than a pin can give.
+sidebar:
+  order: 8
+---
+
+import Quiz from '@components/Quiz.astro';
+
+An **actuator** is the opposite of a sensor: a component that turns an electrical signal into
+a physical effect. Light, movement, sound, heat, vibration. Sensors are how a project notices;
+actuators are how it answers.
+
+The problem is that a digital pin has two states, and most of what you want to do is not
+binary. Half brightness, forty-five degrees, a note rather than a click.
+
+## PWM: two states, used cleverly
+
+**Pulse width modulation**, always written **PWM**, is the standard answer. Instead of holding
+the pin high, you switch it on and off very fast and change the *proportion* of each cycle that
+it spends on. That proportion is the **duty cycle**. A pin at 25 percent duty delivers a
+quarter of the energy, and an LED driven that way looks about a quarter as bright, because your
+eye averages a flicker it cannot resolve.
+
+This is the same effect as the sleepless blink loop in lesson 5, done deliberately and by
+hardware rather than by your code.
+
+Two numbers describe a PWM signal:
+
+- **Frequency** — how many on-off cycles per second. For an LED, 1000 Hz is high enough that
+  nothing flickers visibly. It does not affect brightness.
+- **Duty cycle** — the fraction of each cycle spent on. This is the one you vary.
+
+```python
+from machine import Pin, PWM
+import time
+
+led = PWM(Pin(15))
+led.freq(1000)
+
+while True:
+    for level in range(0, 65536, 1000):
+        led.duty_u16(level)
+        time.sleep_ms(10)
+```
+
+`duty_u16()` takes 0 to 65535, the same range `read_u16()` produced in the last lesson —
+which means a knob can drive a lamp with no conversion at all:
+
+```python
+led.duty_u16(knob.read_u16())
+```
+
+:::note[The fade will not look linear]
+Perceived brightness does not follow duty cycle. The bottom of the range looks like most of
+the change and the top half looks nearly identical throughout. That is your eye, not a bug.
+Squaring the value before sending it — `level * level // 65535` — gives a fade that looks
+much more even.
+:::
+
+Two practical notes. PWM is a voltage that switches, not a lower steady voltage: a meter
+averages it, an oscilloscope sees a square wave. And on some chips neighbouring pins share one
+PWM timer, so setting the frequency on one silently changes another. If two PWM outputs
+interfere in a way that makes no sense, that is usually why.
+
+## A servo
+
+A **servo** is a small geared motor with electronics inside that hold it at a commanded
+position. You do not tell it to turn; you tell it where to be, and it goes there and stays.
+Three wires: power, ground, and one signal.
+
+The signal is PWM, but a servo does not read the duty cycle the way an LED does. It measures
+the **length of the on-pulse**: roughly 1 millisecond for one end of its travel, roughly 2 ms
+for the other, repeated 50 times a second. Which means you set the frequency to 50 Hz and then
+work out the duty value that produces the pulse width you want.
+
+At 50 Hz each cycle is 20 ms, so a 1.5 ms pulse is 1.5/20 of the cycle, and
+`65535 × 1.5 / 20 ≈ 4915`.
+
+```python
+from machine import Pin, PWM
+import time
+
+servo = PWM(Pin(16))
+servo.freq(50)
+
+MIN_US = 500    # pulse in microseconds for one end of the travel — tune this
+MAX_US = 2500   # pulse for the other end — tune this too
+
+def angle(degrees):
+    us = MIN_US + (MAX_US - MIN_US) * degrees / 180
+    servo.duty_u16(int(us * 65535 / 20000))
+
+while True:
+    angle(0)
+    time.sleep(1)
+    angle(90)
+    time.sleep(1)
+    angle(180)
+    time.sleep(1)
+```
+
+`MIN_US` and `MAX_US` are named and adjustable on purpose. Servos vary: 500 and 2500 suit many,
+1000 and 2000 suit others, and pushing a servo past its real limit makes it buzz and strain
+against its own end stop. On real hardware, start with a narrow range, widen it until the arm
+reaches the ends cleanly, and stop there. Anything that reads a physical position will need
+calibrating like this.
+
+## A buzzer
+
+There are two kinds and they behave completely differently.
+
+An **active buzzer** contains its own oscillator. Give it power and it makes its one note.
+It is a digital output: `value(1)` for sound, `value(0)` for silence, no PWM involved.
+
+A **passive buzzer** is a tiny speaker with no electronics. It makes whatever frequency you
+feed it, which means you can play notes:
+
+```python
+from machine import Pin, PWM
+import time
+
+buzzer = PWM(Pin(17))
+
+def tone(hz, ms):
+    buzzer.freq(hz)
+    buzzer.duty_u16(32768)   # half on, half off
+    time.sleep_ms(ms)
+    buzzer.duty_u16(0)       # silence
+
+for note in (262, 294, 330, 349):
+    tone(note, 300)
+    time.sleep_ms(50)
+```
+
+Here the frequency carries the meaning and the duty cycle only needs to be somewhere in the
+middle. Setting duty to 0 stops the sound; `buzzer.deinit()` releases the pin entirely when
+you are finished with it.
+
+## Why motors need help
+
+You can drive an LED from a pin. You cannot drive a motor from one, and the reason is worth
+understanding because it generalises to almost every powerful thing you will ever attach.
+
+**Current.** A pin can supply milliamps. A small DC motor wants hundreds of milliamps while
+running and considerably more at the instant it starts or stalls. The pin cannot deliver it,
+and asking it to will at best brown out the board and at worst destroy the pin.
+
+**Electrical noise.** A motor is a coil, and a coil resists having its current stopped: when
+you switch it off it produces a voltage spike in the opposite direction that can be many times
+the supply. That spike goes looking for somewhere to go, and a microcontroller pin is a bad
+place for it to find.
+
+The principle: **the pin carries the decision, not the power.** Between the pin and anything
+hungry you put a switching component — a transistor, or a ready-made **motor driver** board —
+which takes the small signal from the pin and uses it to control current from a separate,
+larger supply. The two supplies must share a common ground, or neither side can tell what the
+other's signals mean.
+
+A servo sits on the edge of this rule. Its signal wire is genuinely only a signal, so that
+part is fine; its power wire draws far more than a pin can give, so on a real board it goes to
+a supply rather than to a data pin. In the simulator none of this matters, which is precisely
+why it is worth reading now rather than discovering later.
+
+:::caution[Before you wire a motor in class]
+Ask what the motor draws and what your driver is rated for, and check the board's own limits
+in its documentation. This is the one area of this section where a confident guess costs
+money. Principle first, datasheet second, wire third.
+:::
+
+## Confirm it works
+
+In a new Raspberry Pi Pico MicroPython project on [wokwi.com](https://wokwi.com):
+
+- [ ] An LED on `GP15` fades smoothly up and down with PWM rather than blinking
+- [ ] I changed the PWM frequency to 5 Hz and saw the fade turn into a visible flicker
+- [ ] I squared the level before sending it and compared how even the fade looks
+- [ ] I added a potentiometer and used `duty_u16(knob.read_u16())` to dim the LED by hand
+- [ ] I added a servo, set 50 Hz, and made it move between two positions
+- [ ] I changed `MIN_US` and `MAX_US` and watched the travel change
+- [ ] I added a buzzer and played four different notes with PWM
+- [ ] I can explain why the servo's signal wire is fine on a pin but its power wire is not
+
+<Quiz
+	questions={[
+		{
+			q: 'What does changing the duty cycle of a PWM signal do?',
+			options: [
+				'Lowers the voltage the pin outputs',
+				'Changes the proportion of each cycle the pin spends switched on',
+				'Changes how many cycles per second the pin produces',
+			],
+			answer: 1,
+			explanation:
+				'The pin still swings fully between 0 V and the supply. Duty cycle is the fraction of time it spends high, and it is the average over a cycle that an LED or a motor responds to. Cycles per second is the frequency, a separate setting.',
+		},
+		{
+			q: 'A servo is driven at 50 Hz. What actually tells it what position to take?',
+			options: [
+				'The frequency of the signal',
+				'The length of the on-pulse in each cycle, roughly 1 to 2 milliseconds',
+				'The voltage of the signal',
+			],
+			answer: 1,
+			explanation:
+				'The servo measures pulse width, not duty ratio. The 50 Hz frequency is only the rate at which you repeat the instruction — so you set the frequency once and vary the duty value to produce the pulse length you want.',
+		},
+		{
+			q: 'Why should a DC motor not be connected directly to a GPIO pin?',
+			options: [
+				'The pin voltage is too low to turn a motor',
+				'The motor draws far more current than a pin can supply, and produces voltage spikes when switched off',
+				'Motors can only be controlled from analog pins',
+			],
+			answer: 1,
+			explanation:
+				'A pin supplies milliamps; a motor wants hundreds of them, plus a reverse voltage spike as its coil is switched off. A transistor or motor driver takes the pin’s small signal and controls a separate supply, with the two grounds joined.',
+		},
+	]}
+/>

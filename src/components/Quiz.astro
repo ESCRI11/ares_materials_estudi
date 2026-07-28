@@ -1,0 +1,159 @@
+---
+interface Question {
+	q: string;
+	options: string[];
+	/** Index into `options` of the correct answer. */
+	answer: number;
+	/** Shown after answering. A wrong answer must teach, so this is required. */
+	explanation: string;
+}
+
+interface Props {
+	questions: Question[];
+	title?: string;
+}
+
+const { questions, title = 'Check yourself' } = Astro.props;
+---
+
+<quiz-block data-total={questions.length}>
+	<h3>{title}</h3>
+	{
+		questions.map((question) => (
+			<div class="quiz-q">
+				<p class="quiz-prompt">{question.q}</p>
+				<div class="quiz-options">
+					{question.options.map((option, oi) => (
+						<button type="button" class="quiz-option" data-correct={oi === question.answer}>
+							{option}
+						</button>
+					))}
+				</div>
+				<p class="quiz-explanation" hidden>
+					{question.explanation}
+				</p>
+			</div>
+		))
+	}
+	<p class="quiz-score" hidden></p>
+</quiz-block>
+
+<script>
+	customElements.define(
+		'quiz-block',
+		class extends HTMLElement {
+			connectedCallback() {
+				const total = Number(this.dataset.total);
+				const score = this.querySelector('.quiz-score') as HTMLElement;
+				let answered = 0;
+				let correct = 0;
+
+				this.querySelectorAll<HTMLElement>('.quiz-q').forEach((question) => {
+					question.addEventListener('click', (event) => {
+						const picked = (event.target as HTMLElement).closest('.quiz-option');
+						if (!picked || question.dataset.done) return;
+
+						question.dataset.done = 'true';
+						const isRight = picked.getAttribute('data-correct') === 'true';
+						picked.classList.add(isRight ? 'is-correct' : 'is-wrong');
+						if (!isRight) {
+							question.querySelector('[data-correct="true"]')?.classList.add('is-correct');
+						}
+						(question.querySelector('.quiz-explanation') as HTMLElement).hidden = false;
+
+						answered++;
+						if (isRight) correct++;
+						if (answered === total) {
+							score.hidden = false;
+							score.textContent = `${correct} of ${total} correct.`;
+						}
+					});
+				});
+			}
+		},
+	);
+</script>
+
+<style>
+	quiz-block {
+		display: block;
+		margin: 2rem 0;
+		padding: 1.25rem 1.5rem 1.5rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.75rem;
+		background: var(--sl-color-gray-7, var(--sl-color-gray-6));
+	}
+
+	quiz-block h3 {
+		margin: 0 0 1rem;
+		font-size: var(--sl-text-lg);
+	}
+
+	.quiz-q + .quiz-q {
+		margin-top: 1.75rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--sl-color-gray-5);
+	}
+
+	.quiz-prompt {
+		margin: 0 0 0.75rem;
+		font-weight: 600;
+	}
+
+	.quiz-options {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.quiz-option {
+		padding: 0.6rem 0.9rem;
+		text-align: left;
+		font: inherit;
+		color: inherit;
+		background: var(--sl-color-bg);
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.5rem;
+		cursor: pointer;
+	}
+
+	.quiz-option:hover {
+		border-color: var(--sl-color-accent);
+	}
+
+	.quiz-q[data-done] .quiz-option {
+		cursor: default;
+		pointer-events: none;
+		opacity: 0.65;
+	}
+
+	.quiz-q[data-done] .is-correct,
+	.quiz-q[data-done] .is-wrong {
+		opacity: 1;
+		font-weight: 600;
+	}
+
+	.is-correct {
+		border-color: #16a34a;
+		box-shadow: inset 3px 0 0 #16a34a;
+	}
+
+	.is-wrong {
+		border-color: #dc2626;
+		box-shadow: inset 3px 0 0 #dc2626;
+	}
+
+	.quiz-explanation {
+		margin: 0.75rem 0 0;
+		padding-left: 0.9rem;
+		border-left: 2px solid var(--sl-color-accent);
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-2);
+	}
+
+	.quiz-score {
+		margin: 1.5rem 0 0;
+		font-weight: 600;
+		color: var(--sl-color-accent-high);
+	}
+</style>

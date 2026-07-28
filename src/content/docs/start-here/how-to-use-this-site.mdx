@@ -1,0 +1,74 @@
+---
+title: How to use this site
+description: What this site is for, who it is for, and how the exercises work.
+sidebar:
+  order: 1
+---
+
+import Quiz from '@components/Quiz.astro';
+
+This site is preparation, not a replacement for the master. The courses will teach you
+interaction design. What they will *assume* you already have is a working relationship with
+a computer: that you can find a file, open a terminal, install a tool, and put your work
+somewhere a lecturer can see it.
+
+That assumption is the gap this site fills.
+
+## Who this is written for
+
+Someone with a design bachelor's who has never written a line of code, never used a
+terminal, and has heard of GitHub without knowing what it does. If a term appears here
+without being explained, that is a bug — the missing explanation is the problem, not you.
+
+## The three kinds of exercise
+
+**Quizzes** check that a concept landed. Pick an answer and you get the reasoning
+immediately, whether you were right or not.
+
+**Checklists** are for things a quiz cannot test — installing software, making an account,
+pushing your first commit. Tick them off as you go; this browser remembers.
+
+**Sketches** appear in the coding lessons: a small running program you can change and break
+on the spot.
+
+Here is a checklist, so you can see one work:
+
+- [ ] I know which operating system my laptop runs (macOS, Windows, or Linux)
+- [ ] I know how much free disk space I have
+- [ ] I can find the folder where my downloads go
+
+Refresh the page — the ticks stay.
+
+## Pace
+
+Do not binge this. One or two lessons a day, with the exercise actually done rather than
+skimmed, beats a weekend of reading that leaves nothing behind. The tools only stick once
+your own hands have been on them.
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'What is this site for?',
+			options: [
+				'Replacing the technical courses in the master',
+				'Covering the technical basics the courses assume you already have',
+				'Getting you admitted to the master',
+			],
+			answer: 1,
+			explanation:
+				'The courses teach interaction design. They assume a baseline — terminal, files, git, some code — that a design bachelor\'s rarely provides. That baseline is what you are here to build.',
+		},
+		{
+			q: 'You hit a term on this site you have never seen and it is not explained. What is the right conclusion?',
+			options: [
+				'You are underprepared for the master',
+				'The lesson has a gap that should be fixed',
+				'You should look it up and move on quietly',
+			],
+			answer: 1,
+			explanation:
+				'Every term is supposed to be defined on first use. An unexplained one is a defect in the material — worth reporting as an issue on the repository.',
+		},
+	]}
+/>

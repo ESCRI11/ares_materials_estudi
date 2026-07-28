@@ -1,0 +1,64 @@
+/* Theme overrides. Starlight is driven by CSS variables — set them, don't fork components. */
+
+:root {
+	--sl-font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--sl-font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+	/* dark theme accents */
+	--sl-color-accent-low: #2b1a4d;
+	--sl-color-accent: #7b4cf0;
+	--sl-color-accent-high: #d3c1fb;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #e7dcff;
+	--sl-color-accent: #6b34e0;
+	--sl-color-accent-high: #2a1170;
+}
+
+/* Serif headings against the sans body — the whole "stylish" budget lives here. */
+h1,
+h2,
+.hero h1,
+.site-title {
+	font-family: var(--sl-font-display);
+	font-weight: 400;
+	letter-spacing: -0.01em;
+}
+
+h1 {
+	font-size: clamp(2.2rem, 5vw, 3.1rem);
+	line-height: 1.1;
+}
+
+.hero .tagline {
+	font-size: var(--sl-text-lg);
+	max-width: 40ch;
+}
+
+/* Comfortable measure for long-form reading. */
+.sl-markdown-content p,
+.sl-markdown-content li {
+	max-width: 68ch;
+	line-height: 1.7;
+}
+
+/* Self-check task lists: markdown checkboxes, styled to look like a real checklist. */
+.sl-markdown-content ul:has(> li > input[type='checkbox']) {
+	list-style: none;
+	padding-left: 0;
+}
+
+.sl-markdown-content li:has(> input[type='checkbox']) {
+	display: flex;
+	gap: 0.6rem;
+	align-items: baseline;
+	padding: 0.45rem 0.75rem;
+	border-left: 2px solid var(--sl-color-gray-5);
+}
+
+.sl-markdown-content input[type='checkbox'] {
+	accent-color: var(--sl-color-accent);
+	width: 1rem;
+	height: 1rem;
+	flex-shrink: 0;
+}

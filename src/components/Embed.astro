@@ -12,11 +12,16 @@ interface Props {
 	href?: string;
 }
 
-const { src, title, height = 420, href = src } = Astro.props;
+// Wokwi splits its own frame into an editor, a diagram and a serial monitor, so
+// it needs real height to be usable — 420 leaves three unreadable slivers.
+const { src, title, height = 680, href = src } = Astro.props;
 ---
 
-<figure class="embed">
-	<iframe {src} {title} {height} loading="lazy" allow="fullscreen"></iframe>
+{/* The height goes through a custom property because Starlight's markdown CSS
+    sets `iframe { height: auto }`, which beats the HTML height attribute and
+    collapses the frame to ~150px. */}
+<figure class="embed" style={`--embed-height: ${height}px`}>
+	<iframe {src} {title} loading="lazy" allow="fullscreen"></iframe>
 	<figcaption>
 		<a {href} target="_blank" rel="noopener">Open “{title}” in a new tab →</a>
 	</figcaption>
@@ -29,6 +34,7 @@ const { src, title, height = 420, href = src } = Astro.props;
 
 	.embed iframe {
 		width: 100%;
+		height: var(--embed-height, 680px);
 		border: 1px solid var(--sl-color-gray-5);
 		background: #fff;
 	}

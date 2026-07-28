@@ -23,6 +23,23 @@
 	--sl-font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 
 	/*
+	 * Wider than Starlight's 45rem default, because embedded editors and the Wokwi
+	 * simulator are unusable in a narrow column. Prose is separately capped at 68ch
+	 * further down, so the reading measure does not widen with it.
+	 */
+	--sl-content-width: 58rem;
+
+	/*
+	 * Syntax-highlighting colours for the <LiveCode> editor. Each mixes a brand
+	 * highlighter with the theme's text colour, so one definition stays legible on
+	 * both the light and the dark background.
+	 */
+	--code-violet: color-mix(in srgb, var(--ind-highlight-violet) 50%, var(--sl-color-white));
+	--code-green: color-mix(in srgb, var(--ind-highlight-green) 45%, var(--sl-color-white));
+	--code-blue: color-mix(in srgb, var(--ind-highlight-blue) 45%, var(--sl-color-white));
+	--code-orange: color-mix(in srgb, var(--ind-highlight-orange) 50%, var(--sl-color-white));
+
+	/*
 	 * Emphasis is monochrome, never coloured: the active sidebar entry becomes an
 	 * inverted block, exactly like the "1st Semester" labels in the syllabus.
 	 * These resolve per theme because --sl-color-white/-black are redefined below.
@@ -229,6 +246,51 @@ h1 {
 	stroke: var(--sl-color-gray-4) !important;
 }
 
+/* --- LiveCode syntax highlighting -----------------------------------------
+ * Prism builds these spans at runtime, so they never carry Astro's scoped-style
+ * attribute and have to be styled globally.
+ */
+
+.live-highlight .token.comment,
+.live-highlight .token.prolog,
+.live-highlight .token.doctype,
+.live-highlight .token.cdata {
+	color: var(--sl-color-gray-3);
+	font-style: italic;
+}
+
+.live-highlight .token.punctuation,
+.live-highlight .token.operator {
+	color: var(--sl-color-gray-3);
+}
+
+.live-highlight .token.tag,
+.live-highlight .token.keyword,
+.live-highlight .token.selector,
+.live-highlight .token.important {
+	color: var(--code-violet);
+}
+
+.live-highlight .token.attr-name,
+.live-highlight .token.property,
+.live-highlight .token.class-name {
+	color: var(--code-blue);
+}
+
+.live-highlight .token.attr-value,
+.live-highlight .token.string,
+.live-highlight .token.char {
+	color: var(--code-green);
+}
+
+.live-highlight .token.number,
+.live-highlight .token.boolean,
+.live-highlight .token.constant,
+.live-highlight .token.function,
+.live-highlight .token.unit {
+	color: var(--code-orange);
+}
+
 /* --- Select-a-word definitions (public/glossary.js) ----------------------- */
 
 .ind-define {
@@ -271,12 +333,21 @@ h1 {
 	padding-left: 0;
 }
 
+/*
+ * Deliberately not flex: a flex container turns every inline `<code>` chip and
+ * text node in the item into a separate flex item, which breaks lines in the
+ * middle of words. Keep normal inline flow and hang the checkbox off the side.
+ */
 .sl-markdown-content li:has(> input[type='checkbox']) {
-	display: flex;
-	gap: 0.6rem;
-	align-items: baseline;
-	padding: 0.45rem 0.75rem;
+	position: relative;
+	padding: 0.45rem 0.75rem 0.45rem 2.3rem;
 	border-left: 2px solid var(--sl-color-gray-5);
+}
+
+.sl-markdown-content li > input[type='checkbox'] {
+	position: absolute;
+	left: 0.7rem;
+	top: 0.75rem;
 }
 
 .sl-markdown-content li:has(> input[type='checkbox']:checked) {

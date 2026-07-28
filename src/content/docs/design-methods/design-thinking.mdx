@@ -18,10 +18,15 @@ length on the part that is genuinely different: **co-design**, which is what
 Two diamonds side by side. The first covers the problem, the second the solution, and each
 one widens before it narrows:
 
-```
-   discover      define        develop       deliver
-  ◇ widen ◇     ◇ narrow ◇    ◇ widen ◇     ◇ narrow ◇
-  ─────── problem ───────     ─────── solution ───────
+```mermaid
+flowchart LR
+  subgraph problem
+    A["discover — widen"] --> B["define — narrow"]
+  end
+  subgraph solution
+    C["develop — widen"] --> D["deliver — narrow"]
+  end
+  B --> C
 ```
 
 You will hear all four words used as verbs in studio, and you will hear **diverge** and

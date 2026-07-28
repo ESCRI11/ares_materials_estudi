@@ -117,8 +117,15 @@ You can build an entire site this way and only think about publishing at the ver
 
 The whole of front-end work is one small cycle, and you will run it a few thousand times:
 
-**edit the file → save it (`Cmd+S` / `Ctrl+S`) → switch to the browser → reload
-(`Cmd+R` / `Ctrl+R`)**
+```mermaid
+flowchart LR
+    A["Edit the file"] --> B["Save"]
+    B --> C["Reload"]
+    C --> D["See the change"]
+    D --> A
+```
+
+Save is `Cmd+S` on macOS, `Ctrl+S` on Windows; reload is `Cmd+R` or `Ctrl+R`.
 
 Nothing compiles. Nothing builds. The browser re-reads the file from scratch every time you
 reload, so if you saved it, you are looking at it. When a change appears not to have worked,

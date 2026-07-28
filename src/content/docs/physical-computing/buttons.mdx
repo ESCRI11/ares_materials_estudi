@@ -5,6 +5,7 @@ sidebar:
   order: 6
 ---
 
+import Embed from '@components/Embed.astro';
 import Quiz from '@components/Quiz.astro';
 
 Output was the easy direction. A pin set to `OUT` does what you tell it. Input is where the
@@ -168,10 +169,20 @@ rather than `a - b` and the problem never appears.
 `DEBOUNCE_MS` is left as a named value on purpose. Thirty milliseconds suits most buttons;
 a tired switch or a long wire may need more. It is a knob, not a constant of nature.
 
-:::note[The simulator is too clean]
-Wokwi's button does not bounce, so the naive version will look correct there and misbehave on
-the real hardware in class. Write the debounced version anyway. This is the general shape of
-physical computing: the model is tidy and the world is not.
+:::note[The simulator bounces too]
+Wokwi simulates contact bounce, which is lucky: the naive version misbehaves on screen exactly
+as it would on the bench, so you can watch the bug happen instead of taking our word for it.
+
+You can also prove it to yourself. The pushbutton part takes a `bounce` attribute — set it to
+`"0"` and bouncing switches off, and the undebounced version suddenly looks perfect. In the
+diagram editor that means adding it to the part's attributes:
+
+```json
+{ "type": "wokwi-pushbutton", "id": "btn1", "attrs": { "bounce": "0" } }
+```
+
+Turn it back on before you trust anything. A button that never bounces exists only in the
+simulator.
 :::
 
 ## Confirm it works
@@ -179,6 +190,12 @@ physical computing: the model is tidy and the world is not.
 In a new Raspberry Pi Pico MicroPython project on [wokwi.com](https://wokwi.com), add a
 **pushbutton** and wire one side to `GP14` and the other to `GND`. Keep the LED and resistor
 from the last lesson on `GP15`.
+
+The panel below is that project. Add the parts, paste each version of the program into
+`main.py` in turn, and press play — you can watch the naive one misbehave and the debounced
+one behave without leaving the page.
+
+<Embed src="https://wokwi.com/projects/new/micropython-pi-pico" title="Wokwi simulator" height={520} />
 
 - [ ] With `Pin(14, Pin.IN, Pin.PULL_UP)` and the polling program, the LED follows the button
 - [ ] I printed `button.value()` in the loop and watched it read 1 released, 0 pressed

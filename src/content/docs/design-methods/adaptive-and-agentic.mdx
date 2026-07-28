@@ -150,6 +150,18 @@ these are its sections:
 - **Failure behaviour.** What it does when it cannot do the thing. Silence is the worst
   available answer and the most common one.
 
+Scope, permission and escalation are one question asked of each action, in this order:
+
+```mermaid
+flowchart TD
+  A["agent has an action"] --> B{"in scope?"}
+  B -->|"no"| C["stop and ask"]
+  B -->|"yes"| D{"reversible?"}
+  D -->|"no"| C
+  D -->|"yes"| E["act, then log it"]
+  C -->|"approved"| E
+```
+
 ### Trust is calibrated, not maximised
 
 The goal is not maximum trust. It is trust that **matches the system's actual reliability**.

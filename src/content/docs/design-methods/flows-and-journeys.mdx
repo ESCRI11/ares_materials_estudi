@@ -20,23 +20,17 @@ Four tools, then the part that matters — how to pick one.
 **A user flow is one task, in one system you control, drawn as states and the transitions
 between them.** Time is short: minutes. The reader is you, your team, and whoever builds it.
 
-```
-   ( start )
-       │
-       ▼
-  [ scan machine QR ]
-       │
-       ▼
-   ◇ logged in? ◇ ── no ──▶ [ sign-in ] ──▶ (fail: no account) 
-       │ yes
-       ▼
-   ◇ slot free? ◇ ── no ──▶ [ next free slot offered ] ──┐
-       │ yes                                             │
-       ▼                                                 ▼
-  [ confirm booking ]  ◀──────────────────────────  ◇ accept? ◇ ── no ──▶ ( end: abandoned )
-       │
-       ▼
-  ( end: booked )
+```mermaid
+flowchart TD
+  A(["start"]) --> B["scan machine QR"]
+  B --> C{"logged in?"}
+  C -->|"no"| D(["end: no account"])
+  C -->|"yes"| E{"slot free?"}
+  E -->|"no"| F{"accept next slot?"}
+  F -->|"no"| G(["end: abandoned"])
+  E -->|"yes"| H["confirm booking"]
+  F -->|"yes"| H
+  H --> I(["end: booked"])
 ```
 
 The conventions are worth using because everyone reads them without being taught: boxes are
@@ -122,17 +116,16 @@ experience failures have nothing wrong on the surface at all.
 
 Read top to bottom:
 
+```mermaid
+flowchart TD
+  A["physical evidence"] --> B["customer actions"]
+  B -->|"line of interaction"| C["front-stage"]
+  C -->|"line of visibility"| D["back-stage"]
+  D -->|"line of internal interaction"| E["support processes"]
 ```
-  physical evidence   the sheet, the machine, the email, the room
-  ─────────────────────────────────────────────────── line of interaction
-  customer actions    what the person does
-  ─────────────────────────────────────────────────── 
-  front-stage         staff and interfaces the person can see
-  ─────────────────────────────────────────────────── line of visibility
-  back-stage          work done for this person that they never see
-  ─────────────────────────────────────────────────── line of internal interaction
-  support processes   systems, databases, suppliers, other departments
-```
+
+Physical evidence is the sheet, the machine, the email, the room. Support processes are the
+systems, databases, suppliers and other departments underneath everything else.
 
 **Front-stage** is everything the person can perceive: the booking screen, the technician at
 the desk, the confirmation email. **Back-stage** is the work that makes it possible and stays

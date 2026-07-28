@@ -91,6 +91,19 @@ Two awaits, because there are two waits. The first gets a **response** — heade
 the connection. The second reads the body of that response and parses it as JSON, which is also
 not instant.
 
+```mermaid
+sequenceDiagram
+    participant Page
+    participant Server
+    Page->>Server: fetch, here is the address
+    Server-->>Page: status and headers
+    Server-->>Page: the body, as JSON text
+    Note over Page: parsed into values you can use
+```
+
+Your page carries on with everything else between those arrows. That is what `await` buys you:
+the function stops, the browser does not.
+
 :::caution[Your own file needs a server too]
 `fetch("data.json")` for a file sitting next to your `index.html` works when the folder is
 served — the **Live Server** extension in VS Code, at a `localhost` address. Opened directly as

@@ -1,8 +1,8 @@
 ---
 title: VS Code
-description: Installing the editor the coding courses use, and learning its four panels before you write a line of code.
+description: Installing the editor the coding courses use, connecting it to WSL2, and learning its four panels before you write a line of code.
 sidebar:
-  order: 5
+  order: 6
 ---
 
 import Quiz from '@components/Quiz.astro';
@@ -34,8 +34,60 @@ brew install --cask visual-studio-code
 winget install --id Microsoft.VisualStudioCode -e
 ```
 
+:::caution[Windows: install it into Windows, not into Ubuntu]
+VS Code is an application with a window, so it belongs on the Windows side — the download
+page or that winget line in PowerShell, not `apt` inside Ubuntu. The next section connects
+it to your Linux files, which is how you get an editor that looks like Windows and works on
+Linux at the same time.
+:::
+
 Open it. You get a Welcome tab and possibly a colour theme picker; pick whichever you like
 and ignore the rest of that tab.
+
+## Windows: connect it to WSL2
+
+Your project files live in the Linux home directory, and VS Code is a Windows program.
+Bridging that is one extension and one command, and it is the difference between an editor
+that fights you and one you stop thinking about.
+
+An **extension** is an add-on that teaches the editor something new. Open the Extensions
+panel (Ctrl+Shift+X), search for **WSL**, and install the one published by Microsoft. It is
+free and it is the only extension this section asks for.
+
+Now open your project. From the Ubuntu terminal:
+
+```sh
+cd ~/ind-prep
+code .
+```
+
+Remember that `.` means "the folder I am in right now". The first time you run `code`, it
+spends a moment installing a small helper inside Ubuntu; after that it is instant. A VS
+Code window opens on your `ind-prep` folder.
+
+The same thing without the terminal: open the command palette with Ctrl+Shift+P, type
+`WSL`, and choose **WSL: Connect to WSL**. Then File → Open Folder, which now browses the
+Linux filesystem rather than `C:`.
+
+**How to tell it worked.** Look at the far bottom-left corner of the window. There is a
+small coloured block, and once you are connected it reads **WSL: Ubuntu**. If it is empty,
+you are editing Windows files and the commands in later lessons will not behave.
+
+Two things follow from being connected, and both are the point of the exercise:
+
+- The **integrated terminal** inside VS Code is now bash inside Ubuntu, standing in your
+  project folder. Everything from the moving-around lesson works in it as written.
+- Extensions split into two groups. Some run on the Windows side, where the window is;
+  others have to run next to your files, and for those VS Code shows a button reading
+  **Install in WSL: Ubuntu**. Click it when you see it. Nothing is broken — it is the
+  editor telling you which side of the machine an add-on belongs on.
+
+:::note[The slow way, and why not to use it]
+You can also open `\\wsl$\Ubuntu\home\you\ind-prep` in a plain VS Code window. It works,
+and it is the wrong habit: the editor is then reaching across the filesystem boundary for
+every read and every save, its terminal is PowerShell rather than bash, and git gets
+noticeably slow. Connect properly once and forget about it.
+:::
 
 ## Open a folder, not a file
 
@@ -66,14 +118,16 @@ extension: `index.html`, not `index`.
 **Search** — Cmd+Shift+F or Ctrl+Shift+F. Searches every file in the folder at once. The
 day you cannot remember where you wrote something, this is the answer.
 
-**Extensions** — Cmd+Shift+X or Ctrl+Shift+X. An **extension** is an add-on that teaches
-the editor something new: a language, a formatter, a preview pane. Resist installing a pile
-of them today. Each section of this site names the ones it actually needs, and an editor
-full of unexplained extensions is harder to learn in, not easier.
+**Extensions** — Cmd+Shift+X or Ctrl+Shift+X. Add-ons that teach the editor something new:
+a language, a formatter, a preview pane. Resist installing a pile of them today. Each
+section of this site names the ones it actually needs — on Windows that list starts and,
+for now, ends with WSL — and an editor full of unexplained extensions is harder to learn
+in, not easier.
 
 **The integrated terminal** — View → Terminal, or Ctrl and the backtick key (the one above
 Tab, to the left of the 1). A terminal opens in the bottom half of the window, and here is
-the payoff: it starts **already inside the folder you have open**. Try it:
+the payoff: it starts **already inside the folder you have open**, and on Windows it is the
+Ubuntu shell rather than PowerShell. Try it:
 
 ```sh
 pwd
@@ -91,10 +145,11 @@ the way documentation will tell you to do things.
 Two worth knowing now:
 
 - Type `terminal` to find *View: Toggle Terminal*.
+- Type `WSL` to find *WSL: Connect to WSL*, on Windows.
 - On macOS only, type `shell command` and run **Shell Command: Install 'code' command in
   PATH**. That lets you type `code .` in any terminal to open the current folder in the
-  editor — remember that `.` means "the folder I am in". On Windows the installer sets this
-  up for you.
+  editor. On Windows the WSL extension puts `code` into your Ubuntu shell for you the first
+  time you use it.
 
 ## One setting to change
 
@@ -104,11 +159,12 @@ a file you forgot to save, which is a rite of passage worth skipping.
 ## Check yourself
 
 - [ ] VS Code is installed and opens
-- [ ] I opened the `ind-prep` **folder** with File → Open Folder, not a single file
+- [ ] Windows: I installed the **WSL** extension by Microsoft
+- [ ] Windows: the bottom-left corner of the window reads **WSL: Ubuntu**
+- [ ] I opened the `ind-prep` **folder**, not a single file — with `code .` from Ubuntu, or File → Open Folder
 - [ ] I can see the file tree in the Explorer panel
 - [ ] I created a file called `notes.md` from the Explorer and typed a sentence in it
 - [ ] I opened the integrated terminal and `pwd` printed the path to `ind-prep`
-- [ ] I found the Extensions panel without installing anything
 - [ ] I opened the command palette and turned Auto Save on
 
 <Quiz
@@ -134,6 +190,17 @@ a file you forgot to save, which is a rite of passage worth skipping.
 			answer: 1,
 			explanation:
 				'The integrated terminal opens with the workspace folder as its working directory. That is most of the reason to run commands from inside the editor: no navigating before you can do anything.',
+		},
+		{
+			q: 'On Windows, what does the WSL extension let you do?',
+			options: [
+				'Run VS Code itself inside Ubuntu instead of Windows',
+				'Keep the editor on Windows while it edits, searches and runs commands inside Ubuntu, next to your files',
+				'Copy your Linux files onto the C: drive so Windows can open them',
+			],
+			answer: 1,
+			explanation:
+				'The window stays a Windows application; everything behind it — the file tree, the search, the integrated terminal, git — happens inside Ubuntu, where your project lives. Nothing is copied anywhere, and the bottom-left corner reads WSL: Ubuntu when it is working.',
 		},
 	]}
 />

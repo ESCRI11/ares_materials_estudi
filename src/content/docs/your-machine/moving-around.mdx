@@ -1,8 +1,8 @@
 ---
 title: Moving around from the keyboard
-description: pwd, ls, cd and tab completion — walking your folder tree without a mouse, on macOS and on Windows.
+description: pwd, ls, cd and tab completion — walking your folder tree without a mouse.
 sidebar:
-  order: 3
+  order: 4
 ---
 
 import Quiz from '@components/Quiz.astro';
@@ -14,6 +14,10 @@ changing it.
 
 Three commands do the job. You will use them every day for the rest of the master.
 
+Everything on this page is typed into zsh on macOS or into Ubuntu on Windows, and it is
+identical in both. That sameness is exactly what
+[installing WSL2](/ares_materials_estudi/your-machine/wsl2/) bought you.
+
 ## Where am I
 
 ```sh
@@ -21,7 +25,7 @@ pwd
 ```
 
 Short for *print working directory*. It answers with an absolute path — the full address
-of the folder you are in. Works on macOS and in PowerShell.
+of the folder you are in.
 
 When a tool says it cannot find a file that you can clearly see, `pwd` is the first thing
 to type. Nine times out of ten you are standing in the wrong place.
@@ -32,16 +36,16 @@ to type. Nine times out of ten you are standing in the wrong place.
 ls
 ```
 
-Lists the files and folders in the working directory. The output looks different on the
-two systems — macOS gives you bare names in columns, PowerShell gives you a table with
-dates and sizes — but the question being asked is the same.
+Lists the files and folders in the working directory, as bare names in columns. Two
+variants earn their keep:
 
-Two useful variants:
+```sh
+ls -l      # one per line, with size and date
+ls -a      # include hidden files
+```
 
-| | macOS | Windows PowerShell |
-|---|---|---|
-| Long listing with sizes and dates | `ls -l` | `ls` already does this |
-| Include hidden files | `ls -a` | `ls -Force` |
+Those are **flags**, from the terminal lesson: a dash and a letter that change how the
+command behaves. They combine, so `ls -la` does both.
 
 **Hidden files** are ones whose name starts with a dot, like `.git` or `.gitignore`. They
 are not secret; the convention exists to keep configuration out of your way. You will meet
@@ -67,13 +71,25 @@ cd ~/Desktop      # straight to an absolute location, from anywhere
 Everything after `#` in those lines is a comment for you, not part of the command — leave
 it out when you type.
 
-The argument to `cd` is a path, exactly as described in the paths lesson: relative if it
-starts with a folder name or with `..`, absolute if it starts with `/`, `C:\` or `~`. This
-is the moment that lesson pays for itself.
+A fresh Linux home starts empty, so on Windows that last one answers *No such file or
+directory* until you have made a Desktop folder. That is the shell being precise rather
+than broken, and it is the same message you get for a typo.
 
-:::note[Windows accepts both slashes]
-PowerShell understands `cd Documents/thesis` as well as `cd Documents\thesis`. Where these
-lessons show a forward slash, you can type it as written.
+The argument to `cd` is a path, exactly as described in the paths lesson: relative if it
+starts with a folder name or with `..`, absolute if it starts with `/` or `~`. This is the
+moment that lesson pays for itself.
+
+:::note[Windows readers: getting to your Windows files]
+Inside Ubuntu your `~` is the Linux home directory, which starts out empty. Your Windows
+drives are one folder away, under `/mnt/c`:
+
+```sh
+cd /mnt/c/Users/ares/Downloads
+```
+
+Use that to reach something that already lives on the Windows side — a photo, a PDF, a
+Figma export. Keep the work you make in `~`, for the speed reason in the
+[WSL2 lesson](/ares_materials_estudi/your-machine/wsl2/).
 :::
 
 ## Tab completion, the habit that matters most
@@ -105,9 +121,10 @@ cd "Design Research"
 ## Two shortcuts worth stealing
 
 **Drag a folder into the terminal window** and its full path is pasted at the cursor. Handy
-when the folder is somewhere deep and you have it open in a window anyway. This works in
-macOS Terminal and in Windows Terminal; if nothing appears on Windows, hold Shift,
-right-click the folder in File Explorer, and choose *Copy as path* instead.
+when the folder is somewhere deep and you have it open in a window anyway. On Windows this
+pastes the path in its Windows form, `C:\Users\ares\Desktop`, which bash does not
+understand — swap the leading `C:\` for `/mnt/c/` and the backslashes for forward slashes,
+and it works.
 
 **Up arrow** to bring back the last command, then edit it, rather than retyping.
 
@@ -117,8 +134,9 @@ right-click the folder in File Explorer, and choose *Copy as path* instead.
 mkdir ind-prep
 ```
 
-*Make directory*. Same command on both systems. Do this in your home folder now — it is
-where everything from these lessons will live.
+*Make directory*. Do this in your home folder now — it is where everything from these
+lessons will live. On Windows that means the Linux home, the one `cd ~` takes you to, not
+anywhere under `/mnt/c`.
 
 ```sh
 cd ~
@@ -131,19 +149,21 @@ Four lines, and you have created a project folder and walked into it. That last 
 should print something ending in `ind-prep`.
 
 :::caution[Treat capital letters as different letters]
-Your Mac or Windows machine will usually let `Ind-Prep` and `ind-prep` refer to the same
-folder. Linux servers and GitHub will not. A project that works on your laptop and breaks
-after upload is very often one capital letter. Use lowercase and stop thinking about it.
+A Mac will usually let `Ind-Prep` and `ind-prep` refer to the same folder. Linux — which
+is what you are typing into inside WSL2 — will not, and neither will GitHub or any server
+your work ends up on. A project that works on a laptop and breaks after upload is very
+often one capital letter. Use lowercase and stop thinking about it.
 :::
 
 ## Do this on your machine
 
 - [ ] I ran `pwd` and understood the path it printed
 - [ ] I listed the contents of my home folder with `ls`
-- [ ] I saw hidden files with `ls -a` (macOS) or `ls -Force` (Windows)
+- [ ] I saw hidden files with `ls -a`
 - [ ] I moved into a folder with `cd`, then back up with `cd ..`
-- [ ] I got somewhere in one move with `cd ~/Desktop`
+- [ ] I got somewhere in one move with `cd ~`
 - [ ] I completed a folder name with the Tab key
+- [ ] On Windows: I reached my Windows Downloads folder through `/mnt/c` and listed it
 - [ ] I created `ind-prep` in my home folder and `pwd` confirms I am inside it
 
 <Quiz
@@ -169,6 +189,17 @@ after upload is very often one capital letter. Use lowercase and stop thinking a
 			answer: 1,
 			explanation:
 				'Tab completes against the contents of the working directory. Silence means no match, which is a free spell-check and a free existence check. Run ls to see what is actually there, or cd ~ to get home first.',
+		},
+		{
+			q: 'On Windows, inside Ubuntu, you type cd /mnt/c/Users. Where have you gone?',
+			options: [
+				'Into the Linux home directory',
+				'Into the users folder of your Windows C: drive',
+				'Nowhere — /mnt is not a real path',
+			],
+			answer: 1,
+			explanation:
+				'Your Windows drives appear inside the Linux tree under /mnt, so the C: drive is /mnt/c. It is the right way to reach a file that already lives on the Windows side, and the wrong place to keep the work you make, which belongs in ~.',
 		},
 	]}
 />

@@ -30,7 +30,18 @@ This HTML:
 </body>
 ```
 
-becomes a tree — `body` holds an `h1` and a `ul`, the `ul` holds two `li`. Each of those is an
+becomes a tree:
+
+```mermaid
+flowchart TD
+    D["document"] --> B["body"]
+    B --> H["h1"]
+    B --> U["ul"]
+    U --> L1["li"]
+    U --> L2["li"]
+```
+
+`body` holds an `h1` and a `ul`, the `ul` holds two `li`. Each of those is an
 **element**: an object with properties you can read and change from JavaScript. Change one,
 and the screen updates immediately. The HTML file on disk never changes; you are editing the
 browser's live copy of it.

@@ -5,6 +5,7 @@ sidebar:
   order: 9
 ---
 
+import Embed from '@components/Embed.astro';
 import Quiz from '@components/Quiz.astro';
 
 Your board has no screen. When something goes wrong — and something will — you cannot open a
@@ -104,6 +105,19 @@ Type a number into the serial monitor, press Enter, the LED changes. Note `int(t
 arrives is always text, never a number, and forgetting to convert it is a rite of passage in
 every language.
 
+Three different things — printing, the prompt, and reading a line back — and one cable
+carrying all of them, in both directions:
+
+```mermaid
+sequenceDiagram
+    participant Board
+    participant Computer
+    Board->>Computer: a value from print
+    Computer->>Board: a line typed at the REPL
+    Board->>Computer: the result of that line
+    Computer->>Board: the text input is waiting for
+```
+
 `input()` **blocks**: nothing else in the program happens while it waits. That is fine for a
 tool you are driving by hand and wrong for anything that also has to watch a sensor. Reading
 serial without blocking is a real topic and a later one — for now, know that this is a
@@ -141,8 +155,12 @@ page instead. Same idea, different cable, and a different course.
 
 ## Confirm it works
 
-In a Raspberry Pi Pico MicroPython project on [wokwi.com](https://wokwi.com), with a
-potentiometer on `GP26` and an LED on `GP15`:
+The panel below is a fresh Raspberry Pi Pico MicroPython project. Add a potentiometer on
+`GP26` and an LED on `GP15`, paste the programs into `main.py`, and press play — the serial
+monitor underneath the diagram is where `print()` lands and where you type, without leaving
+the page.
+
+<Embed src="https://wokwi.com/projects/new/micropython-pi-pico" title="Wokwi simulator" height={520} />
 
 - [ ] I printed a sensor reading in a loop and watched it change in the serial monitor
 - [ ] I stopped the program with `Ctrl+C` and got a `>>>` prompt

@@ -18,11 +18,17 @@ heat rather than being one solid piece, and the whole thing takes hours.
 
 ## The chain from model to object
 
-```
-Fusion model  →  STL or 3MF file  →  slicer  →  gcode  →  printer
+```mermaid
+flowchart LR
+  A["Fusion model"] --> B["STL or 3MF"]
+  B --> C["Slicer"]
+  C --> D["gcode"]
+  D --> E["Printer"]
+  E -.->|edits go back here| A
 ```
 
-Four steps, three file handovers, and each one loses something.
+Four steps, three file handovers, and each one loses something. The dashed arrow is the only
+way back: nothing downstream can be edited into a better shape.
 
 **STL** is the oldest and most common export. It describes the outer surface of your object
 as thousands of triangles — nothing else. No units, no colour, no history, no parameters.

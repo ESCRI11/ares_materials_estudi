@@ -38,6 +38,17 @@ against, and the path the water takes to get back to the pump. On a board it is 
 That last point is the one beginners drop. Electricity does not travel to a component and
 stop there. It goes round. If there is no path back to ground, nothing happens at all.
 
+```mermaid
+flowchart LR
+    S["Supply"] --> R["Resistor"]
+    R --> C["Component"]
+    C --> G["Ground"]
+    G -->|"return path"| S
+```
+
+Every circuit in this section is that ring. When something does not work, the first question is
+which part of the ring is open.
+
 :::note[Where the analogy leaks]
 Water can spray out of an open pipe. Electricity cannot: an incomplete circuit does nothing
 rather than leaking onto the table. Otherwise the model holds well enough for everything in

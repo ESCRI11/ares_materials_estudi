@@ -61,6 +61,23 @@ order of effort:
   holds the key and calls the provider. This is the real answer for a public product, and it
   is a hosting problem rather than a code problem.
 
+That last one is worth drawing, because the argument is about where things are rather than
+what they do:
+
+```mermaid
+sequenceDiagram
+    participant B as Browser
+    participant S as Your server
+    participant P as Provider
+    B->>S: the visitor's question
+    S->>P: messages plus your key
+    P-->>S: text plus token counts
+    S-->>B: the answer only
+```
+
+The key exists on one line of that diagram and never crosses to the browser. A prototype you
+run from your own terminal is the same picture with the first participant removed.
+
 ### Put the key in an environment variable
 
 An **environment variable** is a named value that belongs to the environment a program runs in

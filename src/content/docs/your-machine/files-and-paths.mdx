@@ -54,6 +54,19 @@ in order, to reach it.
 
 Read it left to right. Each `/` means "go into". So: the root of the disk, then `Users`,
 then `ares`, then `Documents`, then `thesis`, and inside that a file called `poster.pdf`.
+Drawn as the tree it describes:
+
+```mermaid
+flowchart TD
+  R["/ (the root)"] --> U[Users]
+  U --> A[ares]
+  A --> D[Documents]
+  D --> T[thesis]
+  T --> P[poster.pdf]
+```
+
+The path is that chain of names, written on one line with slashes between them. Nothing
+more is going on.
 
 The two operating systems write this differently, and the difference is only cosmetic:
 
@@ -61,12 +74,34 @@ The two operating systems write this differently, and the difference is only cos
 |---|---|---|
 | Separator | `/` | `\` (a backslash) |
 | Where the tree starts | one root, `/` | one root per drive, `C:\` |
-| Your personal folder | `/Users/ares` | `C:\Users\ares` |
+| Your personal folder | `/Users/ares` on macOS, `/home/ares` on Linux | `C:\Users\ares` |
 
 That personal folder is your **home folder**: your Desktop, Documents, Downloads and
-everything else you own live inside it. It has a shorthand, `~` (tilde), which both
-systems understand in most places. So `~/Downloads` means `/Users/ares/Downloads` on a Mac
+everything else you own live inside it. It has a shorthand, `~` (tilde), which every system
+here understands in most places. So `~/Downloads` means `/Users/ares/Downloads` on a Mac
 and `C:\Users\ares\Downloads` on Windows.
+
+## Windows: you will be writing the left-hand column
+
+The backslash column is what File Explorer shows you and what a Windows program prints.
+It is not what you will type. Once you have
+[installed WSL2](/ares_materials_estudi/your-machine/wsl2/) — the next lesson but one — the
+shell you work in is Linux, so everything you write uses forward slashes and one root.
+
+The two views describe the same disk, and this is how they line up:
+
+| What it is | Windows writes it | You will write it |
+|---|---|---|
+| Your Windows home | `C:\Users\ares` | `/mnt/c/Users/ares` |
+| Your Windows Downloads | `C:\Users\ares\Downloads` | `/mnt/c/Users/ares/Downloads` |
+| Your Linux home | `\\wsl$\Ubuntu\home\ares` | `/home/ares`, or `~` |
+
+Two rules turn one into the other: a drive letter becomes `/mnt/` plus that letter in
+lowercase, and every backslash becomes a forward slash. `C:\Users\ares\Desktop` is
+`/mnt/c/Users/ares/Desktop`, and there is no third rule.
+
+The Linux home in that last row is a genuinely separate place, not a folder on `C:`. It is
+where your project files will live, and the WSL2 lesson explains why.
 
 :::note[Where downloads go]
 Your browser puts everything in `~/Downloads` unless you tell it otherwise. "I downloaded
@@ -138,6 +173,7 @@ A habit worth starting today, because it costs nothing and saves a lot:
 - [ ] Filename extensions are now visible in Finder or File Explorer
 - [ ] I can write out the absolute path of my Downloads folder from memory
 - [ ] I copied the full path of a real file (macOS: hold Option, right-click the file, choose *Copy … as Pathname*. Windows: hold Shift, right-click, choose *Copy as path*)
+- [ ] Windows: I rewrote that copied path in the Unix form, starting `/mnt/c/`
 - [ ] I renamed one file to lowercase-with-hyphens
 
 <Quiz
@@ -174,6 +210,17 @@ A habit worth starting today, because it costs nothing and saves a lot:
 			answer: 2,
 			explanation:
 				'A relative path describes the position of the file inside the project, so the whole folder can be moved, zipped, or uploaded and the link still resolves. The absolute path names a folder that exists only on your laptop.',
+		},
+		{
+			q: 'File Explorer shows a file at C:\\Users\\ares\\Desktop\\brief.pdf. How is that same file written in a Linux shell on the same Windows machine?',
+			options: [
+				'/Users/ares/Desktop/brief.pdf',
+				'/mnt/c/Users/ares/Desktop/brief.pdf',
+				'~/Desktop/brief.pdf',
+			],
+			answer: 1,
+			explanation:
+				'Two rules, no more: the drive letter becomes /mnt/ plus that letter in lowercase, and every backslash becomes a forward slash. It is one disk described twice, not two copies of the file. The tilde is something else again — it means the Linux home, which is a separate place from the Windows one.',
 		},
 	]}
 />

@@ -24,6 +24,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Mermaid diagrams are rendered to SVG during the build, which needs a real browser.
+      - run: npx playwright install --with-deps chromium
       - run: npm run build
       # enablement: turns Pages on for the repo, so no manual Settings step is needed
       - uses: actions/configure-pages@v5

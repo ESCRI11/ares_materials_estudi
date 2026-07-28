@@ -119,6 +119,19 @@ you will type this same skeleton at the start of every page you ever make:
 </html>
 ```
 
+The indentation is drawing a tree. Every element sits inside exactly one parent, and the whole
+document hangs off `html`:
+
+```mermaid
+flowchart TD
+    A["html"] --> B["head"]
+    A --> C["body"]
+    B --> D["meta"]
+    B --> E["title"]
+    C --> F["h1"]
+    C --> G["p"]
+```
+
 Line by line:
 
 - **`<!doctype html>`** tells the browser to use modern rules. It is not really a tag, it has

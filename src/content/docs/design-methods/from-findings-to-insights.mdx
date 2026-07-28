@@ -57,7 +57,16 @@ underneath, and implies a direction.
 Notice what happened between levels 2 and 3. The findings could support a lazy conclusion:
 *people prefer their own notes, so give them a personal notes feature*. The insight goes the
 other way — private records are a symptom, and building a nicer version of the symptom makes
-the shared record worse. That reversal is the entire value of synthesis.
+the shared record worse. That reversal is the entire value of synthesis, and it happens at one
+fork:
+
+```mermaid
+flowchart TD
+  A["observation"] --> B["finding"]
+  B -->|"explain it"| C["insight"]
+  B -->|"leap to a fix"| D["feature request"]
+  C --> E["design direction"]
+```
 
 ## What makes an insight an insight
 

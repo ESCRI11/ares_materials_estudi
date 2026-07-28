@@ -5,6 +5,7 @@ sidebar:
   order: 7
 ---
 
+import Embed from '@components/Embed.astro';
 import Quiz from '@components/Quiz.astro';
 
 A button has two states. Most of the world does not. How bright the room is, how far away
@@ -158,7 +159,11 @@ Slower to respond, far calmer to look at. Ten is a starting point, not a rule.
 
 ## Confirm it works
 
-In a new Raspberry Pi Pico MicroPython project on [wokwi.com](https://wokwi.com):
+The panel below is a fresh Raspberry Pi Pico MicroPython project. Add the potentiometer,
+paste the reading loop into `main.py`, press play, and drag the knob while the numbers scroll
+past in the serial panel — all of it here, without leaving the page.
+
+<Embed src="https://wokwi.com/projects/new/micropython-pi-pico" title="Wokwi simulator" height={520} />
 
 - [ ] I added a potentiometer, wired its outer legs to `3V3` and `GND` and its wiper to `GP26`
 - [ ] Printing `read_u16()` in a loop shows numbers that change as I turn the knob

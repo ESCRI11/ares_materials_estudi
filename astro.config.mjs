@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import rehypeMermaid from 'rehype-mermaid';
 
 // Markdown renders `- [ ]` task lists as *disabled* checkboxes, which makes the
 // self-check lists unusable. Re-enable them and remember ticks per page.
@@ -28,6 +29,38 @@ const base = '/ares_materials_estudi';
 export default defineConfig({
 	site: 'https://escri11.github.io',
 	base,
+	markdown: {
+		// ```mermaid fences become inline SVG at build time, so diagrams cost the reader
+		// no JavaScript and still show up with scripts disabled. Rendering needs a real
+		// browser: CI installs Playwright's chromium, and CHROMIUM_PATH points at a
+		// system one locally.
+		rehypePlugins: [
+			[
+				rehypeMermaid,
+				{
+					strategy: 'inline-svg',
+					launchOptions: process.env.CHROMIUM_PATH
+						? { executablePath: process.env.CHROMIUM_PATH }
+						: undefined,
+					mermaidConfig: {
+						theme: 'base',
+						fontFamily: "'Helvetica Neue', Arial, sans-serif",
+						themeVariables: {
+							// Deliberately mid-tone: one baked SVG has to read on both the
+							// light and the dark theme. custom.css nudges the rest.
+							primaryColor: '#ffffff00',
+							primaryTextColor: '#767676',
+							primaryBorderColor: '#767676',
+							lineColor: '#767676',
+							secondaryColor: '#ffffff00',
+							tertiaryColor: '#ffffff00',
+							background: '#ffffff00',
+						},
+					},
+				},
+			],
+		],
+	},
 	integrations: [
 		starlight({
 			title: 'InD Prep',

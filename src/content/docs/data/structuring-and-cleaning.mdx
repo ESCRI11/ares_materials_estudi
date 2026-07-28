@@ -34,6 +34,22 @@ record entirely, or fill the gap with a value you invent. The third option is le
 statistics and needs to be labelled wherever the result appears, because you made those
 numbers up.
 
+The shape of the decision is the same every time, and it ends in the same place:
+
+```mermaid
+flowchart TD
+  A["blank, N/A, 999"] --> B{"what does it stand for?"}
+  B -->|"nobody asked"| C["mark as missing"]
+  B -->|"they refused"| D["own value: refused"]
+  B -->|"genuinely zero"| E["keep the 0"]
+  C --> F["write the decision in the log"]
+  D --> F
+  E --> F
+```
+
+The last box is not decoration. Whichever branch you took, the record of having taken it is
+what the last section of this page is about.
+
 ## Duplicates
 
 Two kinds. **Exact duplicates** — the same record twice, usually from a double form

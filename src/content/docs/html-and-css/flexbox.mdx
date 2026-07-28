@@ -72,6 +72,21 @@ This is the one concept in flexbox worth slowing down for. A flex container has 
 - The **main axis** is the direction items are laid along. In a row that is horizontal.
 - The **cross axis** is perpendicular to it. In a row that is vertical.
 
+```mermaid
+flowchart TB
+    subgraph ROW["flex-direction: row"]
+        direction LR
+        r1["Item"] -- "main axis" --> r2["Item"]
+    end
+    subgraph COL["flex-direction: column"]
+        direction TB
+        c1["Item"] -- "main axis" --> c2["Item"]
+    end
+```
+
+The arrow is the main axis, and `flex-direction` is the property that turns it. The cross axis
+is always the direction the arrow does not point in.
+
 `flex-direction` chooses the main axis: `row` (the default, left to right) or `column` (top to
 bottom). Two properties then do the aligning, and which visual direction each one affects
 depends entirely on the direction you set:

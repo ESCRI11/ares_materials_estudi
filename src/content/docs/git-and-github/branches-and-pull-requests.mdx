@@ -66,6 +66,21 @@ git switch main
 git merge sound-experiment
 ```
 
+The whole manoeuvre has one shape. Each box below is a commit, and the label says which
+branch it sits on:
+
+```mermaid
+flowchart LR
+    A["main"] --> B["main"]
+    B -- "git switch -c" --> C["experiment"]
+    C --> D["experiment"]
+    B --> E["main"]
+    D -- "git merge" --> E
+```
+
+The line never breaks. `main` keeps working the whole time the experiment is being built, and
+merging is what brings the two ends back together.
+
 `main` now contains the experiment. The branch has served its purpose and can go:
 
 ```bash

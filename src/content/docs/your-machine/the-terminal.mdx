@@ -31,8 +31,10 @@ Three words for things that sit inside each other:
 
 - The **terminal** is the window — the application with the blinking cursor.
 - The **shell** is the program running inside that window. It reads what you type, works
-  out what you meant, and runs it. On macOS the shell is **zsh**; on Windows it is
-  **PowerShell**.
+  out what you meant, and runs it. On macOS the shell is **zsh**. On Windows it is
+  **PowerShell** out of the box, and the [next lesson](/ares_materials_estudi/your-machine/wsl2/)
+  replaces it with **bash**, the shell macOS and Linux both understand — which is the one
+  every tutorial you will ever read assumes.
 - The **command line** is what you are doing: driving the computer by typing lines of text.
   You will also hear **console** and **CLI** (command-line interface).
 
@@ -44,10 +46,21 @@ Nobody will mind if you use the wrong one of these in conversation.
 in Applications → Utilities → Terminal — drag it to your Dock now, because you will open
 it most days from here on.
 
-**Windows.** Click Start and type `terminal`. On Windows 11 that opens Windows Terminal;
-on Windows 10 you may only find *Windows PowerShell*, which is fine — the commands in
-these lessons work in both. Right-clicking the Start button gives you the same entry
-without typing.
+**Windows.** Click Start and type `terminal`. On Windows 11 that opens **Windows
+Terminal**; on Windows 10 you may only find *Windows PowerShell*. Either is fine for the
+few commands on this page. Right-clicking the Start button gives you the same entry without
+typing.
+
+Windows Terminal is the one to keep, because it holds several shells in tabs. That matters
+from the next lesson onwards: you will install a Linux shell called bash, and it appears as
+another tab in the same window. Pin Windows Terminal to your taskbar now.
+
+:::note[Windows readers, one lesson of patience]
+Everything on this page works in PowerShell. From the lesson after next, the commands are
+written for bash, and PowerShell will start disagreeing with them.
+[Install WSL2](/ares_materials_estudi/your-machine/wsl2/) before you go further and the
+disagreement never happens.
+:::
 
 ## The prompt
 
@@ -58,7 +71,13 @@ on macOS:
 ares@MacBook-Air ~ %
 ```
 
-and roughly like this on Windows:
+roughly like this in Ubuntu on Windows, once you have WSL2:
+
+```
+ares@LAPTOP-8H2K4:~$
+```
+
+and like this in PowerShell:
 
 ```
 PS C:\Users\ares>
@@ -66,7 +85,7 @@ PS C:\Users\ares>
 
 This is the **prompt**, and it is telling you four things: who you are, which machine you
 are on, which folder you are currently standing in (`~` is your home folder), and — by
-ending with `%` or `>` and a cursor — that it is waiting for you.
+ending with `%`, `$` or `>` and a cursor — that it is waiting for you.
 
 :::note[The dollar sign in tutorials]
 Documentation everywhere writes commands like `$ whoami`. The `$` stands for "here is a
@@ -88,7 +107,7 @@ It prints your username. Now try:
 date
 ```
 
-Nothing about that was dangerous, and both work identically on macOS and Windows. You have
+Nothing about that was dangerous, and both work on every shell mentioned above. You have
 now used a terminal, which was the only real hurdle.
 
 ## How a command is put together
@@ -116,7 +135,7 @@ for things you asked to see and for problems.
 Errors, by contrast, are loud and literal:
 
 ```
-zsh: command not found: gti
+gti: command not found
 ```
 
 That is the shell saying it has no idea what `gti` is — in this case because the word is
@@ -128,7 +147,8 @@ they are almost never cryptic.
 Nothing you type in these lessons can damage your machine. Two things are worth knowing
 anyway:
 
-- **`sudo`** at the start of a command means "run this with administrator powers". It asks
+- **`sudo`** at the start of a command means "run this with administrator powers". It is a
+  Unix command, so you will meet it on macOS and inside WSL2 but not in PowerShell. It asks
   for your password, and as you type it **nothing appears** — no dots, no stars. The
   terminal has not frozen; that is deliberate. Type it and press Enter.
 - **Never paste a command you do not understand** from a forum, a chat window or an AI
@@ -146,7 +166,7 @@ anyway:
 
 ## Check yourself
 
-- [ ] I have a terminal open, and on macOS I have pinned it to the Dock
+- [ ] I have a terminal open, and I have pinned it to the Dock (macOS) or the taskbar (Windows)
 - [ ] I ran `whoami` and it printed my username
 - [ ] I ran `date` and got today's date
 - [ ] I can point at the prompt and say which folder it says I am in

@@ -5,6 +5,7 @@ sidebar:
   order: 5
 ---
 
+import Embed from '@components/Embed.astro';
 import Quiz from '@components/Quiz.astro';
 
 Blinking an LED is the "hello world" of hardware. It is a small thing that proves a large
@@ -123,6 +124,12 @@ blinks once and the program ends — and you land in the interactive prompt, whi
 about.
 
 ## Confirm it works
+
+The panel below is a fresh Raspberry Pi Pico MicroPython project. Add the two parts, paste
+the program into `main.py`, and press the green play button — all of it here, without
+leaving the page.
+
+<Embed src="https://wokwi.com/projects/new/micropython-pi-pico" title="Wokwi simulator" height={520} />
 
 - [ ] I opened wokwi.com/micropython and started the Raspberry Pi Pico MicroPython template
 - [ ] I added an LED and a 220 Ω resistor and wired them between `GP15` and `GND`

@@ -96,7 +96,15 @@ into a chat.
 
 ## The everyday loop
 
-From here on, working looks like this, over and over:
+From here on, working looks like this, over and over. It is the pipeline from the last lesson
+with one more stage on the end, and the only stage that needs a connection:
+
+```mermaid
+flowchart LR
+    A["Working folder"] -- "add and commit" --> B["Local history"]
+    B -- "git push" --> C["GitHub"]
+    C -- "git pull" --> B
+```
 
 ```bash
 git status

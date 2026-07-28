@@ -42,6 +42,17 @@ draw();                          // start it off
 Yes, the function schedules itself. It reads oddly the first time and then becomes invisible —
 almost every sketch you write this semester has these five lines somewhere.
 
+```mermaid
+flowchart TD
+    A["Clear the canvas"] --> B["Change a number"]
+    B --> C["Draw everything"]
+    C --> D["requestAnimationFrame"]
+    D --> A
+```
+
+The three steps of a frame plus the line that asks for the next one. Take that last edge away
+and you have a single drawing that never moves.
+
 ## Movement
 
 One variable, changed by a small amount each frame. `x = x + 2` moves two pixels per frame,

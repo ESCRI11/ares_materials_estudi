@@ -187,6 +187,48 @@ h1 {
 	line-height: 1.45;
 }
 
+/* --- Mermaid diagrams ------------------------------------------------------
+ * Rendered to SVG at build time, so a single file has to read on both themes.
+ * Mermaid bakes its colours in as inline attributes and styles, which is why
+ * these have to shout. Everything is pulled back to the theme's own tokens.
+ */
+
+.sl-markdown-content svg[aria-roledescription] {
+	display: block;
+	max-width: 100%;
+	height: auto;
+	margin: 2rem 0;
+}
+
+.sl-markdown-content svg[aria-roledescription] :is(text, .nodeLabel, .edgeLabel, span, p) {
+	fill: var(--sl-color-white) !important;
+	color: var(--sl-color-white) !important;
+	font-family: var(--sl-font) !important;
+}
+
+/* Edge labels ship with an opaque light background box. */
+.sl-markdown-content svg[aria-roledescription] :is(.edgeLabel, .labelBkg) rect,
+.sl-markdown-content svg[aria-roledescription] foreignObject :is(div, span) {
+	fill: var(--sl-color-bg) !important;
+	background: var(--sl-color-bg) !important;
+	background-color: var(--sl-color-bg) !important;
+}
+
+.sl-markdown-content svg[aria-roledescription] :is(.node, .cluster) :is(rect, polygon, circle, path) {
+	fill: transparent !important;
+	stroke: var(--sl-color-gray-4) !important;
+}
+
+.sl-markdown-content svg[aria-roledescription] :is(.edgePath, .flowchart-link, .messageLine0, .messageLine1) path,
+.sl-markdown-content svg[aria-roledescription] path.path {
+	stroke: var(--sl-color-gray-4) !important;
+}
+
+.sl-markdown-content svg[aria-roledescription] marker path {
+	fill: var(--sl-color-gray-4) !important;
+	stroke: var(--sl-color-gray-4) !important;
+}
+
 /* --- Select-a-word definitions (public/glossary.js) ----------------------- */
 
 .ind-define {

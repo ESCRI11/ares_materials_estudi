@@ -85,6 +85,21 @@ The same GPIO pin can usually do either job, and your code declares which:
 - **Output** — the pin drives. Your program sets it high or low, and the pin actively holds
   its voltage there, supplying current to whatever is attached.
 
+Almost everything you build this semester is that one shape, run over and over for as long as
+the power is on:
+
+```mermaid
+flowchart TD
+    S["Button or sensor"] --> I["Input pin"]
+    I --> P["Your program"]
+    P --> O["Output pin"]
+    O --> A["LED or buzzer"]
+    P -->|"ask again"| I
+```
+
+The program never waits to be told. It reads the pin, decides, drives the other pin, and comes
+straight back to read again.
+
 The important limit: an output pin can supply only a small current, typically somewhere between
 a few and a few tens of milliamps depending on the chip, with a further limit on all pins added
 together. Enough for an LED with a resistor. Not remotely enough for a motor. Check your chip's

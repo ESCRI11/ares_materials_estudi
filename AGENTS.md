@@ -68,8 +68,23 @@ Three formats, in order of preference:
   Include `<style>` and `<script>` tags inside the string as needed. Sandboxed to scripts
   only, so a snippet cannot reach this page or the network as us.
 - **`<Embed>`** — `import Embed from '@components/Embed.astro'`, then
-  `<Embed src="…" title="…" />` for an external tool: a Wokwi circuit, a p5 sketch.
-  **Only pass a URL you have actually opened.** A dead iframe is worse than a link.
+  `<Embed src="…" title="…" />` for an external tool. **Only pass a URL you have actually
+  opened.** A dead iframe is worse than a link. Wokwi is verified to work in a frame with
+  no sign-in — `https://wokwi.com/projects/new/micropython-pi-pico` gives a full editor,
+  board and Run button inline, so physical computing exercises can be done on the page.
+
+## Diagrams
+
+Write a ` ```mermaid ` fence and it becomes an inline SVG at build time, so diagrams cost
+the reader no JavaScript and survive with scripts off. Colours are forced back to the theme
+in `custom.css`, because one baked SVG has to read on both light and dark.
+
+Use one when the shape of a thing is the lesson — a pipeline, a tree, a state change, a
+request and its response. Do not draw a diagram of a list; prose or a table is better, and
+a decorative diagram costs a build-time browser launch for nothing.
+
+Rendering needs a real browser. CI installs Playwright's chromium; locally, set
+`CHROMIUM_PATH` to a system one or run `npx playwright install chromium`.
 
 **Do not add a syntax-highlighting code editor** to `<LiveCode>`. A plain textarea is
 enough for snippets this size; CodeMirror was considered and deliberately declined.
@@ -137,7 +152,7 @@ cross-checked against maind.supsi.ch. Folder names are the directories under
 
 | # | Folder | Covers | Syllabus course |
 |---|---|---|---|
-| 1 | `your-machine` | Files and paths, the terminal, package managers, VS Code | baseline — no course teaches this |
+| 1 | `your-machine` | Files and paths, the terminal, **WSL2**, package managers, VS Code | baseline — no course teaches this |
 | 2 | `git-and-github` | Version control, commits, branches, PRs, Markdown, Pages | ID102.01 names both as required tools |
 | 3 | `html-and-css` | Elements, selectors, box model, flexbox, responsive, dev tools | Creative Coding Foundations (ID102.01) |
 | 4 | `javascript` | Console, variables, loops, functions, **DOM**, events, **Canvas**, **microphone**, **fetch/APIs**, debugging | Creative Coding Foundations (ID102.01) |
@@ -162,6 +177,11 @@ with a bridge from JavaScript to MicroPython rather than teaching Python from sc
 
 The Arduino kit is handed out during the course, so **electronics exercises must not assume
 the reader owns hardware**. Use the Wokwi browser simulator.
+
+**The reader is on Windows.** Where a lesson touches the terminal, installing things, or
+paths, Windows comes first and WSL2 is the recommended route — it gives them the same Linux
+shell every tutorial, lecturer and error message assumes. Keep macOS instructions alongside
+rather than dropping them; classmates and lecturers will be on Macs.
 
 ## Deploy
 

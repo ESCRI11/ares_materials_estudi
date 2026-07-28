@@ -117,6 +117,21 @@ which is exactly what the laser needs.
 sketch on the flat face, use `Project` to copy the face outline into it, and export that
 sketch. This keeps the flat file linked to the model, so a change upstream reaches the DXF.
 
+Either route takes the same path to the machine:
+
+```mermaid
+flowchart LR
+  A["3D model"] --> B["Flat sketch"]
+  B --> C["DXF file"]
+  C --> D["Lab software"]
+  D --> E["Laser cutter"]
+```
+
+Compare that with the chain a
+[3D printer needs](/ares_materials_estudi/digital-fabrication/designing-for-3d-printing/). The
+laser never receives a 3D model, and the printer never receives a sketch. Both start in the
+same Fusion file, and the second step is where they part company.
+
 Then, before cutting:
 
 - **Check the scale.** Open the DXF in whatever the lab uses and measure something you know

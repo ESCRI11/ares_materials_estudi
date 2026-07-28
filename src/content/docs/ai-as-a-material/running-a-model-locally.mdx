@@ -14,6 +14,25 @@ master are only possible with one.
 happens on your processor, and nothing you type crosses the network. No account, no key, no
 request, no bill.
 
+The difference is easiest to see as a question of where your words travel:
+
+```mermaid
+flowchart LR
+  subgraph Hosted
+    direction LR
+    A["Your text"] --> I["The internet"]
+    I --> S["Provider servers"]
+    S --> R["Reply"]
+  end
+  subgraph Local
+    direction LR
+    B["Your text"] --> M["Model on your disk"]
+    M --> Q["Reply"]
+  end
+```
+
+Every argument in this lesson, for and against, comes from that missing middle step.
+
 ## Why you would
 
 **Privacy.** Interview transcripts, a client's unreleased work, anything with a real person's

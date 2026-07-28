@@ -1,8 +1,8 @@
 ---
 title: Installing software from the terminal
-description: What a package manager is, why it beats hunting for installers, and setting up Homebrew or winget for real.
+description: What a package manager is, why it beats hunting for installers, and using apt or Homebrew for real.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 import Quiz from '@components/Quiz.astro';
@@ -33,11 +33,57 @@ package manager reads that list and installs those too, which is the part that u
 whole evenings.
 
 You have already used one: the App Store is a package manager with pictures. Homebrew and
-winget are the same idea, driven by text, with a catalogue aimed at people who build
-things.
+apt are the same idea, driven by text, with a catalogue aimed at people who build things.
 
 The payoff is that installing becomes one line you can copy, and this site can hand you
 that line instead of a paragraph of clicking.
+
+## Windows: apt, inside WSL2
+
+Ubuntu comes with its package manager already installed. It is called **apt**, and you use
+it from the Ubuntu terminal you set up in the
+[WSL2 lesson](/ares_materials_estudi/your-machine/wsl2/) — not from PowerShell.
+
+Run this first, before anything else, on a fresh install:
+
+```sh
+sudo apt update
+```
+
+`sudo` because it changes something the whole system shares, so it will ask for your Linux
+password and show nothing as you type it.
+
+:::caution[update does not update anything]
+This is the single most confusing name in Linux. `apt update` downloads a fresh copy of the
+**catalogue** — the list of what exists and at which version. It installs nothing and
+changes none of your software.
+
+The command that actually installs newer versions is `apt upgrade`. Run `update` first,
+always, because `upgrade` can only fetch what the catalogue knows about. A stale catalogue
+is why an install sometimes answers "unable to locate package" for something that plainly
+exists.
+:::
+
+The four commands you will actually use:
+
+```sh
+apt search node             # is it in the catalogue, and what is it called
+sudo apt install git        # install something
+sudo apt upgrade            # install newer versions of everything you have
+sudo apt remove git         # take it away again
+```
+
+Searching needs no `sudo`, because looking at a catalogue changes nothing. Installing does.
+
+:::note[winget, and when you still want it]
+Windows has its own package manager, **winget**, run from PowerShell. It installs Windows
+applications — the ones with a window: a browser, Figma, VS Code itself.
+
+That is the division worth keeping in your head. Command-line tools go in with `apt`,
+inside Ubuntu, because that is where you will type their names. Windows applications go in
+with winget or from their own website, because they are Windows programs and Ubuntu has no
+screen to put them on.
+:::
 
 ## macOS: Homebrew
 
@@ -84,44 +130,27 @@ brew install --cask figma   # install an application with a window (a "cask")
 brew upgrade            # update everything Homebrew installed
 ```
 
-## Windows: winget
-
-Windows ships with a package manager called **winget**, part of a component named *App
-Installer*. On Windows 11 and up-to-date Windows 10 it is already there. Check:
-
-```powershell
-winget --version
-```
-
-If that fails, open the Microsoft Store, search for *App Installer*, and install or update
-it.
-
-The equivalent four commands:
-
-```powershell
-winget search node
-winget install --id Git.Git -e
-winget upgrade --all
-winget uninstall --id Git.Git -e
-```
-
-Every package has an **id** — `Git.Git`, `Microsoft.VisualStudioCode` — which is the
-unambiguous name for it. The `-e` flag means *exact*: match that id and nothing else, so
-you install the package you meant rather than something with a similar name.
-
 ## Practice: install git
 
 Time to install something real. **Git** is the tool that records versions of your work and
 is how every course will expect you to hand things in; a whole section of this site is
 about it. Right now you only need it on your machine.
 
+On Windows, in the Ubuntu terminal:
+
+```sh
+sudo apt update
+sudo apt install git
+```
+
+On macOS:
+
 ```sh
 brew install git
 ```
 
-```powershell
-winget install --id Git.Git -e
-```
+If apt answers that git *is already the newest version*, it was preinstalled and you have
+lost nothing — the command is safe to run either way.
 
 Then check:
 
@@ -146,12 +175,13 @@ the world to get wrong.
 
 ## Do this on your machine
 
-- [ ] I installed Homebrew (macOS) or confirmed winget is present (Windows)
-- [ ] `brew --version` or `winget --version` prints a version number
-- [ ] I ran the Next steps commands the Homebrew installer printed, if it printed any
+- [ ] Windows: I ran `sudo apt update` in Ubuntu and it finished without an error
+- [ ] macOS: I installed Homebrew, and `brew --version` prints a version number
+- [ ] macOS: I ran the Next steps commands the Homebrew installer printed, if it printed any
 - [ ] I installed git through the package manager
 - [ ] `git --version` prints a version number
 - [ ] I searched the catalogue for something I already use, to see what is in there
+- [ ] I can say in one sentence what `apt update` does and what it does not do
 
 <Quiz
 	questions={[
@@ -178,15 +208,26 @@ the world to get wrong.
 				'A shell reads PATH — the list of folders it searches for commands — once, when it starts. A window opened before the install has an outdated copy. A fresh window picks up the new one, and it is a lot faster than a reboot.',
 		},
 		{
-			q: 'In winget install --id Git.Git -e, what is the -e for?',
+			q: 'What does sudo apt update do?',
 			options: [
-				'It matches the id exactly, so you get that package and not one with a similar name',
-				'It runs the installer with elevated permissions',
-				'It installs the newest experimental version',
+				'Installs newer versions of the software you already have',
+				'Downloads a fresh copy of the catalogue, without installing or changing anything',
+				'Updates Windows itself',
 			],
-			answer: 0,
+			answer: 1,
 			explanation:
-				'-e is short for exact. Without it, winget searches loosely and may offer several near matches, or install the wrong one silently. Naming the id and demanding an exact match is the reliable form.',
+				'It is the worst-named command in Linux. update refreshes the list of what exists and at which version; upgrade is the one that installs. Run update first, because upgrade can only fetch what the catalogue knows about — and a stale catalogue is why an install sometimes claims a package does not exist.',
+		},
+		{
+			q: 'You are on Windows with WSL2 and want to install a command-line tool. Which package manager do you reach for?',
+			options: [
+				'winget, in PowerShell',
+				'apt, in the Ubuntu terminal',
+				'Homebrew, which you install into Windows first',
+			],
+			answer: 1,
+			explanation:
+				'Command-line tools belong where you will type their names, which is Ubuntu, so apt installs them. winget is still useful, but for Windows applications with a window — a browser, Figma, VS Code itself.',
 		},
 	]}
 />

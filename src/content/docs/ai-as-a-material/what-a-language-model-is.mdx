@@ -111,6 +111,14 @@ tens of thousands of candidates, scored together so that the scores form one dis
 "what comes next". Then one token is chosen, appended to the text, and the whole thing runs
 again on the now slightly longer text.
 
+```mermaid
+flowchart LR
+  A["Text so far"] --> B["Model"]
+  B --> C["A score for every token"]
+  C --> D["One token chosen"]
+  D -->|appended| A
+```
+
 That loop is why answers arrive word by word rather than appearing whole, and why a long answer
 takes longer than a short one: the work is per token, every time.
 

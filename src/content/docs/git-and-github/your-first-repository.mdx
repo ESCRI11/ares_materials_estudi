@@ -78,7 +78,14 @@ record it. Git never records anything you did not ask it to.
 
 ## The two-step save
 
-Saving to history takes two commands, and the reason is worth understanding.
+Saving to history takes two commands, and the reason is worth understanding. A change moves
+through three places, and each command moves it one step along:
+
+```mermaid
+flowchart LR
+    A["Working folder"] -- "git add" --> B["Staging area"]
+    B -- "git commit" --> C["History"]
+```
 
 ```bash
 git add notes.md

@@ -5,6 +5,7 @@ sidebar:
   order: 8
 ---
 
+import Embed from '@components/Embed.astro';
 import Quiz from '@components/Quiz.astro';
 
 An **actuator** is the opposite of a sensor: a component that turns an electrical signal into
@@ -170,7 +171,11 @@ money. Principle first, datasheet second, wire third.
 
 ## Confirm it works
 
-In a new Raspberry Pi Pico MicroPython project on [wokwi.com](https://wokwi.com):
+The panel below is a fresh Raspberry Pi Pico MicroPython project. Add the LED, the servo and
+the buzzer as you reach them, paste each program into `main.py`, and press play — the
+simulator drives all three without leaving the page, and nothing you wire wrongly costs money.
+
+<Embed src="https://wokwi.com/projects/new/micropython-pi-pico" title="Wokwi simulator" height={520} />
 
 - [ ] An LED on `GP15` fades smoothly up and down with PWM rather than blinking
 - [ ] I changed the PWM frequency to 5 Hz and saw the fade turn into a visible flicker

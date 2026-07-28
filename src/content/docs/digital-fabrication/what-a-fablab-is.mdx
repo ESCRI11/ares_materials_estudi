@@ -36,6 +36,21 @@ judgement. That has three consequences worth internalising before you touch a ma
 - **Iteration moves upstream.** You stop refining the object and start refining the file.
   A cycle is: change a number, export, cut, hold it, change the number again.
 
+Drawn out, the process has one loop in it, and that loop is also the shape of this section:
+
+```mermaid
+flowchart LR
+  A["Idea"] --> B["CAD model"]
+  B --> C["Machine file"]
+  C --> D["Machine"]
+  D --> E["Parts"]
+  E --> F["Object"]
+  E -->|adjust| B
+```
+
+The arrow going back is where the hours go. Everything to the left of the machine is a file
+you can edit, which is why the rest of these lessons are mostly about files.
+
 None of that makes hand skills irrelevant. Sanding, gluing, filing and clamping are still
 how a set of machine-made parts becomes an object.
 

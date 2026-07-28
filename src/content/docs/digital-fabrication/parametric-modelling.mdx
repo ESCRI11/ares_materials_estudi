@@ -146,6 +146,19 @@ order you did them. That is the recipe, and it is not read-only.
   that point in the sequence rather than at the end.
 - **Right-click a feature** to suppress, reorder or delete it.
 
+One edit near the start of the recipe re-runs everything after it, in order:
+
+```mermaid
+flowchart LR
+  E["Change 40 to 55"] --> S["Sketch"]
+  S --> X["Extrude"]
+  X --> C["Cut hole"]
+  C --> H["Shell"]
+  H --> F["Fillet"]
+```
+
+You touched the first item and the other four rebuilt themselves against the new number.
+
 This is the whole point of parametric CAD, so it is worth being explicit about what you have
 gained: **you can change a decision made an hour ago without redoing the work built on top
 of it.** No tool in your existing kit does this. In Illustrator, changing the width of a

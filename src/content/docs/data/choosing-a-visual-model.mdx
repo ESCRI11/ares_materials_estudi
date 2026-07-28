@@ -37,6 +37,17 @@ one of five kinds.
 - **Change over time** — "what happened?" A **line chart**, time on the horizontal axis
   running left to right, because that is the direction everyone already reads it in.
 
+As a lookup, with the question in the shape it usually arrives in:
+
+```mermaid
+flowchart TD
+  Q{"what is the question?"} -->|"which is biggest"| A["bar chart"]
+  Q -->|"what is it made of"| B["stacked bar"]
+  Q -->|"how are they spread"| C["histogram"]
+  Q -->|"does this move with that"| D["scatter plot"]
+  Q -->|"what happened over time"| E["line chart"]
+```
+
 Pick the family from the question and you are most of the way there. The remaining choice —
 which of two or three forms in that family — is a design decision, and yours.
 

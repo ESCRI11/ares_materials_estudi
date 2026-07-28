@@ -25,7 +25,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      # enablement: turns Pages on for the repo, so no manual Settings step is needed
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

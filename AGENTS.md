@@ -69,6 +69,25 @@ Three formats, in order of preference:
 **Do not build an in-page code sandbox** (CodeMirror + live preview). It was considered and
 deliberately deferred. Revisit only if the p5 embed proves inadequate.
 
+## Visual identity
+
+Taken from the syllabus PDF and maind.supsi.ch, which share one system:
+
+- **Helvetica Neue** (Arial as fallback) for everything, **IBM Plex Mono** for labels and
+  code. No serif, anywhere.
+- Near-black `#1b1b1b` on off-white `#f7f7f7`, neutral greys, thin rules between sections.
+- Colour appears **only as a highlighter fill behind text** — never as coloured type.
+  The palette is in `custom.css` as `--ind-highlight-*`; `--ind-marker` (yellow) is the
+  default. Link hover, checked tasks, quiz answers and the score chip all use it.
+- The signature device is a **tight inverted block** behind a short label — the PDF uses it
+  for "Syllabus", "1st Semester", the page numbers. Here it is the site title, the active
+  sidebar entry, and the quiz heading. Add `class="ind-label"` to reuse it in content.
+- No rounded corners, no shadows, no gradients.
+
+Starlight's own accent and stoplight hues are remapped in `custom.css`, so asides and cards
+come out in the brand palette automatically. Don't hardcode a hex in a component — use the
+`--ind-*` tokens, and if you need a new one, add it to `:root` rather than inline.
+
 ## Writing rules
 
 - English only. Match the vocabulary the courses use — students will hear these words in class.

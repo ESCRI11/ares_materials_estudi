@@ -17,7 +17,7 @@ const { questions, title = 'Check yourself' } = Astro.props;
 ---
 
 <quiz-block data-total={questions.length}>
-	<h3>{title}</h3>
+	<h3 class="quiz-title">{title}</h3>
 	{
 		questions.map((question) => (
 			<div class="quiz-q">
@@ -77,16 +77,13 @@ const { questions, title = 'Check yourself' } = Astro.props;
 <style>
 	quiz-block {
 		display: block;
-		margin: 2rem 0;
-		padding: 1.25rem 1.5rem 1.5rem;
-		border: 1px solid var(--sl-color-gray-5);
-		border-radius: 0.75rem;
-		background: var(--sl-color-gray-7, var(--sl-color-gray-6));
+		margin: 2.5rem 0;
+		padding: 1.25rem 0 0;
+		border-top: 2px solid var(--sl-color-white);
 	}
 
 	quiz-block h3 {
-		margin: 0 0 1rem;
-		font-size: var(--sl-text-lg);
+		margin: 0 0 1.25rem;
 	}
 
 	.quiz-q + .quiz-q {
@@ -107,53 +104,59 @@ const { questions, title = 'Check yourself' } = Astro.props;
 	}
 
 	.quiz-option {
-		padding: 0.6rem 0.9rem;
+		padding: 0.55rem 0.75rem;
 		text-align: left;
 		font: inherit;
 		color: inherit;
-		background: var(--sl-color-bg);
+		background: transparent;
 		border: 1px solid var(--sl-color-gray-5);
-		border-radius: 0.5rem;
+		border-radius: 0;
 		cursor: pointer;
 	}
 
 	.quiz-option:hover {
-		border-color: var(--sl-color-accent);
+		border-color: var(--sl-color-white);
 	}
 
 	.quiz-q[data-done] .quiz-option {
 		cursor: default;
 		pointer-events: none;
-		opacity: 0.65;
+		opacity: 0.5;
 	}
 
+	/* Answers are marked with the brand's highlighter fills, black text on top. */
 	.quiz-q[data-done] .is-correct,
 	.quiz-q[data-done] .is-wrong {
 		opacity: 1;
-		font-weight: 600;
+		color: var(--ind-black);
+		border-color: transparent;
 	}
 
 	.is-correct {
-		border-color: #16a34a;
-		box-shadow: inset 3px 0 0 #16a34a;
+		background: var(--ind-highlight-green);
 	}
 
 	.is-wrong {
-		border-color: #dc2626;
-		box-shadow: inset 3px 0 0 #dc2626;
+		background: var(--ind-highlight-red);
 	}
 
 	.quiz-explanation {
 		margin: 0.75rem 0 0;
 		padding-left: 0.9rem;
-		border-left: 2px solid var(--sl-color-accent);
+		border-left: 1px solid var(--sl-color-gray-4);
 		font-size: var(--sl-text-sm);
 		color: var(--sl-color-gray-2);
 	}
 
-	.quiz-score {
-		margin: 1.5rem 0 0;
-		font-weight: 600;
-		color: var(--sl-color-accent-high);
+	/* :not([hidden]) matters — a bare `display` would override the hidden attribute
+	   and leave an empty marker chip sitting under every quiz. */
+	.quiz-score:not([hidden]) {
+		margin: 1.75rem 0 0;
+		display: inline-block;
+		padding: 0.1em 0.3em;
+		background: var(--ind-marker);
+		color: var(--ind-black);
+		font-family: var(--sl-font-mono);
+		font-size: var(--sl-text-sm);
 	}
 </style>

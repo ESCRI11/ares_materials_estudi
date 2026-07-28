@@ -1,48 +1,194 @@
-/* Theme overrides. Starlight is driven by CSS variables — set them, don't fork components. */
+/*
+ * Visual identity lifted from the MA InD syllabus PDF and maind.supsi.ch:
+ * Helvetica Neue, near-black on off-white, IBM Plex Mono for labels, and
+ * highlighter-marker fills as the only colour. Starlight is driven by CSS
+ * variables — set them, don't fork components.
+ */
 
 :root {
-	--sl-font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-	--sl-font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-	/* dark theme accents */
-	--sl-color-accent-low: #2b1a4d;
-	--sl-color-accent: #7b4cf0;
-	--sl-color-accent-high: #d3c1fb;
+	/* brand tokens, named as on maind.supsi.ch */
+	--ind-black: #1b1b1b;
+	--ind-white: #f7f7f7;
+	--ind-light-gray: #c7c7c7;
+	--ind-highlight-yellow: #f7ff5f;
+	--ind-highlight-green: #87ff97;
+	--ind-highlight-red: #ff7373;
+	--ind-highlight-violet: #ba85ff;
+	--ind-highlight-blue: #7df0ff;
+	--ind-highlight-orange: #fca86c;
+	/* the marker colour used for hover and emphasis */
+	--ind-marker: var(--ind-highlight-yellow);
+
+	--sl-font: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+	--sl-font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+
+	/*
+	 * Emphasis is monochrome, never coloured: the active sidebar entry becomes an
+	 * inverted block, exactly like the "1st Semester" labels in the syllabus.
+	 * These resolve per theme because --sl-color-white/-black are redefined below.
+	 */
+	--sl-color-text-accent: var(--sl-color-white);
+	--sl-color-text-invert: var(--sl-color-black);
+
+	/*
+	 * Asides (:::note, :::caution, …) ship in Starlight's stoplight hues. Remap
+	 * them to the brand highlighters so a lesson can never introduce a colour we
+	 * did not choose. The -low/-high mixes hold in both themes unchanged, because
+	 * --sl-color-black is always the background and --sl-color-white the text.
+	 */
+	--sl-color-green: var(--ind-highlight-green);
+	--sl-color-red: var(--ind-highlight-red);
+	--sl-color-orange: var(--ind-highlight-orange);
+	--sl-color-purple: var(--ind-highlight-violet);
+	--sl-color-blue: var(--ind-highlight-blue);
+	--sl-color-green-low: color-mix(in srgb, var(--sl-color-green) 16%, var(--sl-color-black));
+	--sl-color-red-low: color-mix(in srgb, var(--sl-color-red) 16%, var(--sl-color-black));
+	--sl-color-orange-low: color-mix(in srgb, var(--sl-color-orange) 16%, var(--sl-color-black));
+	--sl-color-purple-low: color-mix(in srgb, var(--sl-color-purple) 16%, var(--sl-color-black));
+	--sl-color-blue-low: color-mix(in srgb, var(--sl-color-blue) 16%, var(--sl-color-black));
+	--sl-color-green-high: color-mix(in srgb, var(--sl-color-green) 45%, var(--sl-color-white));
+	--sl-color-red-high: color-mix(in srgb, var(--sl-color-red) 45%, var(--sl-color-white));
+	--sl-color-orange-high: color-mix(in srgb, var(--sl-color-orange) 45%, var(--sl-color-white));
+	--sl-color-purple-high: color-mix(in srgb, var(--sl-color-purple) 45%, var(--sl-color-white));
+	--sl-color-blue-high: color-mix(in srgb, var(--sl-color-blue) 45%, var(--sl-color-white));
+
+	/* dark theme — neutral greys, not Starlight's default blue-greys */
+	--sl-color-white: var(--ind-white);
+	--sl-color-gray-1: #e8e8e8;
+	--sl-color-gray-2: var(--ind-light-gray);
+	--sl-color-gray-3: #8f8f8f;
+	--sl-color-gray-4: #5a5a5a;
+	--sl-color-gray-5: #3a3a3a;
+	--sl-color-gray-6: #262626;
+	--sl-color-black: var(--ind-black);
+	--sl-color-accent-low: #2f2440;
+	--sl-color-accent: #7d4fd0;
+	--sl-color-accent-high: var(--ind-highlight-violet);
 }
 
 :root[data-theme='light'] {
-	--sl-color-accent-low: #e7dcff;
-	--sl-color-accent: #6b34e0;
-	--sl-color-accent-high: #2a1170;
+	--sl-color-white: var(--ind-black);
+	--sl-color-gray-1: #262626;
+	--sl-color-gray-2: #3a3a3a;
+	--sl-color-gray-3: #5a5a5a;
+	--sl-color-gray-4: #8f8f8f;
+	--sl-color-gray-5: var(--ind-light-gray);
+	--sl-color-gray-6: #ececec;
+	--sl-color-gray-7: #f2f2f2;
+	--sl-color-black: var(--ind-white);
+	--sl-color-accent-low: #ece0ff;
+	--sl-color-accent: #6b2fd0;
+	--sl-color-accent-high: #35156b;
 }
 
-/* Serif headings against the sans body — the whole "stylish" budget lives here. */
+/* Card icons cycle through those hues per card; keep them monochrome instead. */
+.card .icon {
+	--sl-card-bg: transparent;
+	--sl-card-border: var(--sl-color-gray-5);
+	color: var(--sl-color-white);
+	border-radius: 0;
+}
+
+/* --- Typography: Swiss, tight, no serif anywhere --------------------------- */
+
 h1,
 h2,
-.hero h1,
+h3,
 .site-title {
-	font-family: var(--sl-font-display);
-	font-weight: 400;
-	letter-spacing: -0.01em;
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	line-height: 1.08;
 }
 
 h1 {
-	font-size: clamp(2.2rem, 5vw, 3.1rem);
-	line-height: 1.1;
+	font-size: clamp(2.3rem, 5.5vw, 3.4rem);
 }
 
-.hero .tagline {
-	font-size: var(--sl-text-lg);
-	max-width: 40ch;
+/*
+ * Section rules, as the syllabus separates its blocks. The rule goes on the
+ * wrapper, not the heading — Starlight renders headings inline so the anchor
+ * link can sit beside the text, which would cut the rule off at the last word.
+ */
+.sl-markdown-content .sl-heading-wrapper.level-h2 {
+	margin-top: 2.75rem;
+	padding-top: 1.25rem;
+	border-top: 1px solid var(--sl-color-gray-5);
 }
 
-/* Comfortable measure for long-form reading. */
 .sl-markdown-content p,
 .sl-markdown-content li {
 	max-width: 68ch;
-	line-height: 1.7;
+	line-height: 1.65;
 }
 
-/* Self-check task lists: markdown checkboxes, styled to look like a real checklist. */
+/*
+ * The signature device: a tight inverted block behind a label, used in the PDF
+ * for "Syllabus", "1st Semester", "SUPSI-DACD", the page numbers.
+ */
+.ind-label,
+.quiz-title {
+	display: inline-block;
+	padding: 0.1em 0.28em;
+	background: var(--sl-color-white);
+	color: var(--sl-color-black);
+	font-family: var(--sl-font-mono);
+	font-size: var(--sl-text-xs);
+	font-weight: 500;
+	letter-spacing: 0.02em;
+}
+
+/* The masthead label, standing in for the PDF's "SUPSI-DACD" block. */
+.site-title {
+	padding: 0.15em 0.4em;
+	background: var(--sl-color-white);
+	color: var(--sl-color-black);
+	font-family: var(--sl-font-mono);
+	font-size: var(--sl-text-sm);
+	font-weight: 500;
+	letter-spacing: 0;
+}
+
+/* --- Links: black with an underline, marker fill on hover ----------------- */
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+	color: inherit;
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.22em;
+	transition: background-color 0.12s ease;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+	background: var(--ind-marker);
+	color: var(--ind-black);
+	text-decoration-color: transparent;
+	box-shadow: 0 0 0 0.12em var(--ind-marker);
+}
+
+/* Calls to action read as printed blocks, not rounded web buttons. */
+.sl-link-button {
+	border-radius: 0;
+}
+
+.sl-link-button.primary {
+	background: var(--sl-color-white);
+	color: var(--sl-color-black);
+	border-color: var(--sl-color-white);
+}
+
+.sl-link-button.primary:hover {
+	background: var(--ind-marker);
+	border-color: var(--ind-marker);
+	color: var(--ind-black);
+}
+
+.hero .tagline {
+	max-width: 46ch;
+	line-height: 1.45;
+}
+
+/* --- Self-check task lists ------------------------------------------------ */
+
 .sl-markdown-content ul:has(> li > input[type='checkbox']) {
 	list-style: none;
 	padding-left: 0;
@@ -56,8 +202,13 @@ h1 {
 	border-left: 2px solid var(--sl-color-gray-5);
 }
 
+.sl-markdown-content li:has(> input[type='checkbox']:checked) {
+	border-left-color: var(--ind-marker);
+	color: var(--sl-color-gray-3);
+}
+
 .sl-markdown-content input[type='checkbox'] {
-	accent-color: var(--sl-color-accent);
+	accent-color: var(--ind-marker);
 	width: 1rem;
 	height: 1rem;
 	flex-shrink: 0;

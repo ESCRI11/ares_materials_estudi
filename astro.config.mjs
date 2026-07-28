@@ -33,6 +33,8 @@ export default defineConfig({
 				'Get up to speed with the technical requirements of the MA SUPSI in Interaction Design.',
 			customCss: ['./src/styles/custom.css'],
 			head: [
+				// Helvetica Neue is a system font (Arial is the fallback everywhere else), so
+				// only the mono face has to be fetched. Same pairing as maind.supsi.ch.
 				{ tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' } },
 				{
 					tag: 'link',
@@ -42,7 +44,7 @@ export default defineConfig({
 					tag: 'link',
 					attrs: {
 						rel: 'stylesheet',
-						href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Instrument+Serif&display=swap',
+						href: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap',
 					},
 				},
 				{ tag: 'script', content: checklistScript },

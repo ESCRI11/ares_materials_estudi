@@ -73,6 +73,23 @@ Three formats, in order of preference:
   no sign-in — `https://wokwi.com/projects/new/micropython-pi-pico` gives a full editor,
   board and Run button inline, so physical computing exercises can be done on the page.
 
+## Screenshots
+
+Put them in `src/assets/screenshots/` and reference them with an ordinary markdown image
+using a **relative** path — `![alt](../../../assets/screenshots/name.png)` from a lesson.
+Astro optimises them and handles the base prefix, which is why they do not follow the
+"write the prefix out" rule that links do. Files in `public/` would skip both.
+
+- **Never fabricate a screenshot of a user interface**, and never describe an invented one
+  as real. If an image cannot be captured, describe what the reader will see in prose.
+- Alt text is a description of what is in the image, for someone who cannot see it — not a
+  caption and not a repeat of the sentence above it.
+- Screenshot a UI only when the shape of the interface is the lesson: where a panel lives,
+  which of six identical buttons to press. A terminal command belongs in a code block, not
+  an image — a picture of text cannot be copied, searched, or read by a screen reader.
+- Crop tight, capture at 2× device scale, and prefer a real project's state over a
+  contrived empty one.
+
 ## Diagrams
 
 Write a ` ```mermaid ` fence and it becomes an inline SVG at build time, so diagrams cost

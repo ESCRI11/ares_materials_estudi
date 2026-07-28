@@ -634,6 +634,9 @@ const GLOSSARY = {
 	"edge case": "An input at the boundary of what you had in mind — the empty list, zero, a name with an apostrophe, a second click before the first finished. Where plausible-looking code usually breaks.",
 	"api credits": "Paying for what you use rather than a monthly amount: you buy credit and each request draws it down. The alternative to a subscription plan.",
 	curl: "A command-line program that fetches whatever is at a web address. Piped into a shell with | bash, it downloads and runs an install script in one line — which is why the address should come from the tool's own documentation.",
+
+	// added from claude-code
+	gh: "GitHub\u2019s command-line tool. It lets the terminal do the things you would otherwise click on github.com \u2014 open a pull request, read issues \u2014 after a one-time gh auth login.",
 };
 
 const API = 'https://api.dictionaryapi.dev/api/v2/entries/en/';

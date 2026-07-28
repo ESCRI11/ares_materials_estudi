@@ -1,0 +1,190 @@
+---
+title: Working in a real project
+description: Pointing it at a specific file, asking it to transform one, and letting it drive git — branches, commits and pull requests — and what that costs you.
+sidebar:
+  order: 6
+---
+
+import Quiz from '@components/Quiz.astro';
+
+So far you have asked it questions. This lesson is about the other half: running it
+inside an actual project you cloned, pointing it at particular files, and letting it
+handle the git work you learned to do by hand in
+[Git & GitHub](/ares_materials_estudi/git-and-github/what-version-control-is/).
+
+That last part deserves a warning before the how-to, so here it is: everything in the git
+section of this lesson is a thing you should be able to do yourself first. Letting a tool
+branch and commit for you before you understand branches and commits does not save you
+time — it removes the one place where those ideas would have become real.
+
+## Pointing at a file with `@`
+
+Type `@` in the prompt and a file menu appears. Keep typing to narrow it, press Tab to
+accept, and the file is read into the conversation immediately rather than waiting for
+Claude to go looking for it.
+
+```
+Explain what this does, line by line: @src/sketch.js
+```
+
+You can reference more than one in a single question, which is how you ask about a
+relationship rather than a file:
+
+```
+Why does @src/sketch.js import from @src/palette.js? What breaks if I delete that import?
+```
+
+A directory works too — `@src/components` gives it the listing, not the contents of
+everything inside. Wildcards do not work: `@src/*.js` is read as a literal path, not
+expanded into every JavaScript file.
+
+### When to use `@`, and when not to
+
+Use `@` when you already know which file matters. It is faster, it costs less of the
+conversation's room, and the answer stays on the thing you asked about.
+
+Let it search when you *don't* know — when the question is about behaviour rather than a
+file. "Where does the login form actually get submitted?" is a better question than
+guessing at a filename, because finding the answer is the work you wanted done.
+
+The tell is whether you can name the file. If you can, name it.
+
+## Asking it to change a file
+
+The same reference works for edits. This is where the permission model from
+[the permissions lesson](/ares_materials_estudi/claude-code/permissions/) earns its keep.
+
+```
+In @src/sketch.js, pull the drawing code out of the loop into a function called drawFrame.
+```
+
+What happens next, in default mode: it reads the file, works out the change, and shows
+you a **diff** — the before and after, with the changed lines marked — and waits. Nothing
+is written until you approve it.
+
+Changes that span several files work the same way, one approval at a time:
+
+```
+Rename every instance of userId to userID across the project.
+```
+
+It searches for the occurrences first, then walks you through the edits. In default mode
+you see and approve each file. In accept-edits mode it applies them and shows you the
+summary afterwards, which is faster and worth exactly nothing while you are still learning
+to read a diff.
+
+:::note[Screenshots work too]
+You can paste an image straight into the prompt with `Ctrl+V`, or point at one by path.
+An error you cannot describe, a rendering bug, a design you want built — showing is often
+faster than writing three paragraphs about what you are looking at.
+:::
+
+## Letting it drive git
+
+Run it inside a cloned repository and it can see the branch you are on, your uncommitted
+changes, and the recent history. It reads that as context without being asked.
+
+Git commands are just shell commands, so the permission rules you already know apply:
+
+| It runs freely | It asks first |
+|---|---|
+| `git status`, `git log` | `git commit` |
+| `git diff`, `git branch` | `git push`, `git pull` |
+| — | `git switch`, `git merge`, `git reset` |
+
+The split is the same one as everywhere else in the tool: looking is free, changing is not.
+
+### Commits and branches
+
+```
+Create a branch called feature/audio-input and switch to it.
+```
+
+```
+Commit what I've changed, with a message describing what the change actually does.
+```
+
+It writes the message itself. If you want to see it before it lands, ask for the draft
+first — "draft a commit message for these changes" — read it, then tell it to go ahead.
+That habit is worth keeping: a commit message is written for a future reader, and you are
+the one who knows who that is.
+
+### Pull requests, and what they need first
+
+It can open a pull request for you, but **this one needs setup you have to do yourself**,
+and it is better to know that now than to discover it mid-task.
+
+It works through the GitHub command-line tool, `gh`. Install it from
+[cli.github.com](https://cli.github.com) or your package manager, then authenticate once:
+
+```bash
+gh auth login
+```
+
+That is a one-time step; the credentials persist. After that:
+
+```
+Push this branch and open a pull request describing the change.
+```
+
+Without `gh`, it can still reach GitHub's API, but unauthenticated requests run into rate
+limits quickly and the flow becomes unreliable. Install `gh` and it becomes ordinary.
+
+You also need the usual things a pull request always needed: the changes committed, a
+remote configured, and push access to the repository.
+
+## The habit that keeps this honest
+
+Commit before you start a session. Not because anything will go wrong, but because a
+clean starting point means `git diff` answers "what did this session actually change?"
+without you having to remember. It turns every session into something you can inspect and,
+if you want, throw away.
+
+That is the same reason the diff review matters. You are not checking up on the tool. You
+are keeping the thing it built inside the set of things you understand.
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'You want to know why a bug happens when someone submits the contact form, and you have no idea which file is responsible. What is the better move?',
+			options: [
+				'Reference every file in the project with @ so it has everything',
+				'Describe the behaviour and let it search the codebase',
+				'Guess the filename and reference that with @',
+			],
+			answer: 1,
+			explanation:
+				'Finding the responsible file is the work you wanted done. Use @ when you can already name the file; describe the behaviour when you cannot. Referencing everything just fills the conversation with material that is not relevant.',
+		},
+		{
+			q: 'Which of these will it run without stopping to ask you?',
+			options: ['git commit', 'git push', 'git log', 'git switch'],
+			answer: 2,
+			explanation:
+				'Looking is free, changing is not. Reading history with git log changes nothing, so it runs. Committing, pushing and switching branches all alter the state of your repository, so each one asks first.',
+		},
+		{
+			q: 'You ask it to open a pull request and it cannot. What is the most likely reason?',
+			options: [
+				'Pull requests can only be created on the GitHub website',
+				'The gh command-line tool is not installed or not authenticated',
+				'It never has permission to interact with GitHub',
+			],
+			answer: 1,
+			explanation:
+				'It opens pull requests through gh, the GitHub command-line tool. That is a one-time install plus gh auth login, done by you in your own terminal. Without it the fallback is rate-limited and unreliable.',
+		},
+		{
+			q: 'Why is committing before you start a session worth doing?',
+			options: [
+				'It is required — sessions will not start in a dirty repository',
+				'It makes git diff a straight answer to "what did this session change?"',
+				'It stops the tool from editing files you have already committed',
+			],
+			answer: 1,
+			explanation:
+				'Nothing requires it, and it does not restrict what gets edited. It gives you a clean line between your work and the session, so the diff is readable and the whole thing stays easy to inspect or discard.',
+		},
+	]}
+/>

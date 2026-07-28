@@ -1,0 +1,185 @@
+---
+title: Having a conversation with it
+description: Asking it to ask you, requesting options instead of decisions, interrupting mid-task, and the follow-ups that work because it remembers.
+sidebar:
+  order: 7
+---
+
+import Quiz from '@components/Quiz.astro';
+
+Most people treat it like a search box: type a request, take what comes back, retype the
+request when it is wrong. That works, badly. It is a conversation, and the difference
+between a frustrating session and a useful one is usually four or five habits that cost
+nothing to learn.
+
+## Ask it to ask you
+
+The single most useful sentence you can add to a request is an instruction to interrogate
+you first. A vague brief produces a confident answer to a question you did not ask; making
+it check turns that into a two-minute exchange.
+
+```
+I want to add a form to my portfolio site so people can contact me.
+Before you write anything, ask me whatever is unclear.
+```
+
+A reply looks roughly like this:
+
+```
+A few things before I start:
+
+1. Where should submissions go — an email service, a form service
+   like Formspree, or your own backend?
+2. Do you want validation in the browser before it submits?
+3. Should this match the styling of your existing pages, or do you
+   want it to stand on its own?
+```
+
+You answer three questions and get the thing you meant. Without that sentence, you get a
+form that posts to a backend you do not have.
+
+This matters more the less experienced you are, not less — a vague brief is not a beginner
+failing, it is what happens when you do not yet know which decisions exist.
+
+## Ask for options, not a decision
+
+When you do not know what you want, say so and ask it to lay the ground out rather than
+pick for you.
+
+```
+I need to store the drawings people make in my sketch tool so they
+survive a page refresh. Give me three approaches with the trade-offs,
+then stop — don't implement anything yet.
+```
+
+The "then stop" is doing real work in that sentence. Without it you tend to get an
+explanation *and* an implementation of whichever one it preferred, which is exactly the
+outcome you were trying to avoid by asking.
+
+You can push the same technique further when the choice is aesthetic rather than technical:
+
+```
+Propose four different visual directions for this page — for each, give
+me the background colour, the accent, and the typeface, with one line on
+why. Then wait for me to choose.
+```
+
+## Plan mode is this, built in
+
+The permissions lesson mentioned plan mode. This is what it is for: `Shift+Tab` until you
+reach it, and it explores your project and proposes an approach **without touching a
+single file**. You read the plan, argue with it, and only then let it work.
+
+For anything you are unsure about, plan mode first is a better default than asking and
+hoping.
+
+## Interrupt it
+
+You do not have to wait for it to finish being wrong. Press `Esc` and it stops where it
+is; then say what you actually wanted:
+
+```
+[Esc]
+
+Stop — I don't want a separate CSS file, keep the styles in the page
+like the rest of my project does.
+```
+
+It picks up from there with the correction, rather than starting over. Pressing `Esc`
+twice undoes what it did.
+
+Interrupting early is a skill worth building deliberately. The instinct is to let it
+finish out of politeness, which is a strange thing to feel toward a program and costs you
+several minutes each time.
+
+## Short follow-ups work
+
+Within a session it remembers what you have both been doing, so follow-ups can be as
+short as they would be with a person:
+
+```
+Now do the same for the other two files.
+```
+
+```
+That works, but explain why you used a for...of loop there instead of a
+plain for loop.
+```
+
+```
+Undo the last change — I preferred it before.
+```
+
+This is also the reason `/clear` exists. When you move to an unrelated task, the previous
+conversation stops being context and starts being noise.
+
+## Say what you don't want
+
+Constraints are as useful as requests, and they are the part beginners leave out:
+
+```
+Fix the bug where the canvas doesn't clear between frames.
+Change only what's needed for that — don't refactor anything else,
+don't add error handling, and don't touch the styling.
+```
+
+Without that, a small fix can come back as a tidied-up file where you can no longer see
+what the actual fix was.
+
+## Make it teach while it works
+
+Because it is a conversation, you can ask for the reasoning alongside the result — which
+is the whole argument of
+[the previous lesson on learning](/ares_materials_estudi/claude-code/learning-not-outsourcing/):
+
+```
+Write the function, then explain each line as if I've been programming
+for two weeks. I need to be able to write this myself next time.
+```
+
+```
+Before you fix it: what do you think is causing this, and what would
+you check to confirm that? I want to follow the reasoning.
+```
+
+That second one is the most valuable prompt in this section. Debugging is a skill made of
+hypotheses and checks, and watching someone form one is how you learn to do it.
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'You have a vague idea of what you want but you are not sure what the options even are. What gets you the best result?',
+			options: [
+				'Describe it as precisely as you can manage and accept what comes back',
+				'Ask it to lay out several approaches with trade-offs and to stop before implementing',
+				'Ask for the simplest possible version and change it afterwards',
+			],
+			answer: 1,
+			explanation:
+				'Not knowing which decisions exist is exactly the situation options-with-trade-offs solves. The "stop before implementing" half matters too — without it you often get an explanation plus an implementation of whichever one it preferred.',
+		},
+		{
+			q: 'It is halfway through doing something you can already see is wrong. What should you do?',
+			options: [
+				'Let it finish, then explain what was wrong',
+				'Press Esc, then say what you actually wanted',
+				'Press Esc twice and start the request again from scratch',
+			],
+			answer: 1,
+			explanation:
+				'A single Esc stops it where it is and you redirect from there, keeping everything that was already right. Esc twice undoes the work, which you only want when the whole direction was wrong. Waiting politely just costs you the time.',
+		},
+		{
+			q: 'Why add "change only what is needed for this, do not refactor anything else" to a bug-fix request?',
+			options: [
+				'It makes the fix run faster',
+				'Otherwise it is not allowed to edit the file at all',
+				'It keeps the diff small enough that you can see what the actual fix was',
+			],
+			answer: 2,
+			explanation:
+				'A tidied-up file hides the one change you were trying to understand. Constraints are as much a part of a good request as the request itself, and this one keeps the diff readable — which is where your review, and your learning, actually happen.',
+		},
+	]}
+/>

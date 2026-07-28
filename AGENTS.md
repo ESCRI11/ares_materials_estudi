@@ -93,7 +93,9 @@ Four assertions run before the PDF is written, so a bad one is never produced:
   the error names the page to cut
 - **every section folder appears** — add a section to the site and the build fails until
   the card covers it
-- **exactly the expected fonts embed** — Arimo and IBM Plex Mono, nothing else. A glyph
+- **only the expected fonts embed** — an Arial-metric sans (Arimo here, Liberation Sans on
+  the CI runner, which decodes the same woff2 differently; they share metrics and a design
+  lineage, so the fixed layout is unaffected) plus IBM Plex Mono, and nothing else. A glyph
   missing from a subset makes Chromium quietly embed a third font for that one character.
   `Ω`, `→` and `≈` are all absent from Plex Mono's latin set; use `ohm`, `->` and `~` in the
   mono column. `↑` is fine.

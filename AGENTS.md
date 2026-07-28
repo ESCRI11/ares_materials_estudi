@@ -75,6 +75,11 @@ Three formats, in order of preference:
 
 ## Screenshots
 
+`IMAGES-WANTED.md` at the repo root is the running list of images the lessons would be
+better with, grouped by section and priority. When the author drops files into
+`src/assets/screenshots/`, place them, write the alt text, and strike the row from that
+list. Add a row whenever you write a lesson that wants an image you cannot produce.
+
 Put them in `src/assets/screenshots/` and reference them with an ordinary markdown image
 using a **relative** path — `![alt](../../../assets/screenshots/name.png)` from a lesson.
 Astro optimises them and handles the base prefix, which is why they do not follow the

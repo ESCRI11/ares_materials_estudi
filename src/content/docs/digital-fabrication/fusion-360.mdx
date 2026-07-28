@@ -1,0 +1,151 @@
+---
+title: Getting into Fusion 360
+description: Installing Autodesk Fusion 360 on a free licence, and a tour of the browser, the timeline, the toolbar and the navigation before you model anything.
+sidebar:
+  order: 2
+---
+
+**Fusion 360** is the CAD program the course uses. **CAD** stands for computer-aided design:
+software for drawing an object precisely, at real dimensions, in a form a machine can
+manufacture. Autodesk make it, and it is unusual in covering the whole chain in one window —
+modelling, technical drawings, renders, animations, and the toolpaths for machines.
+
+Autodesk have been dropping the "360" from the name, so you will see both *Fusion 360* and
+plain *Fusion* in menus, tutorials and course material. Same program.
+
+## Getting a licence without paying
+
+Fusion is expensive at full price and free for you, by two separate routes. Both start in
+the same place: go to **autodesk.com** and use their own search or menus.
+
+- **Education licence.** Autodesk give students and educators a free licence for a year,
+  renewable while you are enrolled. Look for the education or students section of the site.
+  You have to prove you are a student, which usually means an institutional email address
+  or a document from SUPSI — so this one becomes available once you are enrolled.
+- **Personal-use licence.** A free, non-commercial version available to anyone, found in the
+  Fusion product pages. Some features are switched off and the licence has to be renewed
+  periodically, but everything in these lessons works on it.
+
+Start on personal use now, and switch to the education licence when your SUPSI credentials
+arrive. Nothing is lost in the change.
+
+:::caution[Do not download Fusion from anywhere else]
+Get the installer from autodesk.com after signing in, never from a search result promising
+a free version. The paid-software-for-free corner of the internet is where malware lives,
+and CAD tools are a favourite disguise.
+:::
+
+**One requirement to check before you plan anything:** Fusion runs on macOS and Windows.
+There is no official Linux version. The current system requirements are listed on
+autodesk.com — worth reading if your laptop is more than a few years old, because Fusion
+leans on the graphics chip.
+
+## Making an Autodesk account
+
+You need an Autodesk account before you can install or run anything. It takes a few minutes:
+an email address, a password, a confirmation link. Use an address you will still have in two
+years, because your files are attached to it.
+
+Then download the installer, run it, and sign in when Fusion opens. The first launch is slow.
+
+## Cloud-based, and what that actually means
+
+Most software you know saves a file into a folder you chose. Fusion does not, by default.
+
+Your work lives in a **project** inside an Autodesk **hub** — storage on Autodesk's servers,
+attached to your account. The practical effects:
+
+- **You sign in to work.** Fusion tolerates being offline for a while and syncs later, but
+  it is not a program you can use for a week on a plane.
+- **Every save is a version, forever.** Save with a comment and Fusion keeps that state.
+  You can open version 4 of a model from three weeks ago, or promote it back to current.
+  It is the same idea as [a commit in git](/ares_materials_estudi/git-and-github/what-version-control-is/),
+  applied automatically to CAD, and it means you can experiment without fear.
+- **Sharing is a link,** not an attachment. Useful when a tutor asks to see a model.
+- **Local copies are exports, not the original.** `File → Export` writes a `.f3d` file onto
+  your disk. Do that before any deadline, and before the end of a licence period. A cloud
+  you do not administer is not a backup.
+
+## Parametric, and what that actually means
+
+A drawing program stores shapes. Fusion stores **the steps you took to make the shapes** —
+a recipe, in order, with every number in it still editable.
+
+Draw a rectangle 40 mm wide, pull it up 20 mm, round the corners. Fusion has recorded three
+instructions, not one lump of geometry. Change the 40 to 55 tomorrow and the rectangle, the
+solid and the rounded corners all rebuild around the new number.
+
+This is the single biggest difference from every design tool you already use, and it gets a
+[lesson of its own](/ares_materials_estudi/digital-fabrication/parametric-modelling/). For
+now, know that it is why the interface has a timeline along the bottom.
+
+## A tour of the window
+
+Open Fusion and look at five regions.
+
+**The Data Panel** — the grid of nine dots at the top left. It slides open to show your
+projects and the files inside them, and it is how you create a project and open anything.
+Close it again while modelling; it takes half the screen.
+
+**The workspace switcher** — the leftmost drop-down in the toolbar, usually reading
+**Design**. Fusion is really several programs stacked in one window, and this is how you
+change which one you are in: `Design` for modelling, `Render` for pretty images, `Animation`
+for exploded assembly videos, `Drawing` for dimensioned technical drawings, `Manufacture`
+for machine toolpaths. You will spend nearly all your time in Design.
+
+**The toolbar** — the row of icons across the top, grouped into tabs (`Solid`, `Surface`,
+`Sheet Metal`, `Utilities`) and then into labelled drop-downs (`Create`, `Modify`,
+`Assemble`, `Inspect`). Every command lives in one of those drop-downs. When a tutorial says
+"extrude", it means `Solid → Create → Extrude`.
+
+**The browser** — the small tree at the top left of the canvas, with an eye icon beside each
+entry. This is the layers panel of CAD, and it holds more than you expect: `Document
+Settings` (where the units live), `Origin` (the three reference planes and axes every model
+starts from), then your `Sketches`, `Bodies` and `Components` as you create them. Clicking an
+eye hides something without deleting it, exactly as in Illustrator or Photoshop.
+
+**The timeline** — the strip of small icons along the bottom edge. Each icon is one operation
+you performed, in the order you performed it. Double-click one to edit it. This is the
+recipe, made visible, and it is the part of the interface that has no equivalent in the
+tools you already know.
+
+Also worth finding: the **ViewCube** at the top right, a small cube you click to snap to
+front, top or an isometric view, and the **navigation bar** at the bottom centre, which
+holds orbit, pan, zoom and `Fit`.
+
+## Orbit, pan, zoom
+
+With a normal mouse:
+
+- **Scroll wheel** — zoom in and out, centred on the cursor.
+- **Press the wheel and drag** — pan, sliding the model around the screen.
+- **Shift + press the wheel and drag** — orbit, turning the model in space.
+- **`F6`, or the `Fit` button** — frame everything, for when you have lost your model.
+
+On a laptop trackpad, use the navigation bar at the bottom of the window instead, and
+consider borrowing a mouse for a long session. In `Preferences` you can invert the zoom
+direction and make the navigation mimic other CAD programs, which is worth doing on day one
+if scrolling feels backwards to you. It will feel awkward for about a week and then become
+invisible.
+
+:::note[Set your units before you draw]
+In the browser, right-click `Document Settings` (or open the units entry underneath it) and
+confirm you are in **millimetres**. Every Fablab machine in Europe works in millimetres, and
+a model built in inches arrives at the printer at 25.4 times the size you meant.
+:::
+
+## Check yourself
+
+- [ ] I have an Autodesk account and can sign in on autodesk.com
+- [ ] I found the free education or personal-use licence from autodesk.com, without using a
+      download link from anywhere else
+- [ ] Fusion is installed and opens with me signed in
+- [ ] I created a project in the Data Panel and gave it a name
+- [ ] I can open and close the Data Panel without losing my model
+- [ ] I found the workspace switcher and can name what `Design`, `Render`, `Drawing` and
+      `Animation` are for
+- [ ] I found the browser tree and the `Origin` folder inside it, and toggled an eye icon
+- [ ] I set the document units to millimetres
+- [ ] I can zoom, pan and orbit without thinking about which key does which
+- [ ] I clicked the ViewCube corner to get an isometric view, and pressed `Fit` to reframe
+- [ ] I saved the empty file with a name and a comment, and found it again in the Data Panel

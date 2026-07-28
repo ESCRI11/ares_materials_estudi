@@ -74,6 +74,16 @@ export default defineConfig({
 					label: 'Physical Computing',
 					items: [{ autogenerate: { directory: 'physical-computing' } }],
 				},
+				{
+					label: 'Digital Fabrication',
+					items: [{ autogenerate: { directory: 'digital-fabrication' } }],
+				},
+				{
+					label: 'AI as a Material',
+					items: [{ autogenerate: { directory: 'ai-as-a-material' } }],
+				},
+				{ label: 'Data', items: [{ autogenerate: { directory: 'data' } }] },
+				{ label: 'Design Methods', items: [{ autogenerate: { directory: 'design-methods' } }] },
 			],
 		}),
 	],

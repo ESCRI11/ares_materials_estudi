@@ -1,0 +1,195 @@
+---
+title: Choosing a visual model
+description: Matching a question to a chart form, ranking visual encodings by how accurately people read them, honest axes, and colour that survives being colour-blind or photocopied.
+sidebar:
+  order: 4
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+This is the lesson where your training is worth more than a statistician's. Everything here
+is about how a mark on a surface is perceived, and you have spent years on that. What you
+are adding is a constraint: the shape has to be *true*, and true has a specific meaning when
+a length stands for a number.
+
+Two failures are possible, and only one of them looks like a failure. A chart can be ugly,
+which everyone notices. A chart can be beautiful and misleading, which nobody notices, and
+that is the one this lesson is about.
+
+## Start from the question, not the chart
+
+The syllabus phrase is *identify appropriate visual models*, and the way you identify one is
+by writing the question as a sentence first. Nearly every question in a design project is
+one of five kinds.
+
+- **Comparison** — "which of these is biggest?" One value per category. A **bar chart**,
+  sorted by value rather than alphabetically unless the categories have their own order.
+- **Composition** — "what is this made of?" Parts of one whole. A stacked bar, or a set of
+  bars showing the parts side by side. Percentages need to add up to a hundred, and if they
+  do not, say why.
+- **Distribution** — "how are these spread out?" Many measurements of one thing: every wait
+  time, every temperature reading. A **histogram** — the values grouped into ranges, one bar
+  per range — which shows you the shape, the clumps and the outliers that a single average
+  hides completely.
+- **Relationship** — "does this move with that?" Two measurements of the same records. A
+  **scatter plot**: one dot per record, one variable on each axis.
+- **Change over time** — "what happened?" A **line chart**, time on the horizontal axis
+  running left to right, because that is the direction everyone already reads it in.
+
+Pick the family from the question and you are most of the way there. The remaining choice —
+which of two or three forms in that family — is a design decision, and yours.
+
+## How accurately people read a mark
+
+There is a ranking, established by experiments in the 1980s by Cleveland and McGill and
+confirmed many times since. People compare quantities most accurately when they are encoded
+as:
+
+1. **Position** along a common scale — dots on the same axis, bar tops on the same baseline
+2. **Length** — bars, if they start from the same place
+3. **Angle and slope** — the direction of a line, a slice of a pie
+4. **Area** — circles, squares, bubbles
+5. **Colour intensity** — light to dark
+6. **Hue** — red versus blue, which is not read as a quantity at all
+
+The list is not about beauty. It is about error: the further down you go, the further people's
+estimates land from the real numbers. You can see the gap between rank 2 and rank 4 directly.
+
+<LiveCode
+	title="The same three numbers, twice"
+	height={300}
+	code={`<canvas id="c" width="320" height="240" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+  const values = [10, 20, 40];
+
+  ctx.font = "11px sans-serif";
+  ctx.fillStyle = "#1b1b1b";
+
+  // Length: the bar height is proportional to the value.
+  for (let i = 0; i < values.length; i++) {
+    const height = values[i] * 2;
+    ctx.fillRect(20 + i * 60, 110 - height, 30, height);
+    ctx.fillText(values[i], 20 + i * 60, 126);
+  }
+
+  // Area: the radius is proportional to the value. This is the mistake.
+  for (let i = 0; i < values.length; i++) {
+    ctx.beginPath();
+    ctx.arc(45 + i * 90, 185, values[i], 0, Math.PI * 2);
+    ctx.fill();
+  }
+</script>`}
+/>
+
+The third value is four times the first. The third bar is four times as long, which is what
+you see. The third circle has four times the radius and therefore **sixteen times the area**,
+which is what you feel — and area is what the eye reads a circle by, not radius.
+
+If you must size circles by a value, the radius has to be proportional to the square root of
+it: `Math.sqrt(value)`. Change `values[i]` to `Math.sqrt(values[i]) * 6` in the second loop
+and press Run. The circles now grow honestly, and they are still harder to compare than the
+bars, which is the whole argument.
+
+## Why the pie chart is usually wrong
+
+A pie chart encodes with angle and area — ranks 3 and 4 — and asks people to compare slices
+that do not share a baseline and are rotated differently from each other. Two slices of 23%
+and 26% are indistinguishable in a pie and unmistakable as bars.
+
+It is not forbidden. A pie is readable when there are two or three slices, when they add up
+to a meaningful whole, and when "roughly half" is the entire message. Beyond that, the same
+data as a sorted bar chart is easier to read, easier to label and takes less space.
+
+The bar chart is dull the way a grid is dull. It is the default because it uses the two most
+accurate encodings — position and length — and because everyone can read one without being
+taught.
+
+## Honest axes
+
+**A bar chart must start at zero.** The length of the bar *is* the quantity, so cutting the
+bottom off multiplies differences: two bars for 98 and 100 on an axis starting at 96 look
+like a doubling. This is the most common misleading chart in the world and it is usually an
+accident.
+
+**A line chart may start elsewhere**, because it encodes position and slope rather than
+length. A body temperature chart starting at zero would be a flat line telling you nothing.
+Label the axis clearly so the reader can see where it starts.
+
+Three more that cost nothing:
+
+- **Label both axes, with units.** `duration (s)` rather than `duration`.
+- **Do not put two different scales on one chart** with an axis on each side. Any
+  relationship you see between the two lines is a consequence of how you scaled them.
+- **Keep the spacing even.** Uneven gaps on a time axis — three months, then a year, then a
+  week, evenly spaced — distort every slope in the picture.
+
+## Colour, which is two different tools
+
+**Colour for categories.** Different hues for different things: cities, materials, materials
+in a taxonomy. Hue carries no order and no magnitude, which is exactly right for categories
+and exactly wrong for quantities. Keep it to about seven; beyond that nobody can hold the
+legend in their head, and grouping the tail into "other" tells more truth than twelve colours.
+
+**Colour for quantities.** One hue, running light to dark — a **sequential** scale. Light
+means less, dark means more, and that reading is close to automatic. When there is a
+meaningful midpoint — zero, the average, before and after — use a **diverging** scale: two
+hues meeting at a neutral middle.
+
+**Colour-blindness is not an edge case.** Around one in twelve men and one in two hundred
+women cannot distinguish some pairs of colours, red and green most often. The rule that
+covers it: **never let hue be the only difference**. Vary lightness as well as hue, label
+the thing directly instead of sending the reader to a legend, or add a second cue such as
+position or a dashed line. The quick test is to view the chart in greyscale — if it still
+reads, it will read for everyone.
+
+And the most useful colour in data visualisation is grey. Put everything in grey, then use
+one colour on the single thing your sentence is about. A chart with one accent is read
+correctly in a second; a chart with nine has to be studied.
+
+:::tip[The eye you already have]
+When a chart feels wrong, it usually is wrong, and the reason is usually on this page: a
+truncated axis, an area pretending to be a length, a hue pretending to be a quantity. Trust
+that reaction and then go and find which one it was.
+:::
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'You are showing wait times for six ticket machines, to argue that one is far slower. Which form?',
+			options: [
+				'A pie chart, so the slow one shows as the largest slice',
+				'A bar chart sorted by value, starting at zero',
+				'A line chart with the machines along the horizontal axis',
+			],
+			answer: 1,
+			explanation:
+				'The question is comparison, so bars — position and length, the two encodings people read most accurately. Sorting puts the argument in the shape itself. A line chart implies the machines are a sequence, and a pie implies wait times are parts of a whole.',
+		},
+		{
+			q: 'You size circles so that the radius is proportional to the value. What do readers see?',
+			options: [
+				'The differences accurately, since the radius is exact',
+				'The differences exaggerated, because the eye reads area — doubling the radius quadruples it',
+				'The differences understated, because circles look smaller than squares',
+			],
+			answer: 1,
+			explanation:
+				'Area grows with the square of the radius, so a value four times larger becomes a circle sixteen times the area. Scale the radius by the square root of the value — and remember that area sits well below length in how accurately anyone reads it.',
+		},
+		{
+			q: 'Your bar chart uses red and green bars to separate two groups. What is the problem?',
+			options: [
+				'Red and green clash',
+				'Roughly one man in twelve cannot tell them apart, and hue is the only thing distinguishing the groups',
+				'Bar charts should never use more than one colour',
+			],
+			answer: 1,
+			explanation:
+				'Red and green is the most common form of colour-blindness. The fix is not a different pair of hues but a second cue: different lightness, a direct label, or separate groups by position. Checking the chart in greyscale finds this in seconds.',
+		},
+	]}
+/>

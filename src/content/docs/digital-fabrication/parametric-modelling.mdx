@@ -1,0 +1,236 @@
+---
+title: Parametric modelling
+description: Sketch, constrain, extrude — the loop at the centre of CAD, and why a model is a set of instructions rather than a shape.
+sidebar:
+  order: 3
+---
+
+import Quiz from '@components/Quiz.astro';
+
+In Illustrator you draw a rectangle and a rectangle exists. In Fusion you draw a rectangle
+and Fusion writes down *"a rectangle, 40 mm by 20 mm, on this plane, its corner at the
+origin"*. The rectangle on screen is the result of that sentence, not the thing itself.
+
+This is what **parametric** means: the model is made of parameters — named, editable
+numbers and rules — and the geometry is recalculated from them whenever one changes. You
+are not drawing an object. You are recording the instructions for building it, and watching
+the current result.
+
+Everything else in this lesson follows from that one idea. It is also the reason the first
+week of CAD feels slower than drawing: you are typing dimensions where you used to drag
+handles. The payback arrives the first time a tutor asks what it looks like 8 mm taller and
+the answer takes four seconds.
+
+## The loop
+
+Nearly every part is made by repeating three steps.
+
+1. **Sketch** — draw a closed 2D outline on a flat plane.
+2. **Constrain** — lock that outline down with rules and dimensions until it cannot move.
+3. **Extrude** — give the outline depth, turning it into a solid.
+
+Then sketch on a face of what you built, and go round again. A complicated object is a long
+sequence of simple loops, not one difficult operation.
+
+## What a sketch plane is
+
+A **sketch** is a 2D drawing, and it always lives on a flat surface in 3D space. Choosing
+that surface is the first thing Fusion asks you for.
+
+It is an artboard you can place anywhere in space. Three of them exist before you start,
+in the `Origin` folder of the browser: the front, top and right planes, all crossing at a
+single point called the **origin**. You can also sketch on any flat face of a solid you have
+already made — the top of a box, so the next thing you draw sits exactly there.
+
+Two habits, learned the hard way by everyone:
+
+- **Start at the origin.** Your first sketch should touch it, ideally symmetrically about
+  it. A model floating a random distance from the origin fights you later, in mirroring, in
+  assembly, and in every drawing view.
+- **Prefer the origin planes to the faces of your own geometry.** A sketch drawn on a face
+  depends on that face continuing to exist. Delete or move the feature that made it and the
+  sketch loses its home, taking everything built on it along. This is the most common way a
+  Fusion model falls apart, and it has nothing to do with skill.
+
+## Constraints, and why snapping is not enough
+
+You already know **snapping**: you drag an edge, it clicks to an alignment, you let go, it
+looks right. Snapping is a one-time favour. Nothing remembers that the two edges were meant
+to be aligned, and the next edit can quietly break it.
+
+A **constraint** is a rule that holds. Apply *horizontal* to a line and it is horizontal
+now and after every subsequent change. The usual set, all of which you already understand
+as design ideas:
+
+- **Horizontal / vertical** — a line stays flat or upright.
+- **Coincident** — two points are the same point. This is what actually attaches things.
+- **Parallel, perpendicular, tangent** — the relationships between two lines or a line and
+  an arc.
+- **Equal** — two lines or two circles are always the same size as each other, whatever
+  that size turns out to be.
+- **Concentric** — two circles share a centre.
+- **Symmetric** — two elements mirror each other about a line. Enormously useful, and
+  underused by beginners.
+
+A **dimension** is a constraint with a number: this line is 40 mm; these two holes are 25 mm
+apart; this angle is 30 degrees. Add one with the dimension tool, type the value, press
+Enter.
+
+The difference in practice: dimensions say how big, constraints say how things relate. If a
+relationship should survive a change of size, it wants a constraint, not two dimensions that
+happen to match.
+
+## Fully constrained is the goal
+
+Fusion colours sketch geometry to tell you its status. Under-constrained geometry is drawn
+in **blue** and you can drag it around with the mouse. Once every element is pinned by rules
+and dimensions it turns **black**, and dragging does nothing.
+
+That state is **fully constrained**, and it is what you are aiming for before you leave any
+sketch.
+
+Not for tidiness. A blue sketch has freedom in it that you did not decide — a rectangle that
+is 40 mm wide today because that is where you released the mouse, not because you chose 40.
+Change something upstream and that undecided freedom gets used up in whatever way the solver
+finds convenient, which is how a model develops a 39.7 mm edge nobody drew.
+
+Two ways to close the gap when a sketch stubbornly stays blue:
+
+- Drag the geometry. Whatever moves is what is still free.
+- Look for the missing *relationship* rather than adding another number. Beginners add too
+  many dimensions; a symmetric constraint often replaces three of them and describes the
+  intent better.
+
+If Fusion refuses a constraint and says the sketch is over-constrained, you have told it the
+same thing twice. Remove one, do not fight it.
+
+## Extrude, and the other features
+
+To **extrude** is to take a closed 2D profile and push it perpendicular to its plane to make
+a solid — the CAD verb for giving a shape thickness. Select the region, type a distance,
+press Enter.
+
+The setting that matters is the **operation**, on the extrude dialogue:
+
+- **New body** — makes a separate solid.
+- **Join** — fuses with what is already there.
+- **Cut** — removes material instead of adding it. This is how holes, slots and pockets are
+  made: sketch the shape of the hole on a face, extrude it as a cut.
+
+Once a solid exists, several features need no sketch at all:
+
+- **Fillet** rounds an edge; **chamfer** cuts it at 45 degrees. Both are chosen by clicking
+  the edge and typing a radius or a distance.
+- **Shell** hollows a solid out to a wall thickness, which turns a block into a box in one
+  operation. Learn this one early; it is most of what an enclosure is.
+- **Hole** places a properly specified hole, including the counterbores and threads you get
+  in real hardware.
+- **Revolve** spins a profile around an axis, for anything turned: a knob, a bottle, a lens
+  housing.
+
+Keep fillets and chamfers late in the sequence. They are decoration on top of the shape, and
+having them early makes every later edit harder for the solver to rebuild.
+
+## The timeline is an editable history
+
+The strip along the bottom of the window holds one icon per operation, left to right, in the
+order you did them. That is the recipe, and it is not read-only.
+
+- **Double-click a feature** to reopen its dialogue. Change 40 to 55, press Enter, and the
+  model rebuilds — including everything you made after it. The hole you cut, the shell, the
+  fillets: all recomputed against the new number.
+- **Double-click a sketch** in the timeline or the browser to edit its dimensions and
+  constraints directly.
+- **Drag the marker** at the end of the timeline backwards to travel to an earlier state and
+  see the model part-built. Anything you create with the marker parked there is inserted at
+  that point in the sequence rather than at the end.
+- **Right-click a feature** to suppress, reorder or delete it.
+
+This is the whole point of parametric CAD, so it is worth being explicit about what you have
+gained: **you can change a decision made an hour ago without redoing the work built on top
+of it.** No tool in your existing kit does this. In Illustrator, changing the width of a
+shape you drew first thing does nothing to the twenty things you aligned to it afterwards.
+
+The cost is that the recipe has to remain valid. If you delete the face a later sketch was
+drawn on, or move a hole so far it falls off the edge of the part, the affected features get
+a warning marker and the model stops rebuilding until you fix them. Fusion tells you which
+feature broke; the fix is nearly always to point the orphaned sketch at a plane that still
+exists.
+
+## Named parameters, the real payoff
+
+You can go one step further and give numbers names. Under `Modify → Change Parameters`,
+create a **user parameter**: a name, a value, a unit, and a comment.
+
+```
+material_thickness = 3 mm
+box_width         = 120 mm
+sensor_hole       = 16.2 mm
+```
+
+Now type `material_thickness` into a dimension field instead of `3`. Fusion accepts names
+and arithmetic anywhere it accepts a number, so `material_thickness * 2` and
+`box_width / 3` are valid dimensions too.
+
+When the Fablab hands you plywood that measures 2.8 mm rather than the 3 mm on the label,
+you change one parameter and every slot, tab and finger joint in the model adjusts. Without
+named parameters, that is forty dimensions found by hand, and you will miss two.
+
+Name parameters for anything that comes from the physical world — material thickness,
+component sizes, the fit clearance between two parts — and anything you already suspect you
+will argue about.
+
+<Quiz
+	questions={[
+		{
+			q: 'Your sketch is still drawn in blue and you can drag the edges around. Why does that matter?',
+			options: [
+				'It does not, as long as the dimensions look right on screen',
+				'The sketch has freedom you did not decide, so a later edit can change it in ways you did not choose',
+				'Blue geometry cannot be extruded',
+			],
+			answer: 1,
+			explanation:
+				'Blue means under-constrained. Anything still free was set by where you released the mouse, not by a decision, and when the solver rebuilds after an upstream change it will use that freedom however it likes. Fully constrained geometry turns black and cannot move.',
+		},
+		{
+			q: 'You need two holes that must always be the same diameter as each other, whatever that diameter turns out to be. What do you use?',
+			options: [
+				'A dimension on each hole, with the same number typed into both',
+				'An equal constraint between them, plus one dimension',
+				'Snapping one circle to the other while drawing',
+			],
+			answer: 1,
+			explanation:
+				'Two matching dimensions record a coincidence; the equal constraint records the intention. Change the one dimension and both holes follow. Snapping is a one-time alignment and nothing remembers it afterwards.',
+		},
+		{
+			q: 'What does dragging the timeline marker backwards do?',
+			options: [
+				'Undoes the operations permanently',
+				'Rewinds the model to that point in its construction, so you can inspect it or insert a new feature there',
+				'Exports a previous version of the file',
+			],
+			answer: 1,
+			explanation:
+				'The timeline is the recipe, and the marker is your position in it. Rewinding shows the part-built model; anything you create while parked there is inserted at that point in the sequence rather than appended at the end. Nothing is lost when you drag the marker forward again.',
+		},
+	]}
+/>
+
+## Do this before the next lesson
+
+Half an hour with your hands on it is worth more than rereading the page.
+
+- [ ] I sketched a 20 mm square on the front origin plane and extruded it 20 mm into a cube
+- [ ] I dragged an edge of an unconstrained sketch and watched it move
+- [ ] I added dimensions and constraints until the sketch went from blue to black
+- [ ] I sketched a circle on the top face of the cube and extruded it as a `Cut` to make a hole
+- [ ] I double-clicked the first extrude in the timeline, changed 20 mm to 35 mm, and watched
+      the hole survive the change
+- [ ] I created a user parameter under `Modify → Change Parameters` and used its name in a
+      dimension instead of a number
+- [ ] I changed that parameter and saw more than one thing in the model move
+- [ ] I put a fillet on an edge, then dragged the timeline marker back before it to see the
+      model without it
+- [ ] I saved the file with a comment describing what it is

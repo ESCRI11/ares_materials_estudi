@@ -1,0 +1,323 @@
+---
+title: What a language model is
+description: Tokens, prediction, temperature and the context window — what actually happens when you press enter, and why the thing makes up facts with total confidence.
+sidebar:
+  order: 1
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+You have used one of these. *Intelligence as a Material* asks you to design **with** one, and
+you cannot design with a material whose behaviour you find mysterious. Wood splits along the
+grain; a language model fabricates a plausible citation. Both are properties of the material,
+not faults in it, and in both cases the way you work changes once you know.
+
+There is no maths in this lesson. There is one mechanism, described four times from four
+angles.
+
+## The whole mechanism, in one sentence
+
+A **language model** is a program that, given a piece of text, produces a guess at what comes
+next — then adds that guess to the text and does it again.
+
+That is it. Everything below is a consequence. Nothing later in this lesson will contradict
+that sentence, and if something a model does ever seems inexplicable, this is the sentence to
+return to.
+
+## Tokens
+
+The model does not see letters, and it does not quite see words. Before anything happens, text
+is chopped into **tokens**: pieces of roughly a few characters. Common words are usually one
+token each. Rarer words break into two or three. Punctuation is its own token, and in most
+systems the space before a word belongs to that word rather than sitting on its own.
+
+The chunker below is a crude imitation — a real one uses a vocabulary learned from data, not a
+rule about word length — but it makes the shape visible. Type into it.
+
+<LiveCode title="Text becomes chunks" height={260} code={`<style>
+  body { font-family: sans-serif; margin: 0.6rem; }
+  input { width: 100%; padding: 0.4rem; font: inherit; box-sizing: border-box; }
+  .tok { display: inline-block; padding: 2px 5px; margin: 2px; background: #eee; border: 1px solid #bbb; }
+  .count { margin-top: 0.6rem; font-size: 0.85rem; color: #555; }
+</style>
+
+<input id="in" value="Designers prototype unpredictable interfaces." />
+<div id="out"></div>
+<p class="count" id="count"></p>
+
+<script>
+  function isLetter(ch) {
+    return (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || (ch >= "0" && ch <= "9");
+  }
+
+  function chunk(text) {
+    const pieces = [];
+    let word = "";
+
+    function flush() {
+      if (!word) return;
+      if (word.length > 6) {
+        for (let i = 0; i < word.length; i += 4) pieces.push(word.slice(i, i + 4));
+      } else {
+        pieces.push(word);
+      }
+      word = "";
+    }
+
+    for (const ch of text) {
+      if (ch === " ") flush();
+      else if (isLetter(ch)) word += ch;
+      else { flush(); pieces.push(ch); }
+    }
+    flush();
+    return pieces;
+  }
+
+  const input = document.querySelector("#in");
+  const out = document.querySelector("#out");
+  const count = document.querySelector("#count");
+
+  function show() {
+    out.replaceChildren();
+    const pieces = chunk(input.value);
+    for (const piece of pieces) {
+      const span = document.createElement("span");
+      span.className = "tok";
+      span.textContent = piece;
+      out.append(span);
+    }
+    const words = input.value.trim().split(" ").filter(Boolean).length;
+    count.textContent = pieces.length + " tokens from " + words + " words";
+  }
+
+  input.addEventListener("input", show);
+  show();
+</script>`} />
+
+Three things follow from tokens, and you will meet all three:
+
+- **Tokens are the unit of cost and of size.** APIs bill per token and limit you per token, not
+  per word. English runs at roughly three quarters of a word per token; other languages, and
+  code, are less efficient.
+- **The model cannot see inside a token.** Asking how many times a letter appears in a word is
+  asking it to inspect something it never received. It will answer anyway.
+- **Numbers get chopped oddly**, which is one reason arithmetic is shaky ground.
+
+## One token at a time
+
+For a given stretch of text, the model produces a score for every token in its vocabulary —
+tens of thousands of candidates, scored together so that the scores form one distribution over
+"what comes next". Then one token is chosen, appended to the text, and the whole thing runs
+again on the now slightly longer text.
+
+That loop is why answers arrive word by word rather than appearing whole, and why a long answer
+takes longer than a short one: the work is per token, every time.
+
+It also means there is no draft. The text is composed as it is emitted, not typed out from an
+outline written beforehand. Whatever forward planning happens, happens inside the same single
+step — which is why asking a model to "think through it first" changes the answer, a trick the
+[prompting lesson](/ares_materials_estudi/ai-as-a-material/prompting/) puts to work.
+
+## Temperature
+
+Choosing the highest-scoring token every time produces flat, repetitive text that gets stuck in
+loops. So the choice is a weighted draw instead: likely tokens are picked often, unlikely ones
+occasionally. **Temperature** is the dial that controls how much the odds are flattened before
+that draw.
+
+Drag it, then generate a few times at each setting.
+
+<LiveCode title="The same position, different temperatures" height={330} code={`<style>
+  body { font-family: sans-serif; margin: 0.6rem; }
+  .row { display: flex; align-items: center; gap: 8px; margin: 3px 0; font-size: 0.8rem; }
+  .name { width: 80px; text-align: right; color: #555; }
+  .bar { height: 9px; background: #333; }
+  .out { font-size: 1.1rem; margin: 0.4rem 0; }
+  button { font: inherit; padding: 0.2rem 0.8rem; }
+</style>
+
+<p class="out">The interface should feel <b id="picked">…</b></p>
+
+<label>temperature <b id="tval">0.7</b></label>
+<input id="temp" type="range" min="0" max="150" value="70" style="width: 100%" />
+<button id="go">Generate</button>
+<div id="bars"></div>
+
+<script>
+  const words = ["simple", "invisible", "calm", "playful", "honest", "alive", "urgent", "soft"];
+  const base = [0.34, 0.19, 0.13, 0.1, 0.08, 0.07, 0.05, 0.04];
+
+  function weights(t) {
+    if (t === 0) return base.map((p, i) => (i === 0 ? 1 : 0));
+    const raised = base.map((p) => Math.pow(p, 1 / t));
+    const total = raised.reduce((a, b) => a + b, 0);
+    return raised.map((v) => v / total);
+  }
+
+  function draw() {
+    const t = Number(document.querySelector("#temp").value) / 100;
+    document.querySelector("#tval").textContent = t.toFixed(2);
+    const w = weights(t);
+    const bars = document.querySelector("#bars");
+    bars.replaceChildren();
+    words.forEach((word, i) => {
+      const row = document.createElement("div");
+      row.className = "row";
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = word;
+      const bar = document.createElement("span");
+      bar.className = "bar";
+      bar.style.width = (w[i] * 260).toFixed(1) + "px";
+      row.append(name, bar);
+      bars.append(row);
+    });
+    return w;
+  }
+
+  function pick() {
+    const w = draw();
+    let roll = Math.random();
+    for (let i = 0; i < words.length; i++) {
+      roll -= w[i];
+      if (roll <= 0) return words[i];
+    }
+    return words[words.length - 1];
+  }
+
+  document.querySelector("#temp").addEventListener("input", draw);
+  document.querySelector("#go").addEventListener("click", () => {
+    document.querySelector("#picked").textContent = pick();
+  });
+  draw();
+</script>`} />
+
+At **0** the bars collapse onto one candidate: the same input gives the same output, every
+time. Around **the middle** the tail stays in play but the favourite still usually wins. **High**
+flattens everything, so the eighth-best word turns up as often as the best — which reads as
+invention for two sentences and as nonsense by the fifth.
+
+Temperature is a risk dial, not a talent dial. Turn it down for anything you will parse with
+code, classify, or extract; leave it up when you want twenty different starting points and
+intend to throw away nineteen.
+
+## The context window
+
+Everything the model considers has to be given to it, all at once, every time: your standing
+instructions, the whole conversation so far, any document you pasted, and the part of the
+answer it has written so far. The **context window** is the maximum size of that bundle,
+measured in tokens.
+
+Two consequences worth internalising, because they explain most odd behaviour in long sessions:
+
+- **The window is finite.** When a conversation outgrows it, something has to go — the app
+  drops the oldest turns or replaces them with a summary. The model is not told what was
+  removed. From the inside, that material never existed.
+- **There is no memory between conversations.** A new chat starts from nothing. Products that
+  appear to remember you are storing notes somewhere and quietly pasting them back into the
+  window. That is re-sending, not remembering, and it is a feature you design rather than one
+  the model has.
+
+## Training and inference
+
+Two words the course will use constantly, and they name two completely separate events.
+
+**Training** happens once, before you ever touch the thing. Enormous quantities of text are run
+through the model while billions of internal numbers — its **parameters**, or weights — are
+nudged, over and over, so that its predictions on that text get less wrong. It takes months and
+a data centre. A second, much smaller stage follows, using examples and human ratings, to turn
+a raw text-continuer into something that answers questions and declines requests. That stage is
+where a model's manners come from.
+
+**Inference** is what happens when you press enter: the finished model, parameters frozen, runs
+the loop from earlier over your text. Nothing you type changes the model. Your brilliant
+correction improves that conversation and nothing beyond it, and the next chat has never heard
+of you.
+
+Training also stops at some point in time. Anything that happened after that is unknown to the
+model unless you put it in the context window yourself.
+
+## Why it makes things up
+
+Now the mechanism pays off. The model was shaped to produce *plausible* continuations. It has
+no separate store of facts to check against, no flag on a sentence saying this one came from a
+reliable source. A true sentence and a well-formed false one are, from the inside, the same
+kind of object: a likely sequence of tokens.
+
+This is called **hallucination**, and calling it a bug slightly misses the point. It is the
+same faculty that lets the model write a decent paragraph about a topic it has seen described a
+thousand ways. You cannot remove it without removing the generation.
+
+It concentrates in predictable places — wherever the *form* is highly regular and the *content*
+is highly specific:
+
+| Ripe for invention | Why |
+|---|---|
+| Citations, page numbers, DOIs | Academic references have a rigid shape and endless variety |
+| URLs | A plausible-looking address is easy to assemble, and cheap to check |
+| Function and library names | Code documentation is formulaic; a helpful-sounding method name reads as real |
+| Quotes and attributions | Aphorisms drift between authors in the training text already |
+| Dates, statistics, prices | Specific, arbitrary, and unverifiable from language alone |
+
+And the tone will not warn you. Fluent confidence is a property of published prose, which is
+most of what these models read. Hedging is a style, not a signal of doubt.
+
+:::caution[The shape is right and the details are wrong]
+This is the failure mode to watch for, because it is the hardest to catch: the structure of the
+answer is sound, the reasoning reads well, and one specific inside it is invented. Check the
+specifics — the name, the number, the link — and treat the rest as a good draft.
+:::
+
+Retrieval, tool use and citation features reduce hallucination by changing what is in the
+context window, not by making the mechanism truth-seeking. They help. They do not convert a
+prediction engine into a database, and any interface you build should assume that.
+
+## What this makes it good at
+
+Read the mechanism forwards instead of backwards and the strengths appear in the same place.
+Anything that is fundamentally a *transformation of language* sits well within it: rewriting,
+summarising, changing register, translating, drafting, extracting structure from messy text,
+generating twenty variations of a label. Anything that requires a fact to be *retrieved
+correctly* is asking a plausibility engine for accuracy, and needs a source in the context or a
+human at the end.
+
+<Quiz
+	questions={[
+		{
+			q: 'Why does a language model invent a citation that does not exist?',
+			options: [
+				'Its training data contained that fake citation',
+				'It produces plausible continuations, and a well-formed false reference is as plausible as a real one',
+				'The temperature was set too high',
+			],
+			answer: 1,
+			explanation:
+				'There is no fact store to check against. Citations have a rigid, learnable shape and endlessly varied content, which is exactly the combination that invites invention. Lowering the temperature makes it more repetitive, not more truthful.',
+		},
+		{
+			q: 'You correct a model in a long conversation. Does the model now know better?',
+			options: [
+				'Yes — it learns from every conversation',
+				'Only within that conversation, while your correction is still inside the context window',
+				'Yes, but only after the provider retrains it',
+			],
+			answer: 1,
+			explanation:
+				'Training and inference are separate events. At inference the parameters are frozen. Your correction works only as text sitting in the context window — and when the conversation outgrows that window, it can fall out without anyone being told.',
+		},
+		{
+			q: 'What does turning the temperature down to zero do?',
+			options: [
+				'Makes the model more accurate',
+				'Makes it pick the highest-scoring token every time, so the same input gives the same output',
+				'Shortens the answer',
+			],
+			answer: 1,
+			explanation:
+				'Temperature governs the draw, not the knowledge. Zero gives you repeatability — useful when the output feeds code — but a confidently wrong answer at temperature 0 is confidently wrong every single time.',
+		},
+	]}
+/>
+
+Next: [writing the brief](/ares_materials_estudi/ai-as-a-material/prompting/).

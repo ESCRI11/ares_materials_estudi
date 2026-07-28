@@ -1,0 +1,142 @@
+---
+title: Drawings, renders and assembly animations
+description: The two documents every CAD model owes you — a dimensioned technical drawing for whoever makes it, and a render or exploded animation for whoever has to understand it.
+sidebar:
+  order: 6
+---
+
+import Quiz from '@components/Quiz.astro';
+
+A finished model is not a deliverable. The course asks for two things on top of it, and they
+are aimed at different people.
+
+A **technical drawing** is for whoever has to make, check or repair the object. It is
+unambiguous, dimensioned, and deliberately not attractive.
+
+A **render** or an **assembly animation** is for whoever has to understand or approve the
+idea. It is persuasive, and it hides exactly the information the drawing exists to state.
+
+Both come out of the same Fusion model, from different workspaces in the switcher at the top
+left.
+
+## Technical drawings
+
+Switch the workspace from `Design` to `Drawing` and choose the option to create one from the
+current design. Fusion opens a sheet — a page, with a frame — and asks you to place the
+first view.
+
+What goes on it:
+
+- **A base view plus projected views.** Place one view, usually the front, then drag out the
+  top and side views from it. They stay aligned with each other, which is the point of the
+  convention: a dimension in one view lines up with the same feature in the next. An
+  isometric view in a corner helps a reader who is not used to reading orthographic ones.
+- **Section views**, where a plane cuts through the object to show what is inside. The only
+  honest way to describe a wall thickness or an internal cavity.
+- **Detail views**, a circled area enlarged, for something too small to dimension in place.
+- **Dimensions**, added here in the drawing, not taken from the model. You place each one
+  deliberately.
+- **A title block**, the ruled box in the bottom corner: the part name, who drew it, the
+  date, the scale, the units, the material, and a revision number. It is not bureaucracy. A
+  drawing detached from its title block cannot be trusted, because nobody knows which version
+  it is or what scale it was printed at.
+
+Three conventions that make the difference between a drawing and a picture with numbers on
+it:
+
+- **Dimension what matters for making the part**, not everything. A reader looks for the
+  numbers they need, and forty of them hides the six that count.
+- **Never dimension the same feature twice.** Two numbers describing one distance is how a
+  contradiction reaches a workshop.
+- **State the projection convention and the units.** Europe uses **first-angle** projection
+  and the rest of the world mostly uses **third-angle**; they place the side views on
+  opposite sides of the drawing, and confusing them mirrors the part. The symbol in the title
+  block says which is in use. Say millimetres out loud too.
+
+The parametric payoff shows up here as well: the drawing stays linked to the model. Change a
+dimension in the design and the views update, leaving you to check that your annotations
+still sit sensibly. Export as **PDF** for sending to a person, or **DXF** if someone needs
+the geometry back.
+
+## Renders
+
+Switch to the `Render` workspace and the same model appears in a lit studio.
+
+Three things to set, and only three:
+
+- **Appearances** — how a surface looks: brushed aluminium, matte black plastic, oak, frosted
+  acrylic. Drag them onto a body or a face. Note that this is separate from the model's
+  *physical material*, which is what Fusion uses to calculate weight — one is for looks, the
+  other is for engineering, and they are set in different places.
+- **Scene settings** — the environment lighting, the background, the ground plane and its
+  shadow. The lighting comes from an image of a real environment wrapped around the scene, so
+  choosing a different environment changes the whole mood in one click. Turning on a ground
+  shadow is usually what makes an object stop floating.
+- **The camera** — perspective or orthographic, and the focal length. A long lens flattens
+  and looks like product photography; a short one exaggerates and looks like a phone snapshot
+  taken too close. You already know this from photography, and it applies unchanged.
+
+Then render — either live in the canvas, which refines the image while you watch, or on
+Autodesk's servers, which is slower to start and better at the finish. Cloud rendering may
+be unavailable on a personal-use licence; the local render is more than good enough for a
+course presentation.
+
+You have a design education, so the composition, the crop and the light are the part you will
+find easy. Resist the default temptation of the perfect studio white background for
+everything — a prototype photographed as if it already exists in the world usually argues
+its case better.
+
+## Assembly animations
+
+The `Animation` workspace exists for one purpose: showing how the parts of a thing go
+together.
+
+You get a storyboard along the bottom and a model made of components. The two moves that
+cover most needs:
+
+- **Auto-explode**, which pulls every component apart along its own axis in one command. A
+  serviceable exploded view in about ten seconds.
+- **Manual transforms**, where you drag the timeline marker to a moment, move a component,
+  and Fusion records that motion between the two positions. Build the sequence in the order
+  the object is actually assembled.
+
+Then publish it to a video file.
+
+Keep it short — twenty to forty seconds, one idea. An assembly animation earns its place when
+it shows something a still image genuinely cannot: how a joint engages, where a cable runs,
+which way a lid comes off. If a photograph would have said the same thing, use the
+photograph.
+
+:::note[Components, not bodies]
+Animation only moves **components** — the named parts of an assembly. If you modelled
+everything as separate *bodies* inside one part, there is nothing for it to explode. Making
+components as you go, and naming them, is a small habit that pays for itself the first time
+you need this workspace.
+:::
+
+<Quiz
+	questions={[
+		{
+			q: 'What belongs in the title block of a technical drawing?',
+			options: [
+				'A statement of design intent for the project',
+				'Part name, author, date, scale, units, material and revision',
+				'A render of the finished object',
+			],
+			answer: 1,
+			explanation:
+				'The title block answers the questions a maker asks before cutting anything: what is this, which version, what size is it printed at, what is it made of, and who do I ask. A drawing separated from that information cannot be safely used.',
+		},
+		{
+			q: 'You dimension the total width of a part, and also each of the three sections that add up to it. Why is that a problem?',
+			options: [
+				'It is not — more information is always better',
+				'It states the same distance twice, so rounding or a later edit can make the drawing contradict itself',
+				'Drawings can only carry one dimension per view',
+			],
+			answer: 1,
+			explanation:
+				'Every dimension is an instruction. Two instructions describing the same distance can disagree, and the person at the machine then has to guess which one to obey. Dimension what has to be controlled and let the rest follow.',
+		},
+	]}
+/>

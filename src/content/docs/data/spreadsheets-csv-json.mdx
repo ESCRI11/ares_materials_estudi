@@ -1,0 +1,215 @@
+---
+title: Spreadsheets, CSV and JSON
+description: Tidy tables, what a CSV file really is when you open it in a text editor, how JSON maps onto arrays and objects, and choosing between the two.
+sidebar:
+  order: 2
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+A spreadsheet is a drawing program that happens to hold numbers. It lets you merge cells,
+colour a row, put a note in the margin and leave a blank line for air — all of which are
+layout, and none of which survive the trip into code.
+
+This lesson is about the difference between a table that looks organised and a table a
+program can read.
+
+## Tidy tables
+
+There is one arrangement that every tool in this field expects, and it has four rules.
+
+1. **One row per observation.** One survey response, one reading, one object. Never one row
+   per week with seven columns for the days.
+2. **One column per variable.** The city goes in a city column, always, and not in the same
+   column as the year.
+3. **One header row, at the very top.** Short names, no spaces, no accents, no units in
+   them — `duration_s`, not `Duration (in seconds)`.
+4. **Nothing but data below it.** No merged cells, no blank spacer rows, no totals at the
+   bottom, no notes in column H, no second table on the same sheet.
+
+And a fifth that catches designers specifically: **colour is not data**. If the yellow rows
+mean "not verified", a program sees no yellow — it sees ordinary rows. Make a `verified`
+column with `yes` and `no` in it. You can colour it afterwards for yourself; the meaning has
+to exist as a value.
+
+Fixing a table that breaks these rules takes minutes. Writing code that copes with one that
+breaks them takes days, and the code is wrong.
+
+:::note[Keep the raw file]
+Never clean a dataset by editing the file you were given. Keep the original untouched and
+save your work as a new file. The next lesson explains why this matters more than it sounds.
+:::
+
+## What a CSV actually is
+
+**CSV** stands for Comma-Separated Values, and it is the plainest file format in this
+section: a text file, one record per line, values separated by commas, with the field names
+on the first line.
+
+That is the whole specification. Open a `.csv` in a text editor rather than in Excel — right
+click, Open With, VS Code — and this is what you see:
+
+```csv
+city,year,visitors
+Lugano,2024,120
+Zurich,2024,340
+Bellinzona,2024,45
+```
+
+No formulas, no fonts, no colours, no sheets, no cell types. Six kilobytes of a `.xlsx` file
+is a zip archive full of XML describing a document; six kilobytes of CSV is six thousand
+characters of your data. That plainness is exactly why every tool, in every language, for
+forty years, can read it.
+
+Because it is text, you can split it apart with the loops and objects you already have.
+
+<LiveCode
+	title="From text to records"
+	height={280}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const text = "city,year,visitors\\nLugano,2024,120\\nZurich,2024,340";
+
+  const lines = text.split("\\n");
+  const fields = lines[0].split(",");
+  const records = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(",");
+    const record = {};
+    for (let j = 0; j < fields.length; j++) {
+      record[fields[j]] = values[j];
+    }
+    records.push(record);
+  }
+
+  console.log(records.length, "records");
+  console.log(records[0].city, records[0].visitors);
+  console.log("visitors doubled:", records[0].visitors * 2);
+</script>`}
+/>
+
+Two new things, both small.
+
+`"a,b".split(",")` cuts a string wherever it finds the separator and hands back an array of
+the pieces. `\n` inside a string means a line break, so splitting on it gives you one item
+per line.
+
+`record[fields[j]] = values[j]` uses square brackets on an object instead of a dot. A dot
+needs the property name written out — `record.city`. Square brackets take the name from a
+variable, which is the only way to build an object whose field names you do not know until
+the file is open.
+
+Now look at the last line of output. `"120" * 2` gives 240, because JavaScript quietly
+converts the text to a number for multiplication — but `"120" + 2` would give `"1202"`,
+because `+` joins strings. **A CSV has no types.** Every value arrives as text and it is your
+job to convert the ones that are numbers, with `Number(record.visitors)`. This is one of the
+top three sources of silently wrong charts.
+
+## JSON, which you have already met
+
+**JSON** — JavaScript Object Notation — is the other format you will be handed, and you
+learned it in [arrays and objects](/ares_materials_estudi/javascript/arrays-and-objects/)
+without it being called that. The same dataset:
+
+```json
+[
+	{ "city": "Lugano", "year": 2024, "visitors": 120 },
+	{ "city": "Zurich", "year": 2024, "visitors": 340 }
+]
+```
+
+An array of objects: records and fields, written in JavaScript's own notation, as text.
+`JSON.parse(text)` turns it into real values in one line, and unlike CSV the numbers arrive
+as numbers, because JSON does have types — text in quotes, numbers bare, `true`, `false`,
+`null` for a value that is deliberately empty.
+
+JSON also nests. A record can hold a list, or another record:
+
+```json
+{
+	"city": "Lugano",
+	"coordinates": [46.0, 8.95],
+	"contact": { "office": "tourism", "email": "info@example.org" }
+}
+```
+
+CSV cannot do that at all. A CSV cell holds one flat value, full stop.
+
+## Which one to use
+
+**Reach for CSV when** the data is a plain table, when a person needs to open it in a
+spreadsheet, when it is long — tens of thousands of rows stay readable and small — and when
+you are exporting from a survey tool or a sensor log.
+
+**Reach for JSON when** the shape is not flat: a record with a list inside it, settings,
+anything with a hierarchy. Also when the data is going straight into JavaScript and never
+into a spreadsheet, and always when an API is involved — that is what APIs speak.
+
+A useful default: collect and clean in CSV, convert to JSON when the code needs it. Going
+the other way is lossy, since flattening nested JSON into columns means deciding what to
+throw away.
+
+## Two things that will bite you
+
+**The delimiter is not always a comma.** A **delimiter** is the character that separates one
+value from the next. In countries that write decimals with a comma — Italy and Switzerland
+among them — a comma inside `21,4` would break the file, so spreadsheet software exports
+semicolons instead. The file is still called `.csv`. If your import produces one giant field
+per row, look at the file in a text editor and check what is actually separating the values,
+then tell your tool to use that character.
+
+Values containing a comma are wrapped in double quotes: `Lugano,"Ticino, CH",120`. The
+splitting loop above does not handle that, which is honest — it is a teaching snippet, not a
+parser. Real projects use a CSV library for exactly this reason.
+
+**Character encoding.** An **encoding** is the agreement about which bytes mean which
+characters. When the file was written with one agreement and read with another, `Zürich`
+comes out as `ZÃ¼rich`. The fix is to use **UTF-8** everywhere, which covers every language
+and is the modern default. In Excel's save dialog, choose *CSV UTF-8* rather than plain CSV.
+
+One more, since it costs people real data: spreadsheets alter values as you open them.
+Leading zeros disappear from postcodes, and anything that resembles a date is converted into
+one. Check a freshly opened CSV against the text file before trusting it.
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'In your spreadsheet, rows highlighted yellow mean "unverified". You export to CSV and the code sees no yellow. What should you have done?',
+			options: [
+				'Exported to .xlsx instead, which keeps colours',
+				'Added a verified column holding yes or no, and coloured it afterwards for yourself',
+				'Sorted the yellow rows to the bottom so their position carries the meaning',
+			],
+			answer: 1,
+			explanation:
+				'Colour, position and formatting are presentation — no data format carries them as meaning. Anything a program must know has to exist as a value in a field. Sorting has the same flaw: the next sort destroys it.',
+		},
+		{
+			q: 'You read visitors from a CSV and add 10, and get "12010" instead of 130. Why?',
+			options: [
+				'The CSV file is corrupted',
+				'Every value in a CSV arrives as text, and + joins text — convert it with Number() first',
+				'JavaScript cannot add numbers larger than 100',
+			],
+			answer: 1,
+			explanation:
+				'CSV has no types; everything is characters. Some operators convert quietly (* and -), + does not, because joining strings is also a valid meaning for it. Convert on the way in and the rest of your program can stop worrying.',
+		},
+		{
+			q: 'A collaborator sends a dataset where each museum object has a list of materials. Which format fits, and why?',
+			options: [
+				'CSV, because it is smaller',
+				'JSON, because a record can hold a list and a CSV cell cannot',
+				'Either — a CSV cell can hold an array',
+			],
+			answer: 1,
+			explanation:
+				'A CSV cell holds one flat value. Nesting — a list or another record inside a record — is what JSON is for. The usual workaround in CSV is one row per object per material, which duplicates every other field.',
+		},
+	]}
+/>

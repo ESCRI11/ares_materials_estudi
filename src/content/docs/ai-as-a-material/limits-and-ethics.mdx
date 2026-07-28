@@ -1,0 +1,255 @@
+---
+title: Limits and ethics
+description: Hallucination inside a product, bias from training data, where your users' words go, the costs behind the invoice, and how to design the moment the model is wrong.
+sidebar:
+  order: 5
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+This is not the disclaimer at the end of the section. It is the part that changes what you
+build, because every limitation below has an interface consequence — something you either
+designed for or did not.
+
+## Hallucination is a different problem inside a product
+
+In a chat window, you are the safety mechanism. You read the answer, something looks off, you
+check it. That works because you are an expert on your own question and you were already
+suspicious.
+
+Put the same model inside something you designed and all three of those disappear:
+
+- **The user did not ask the question**, so they have no expectation to check anything.
+- **They cannot see the prompt**, the sources, or that a model was involved at all.
+- **Your interface's confidence is your claim**, not the model's. Clean type in a well-designed
+  card reads as a fact your product is asserting.
+
+And the arithmetic changes. A wrong answer once a week in your own chat is an annoyance. The
+same rate across a thousand users is a wrong answer every few minutes, delivered to people with
+no way to know.
+
+The rule this produces is short: **never present a guess as a fact**. Show where it came from,
+mark what was generated, and make the answer's status visible without a footnote nobody reads.
+
+## Bias comes with the training data
+
+A model learned from text people wrote, so it carries the shape of who wrote things down, in
+which languages, about whom, and which of it was digitised. It reproduces the defaults of that
+material: which names sound professional, which occupations get which pronouns, whose English
+is "correct", which country is assumed when you say "here".
+
+The second layer is the tuning stage — the human ratings that turn a text-continuer into an
+assistant. Those ratings encode the values and guidelines of the people who wrote them, which
+is a specific set of people, not a neutral one.
+
+Where this reaches your work is subtler than the obvious cases. Generated personas that all
+turn out the same age and class. Research summaries where the unusual participant gets smoothed
+into the majority, because averaging is exactly what the mechanism does. Copy written for a
+default reader who resembles the training data more than your audience.
+
+You can test for it in an afternoon: run the same prompt with names, cities and contexts from
+different places, and read the outputs next to each other. Differences that you did not put in
+the prompt came from somewhere.
+
+## Where your users' words go
+
+Anything typed into a hosted model leaves the machine, crosses the network, and is processed on
+a company's servers. What happens next depends on the provider and the specific product — and
+the terms for a consumer chat app and the same company's API are often not the same document.
+Depending on which you use, your text may be retained for a period, reviewed by humans for
+abuse, or used to improve the model.
+
+This matters more for you than for most people, because of what design research consists of.
+
+A participant who consented to you recording an interview consented to *you*. Pasting that
+transcript into a hosted model is a disclosure to a third party that they were not asked about,
+and in Switzerland and the EU that is a data-protection question and not only an etiquette one.
+The same applies to a client's unreleased work under NDA, to anything with a face or a real
+name in it, and to the messages your users type into a product you shipped.
+
+Three defensible positions, in the order you should consider them:
+
+1. **Do not send it.** Some material has no business leaving your laptop.
+2. **Send it anonymised.** Strip names, employers, addresses and anything identifying before
+   the model sees it. Do the stripping yourself; do not ask the model to do it.
+3. **Run it locally**, which the
+   [previous lesson](/ares_materials_estudi/ai-as-a-material/running-a-model-locally/) covers.
+   This is the only option where "where did the data go" has a clean answer.
+
+If you are gathering data that will meet a model at some point, say so on the consent form
+while you are writing it. It is one sentence then, and an unfixable problem afterwards.
+
+## The costs that are not on the invoice
+
+Two facts, stated once, without a sermon.
+
+**Energy and water.** Training a large model consumes a great deal of electricity, and serving
+it consumes more, continuously, in data centres that need cooling. One query is a small amount.
+A product that fires off a request on every keystroke, multiplied by its users, is not. Whether
+a feature deserves a model call is a design question with an environmental component, and it is
+usually answered by noticing that a lookup or a rule would have done.
+
+**Labour.** The tuning and safety layers rest on human work — people rating outputs, labelling
+data, and reviewing the worst material the internet produces so that the model refuses to
+repeat it. That work is often outsourced, often low-paid, and sometimes genuinely harmful to do.
+The polish you experience as effortless was not.
+
+Neither fact means do not use these tools. Both mean use them deliberately, which is the whole
+argument of the course title: a material has costs, and a designer who does not know a
+material's costs is not designing with it.
+
+## Whose work is in there
+
+Models were trained on enormous quantities of text, images and code whose authors were not
+asked and are not credited. Whether that is permitted is being argued in courts in several
+countries right now and the answer is not settled — a live legal question rather than a
+philosophical one.
+
+Practically, for you:
+
+- **Your work is probably in there**, and so is every designer's you admire.
+- **An output can closely resemble a specific source** without any indication that it did.
+  Prompting for "in the style of" a living artist is the case where this stops being abstract.
+- **Say when a model made something.** In coursework, in a portfolio, to a client. Undisclosed
+  generation is the thing that damages trust, more than the generation itself.
+- **Check what your client or your school requires**, because policies differ and both exist.
+
+## Designing for the failure case
+
+Here is the part that is actually your job. Below is one card, holding three different things
+that came back from a model. Press each button.
+
+<LiveCode title="The same component, three outcomes" height={320} code={`<style>
+  body { font-family: sans-serif; margin: 0.6rem; color: #111; }
+  .card { border: 1px solid #bbb; padding: 0.7rem; margin-top: 0.7rem; }
+  .label { margin: 0; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: #666; }
+  .text { margin: 0.5rem 0; line-height: 1.45; }
+  .empty { color: #666; }
+  .actions { margin: 0; }
+  button { font: inherit; font-size: 0.85rem; margin-right: 0.3rem; }
+  .note { margin-top: 0.5rem; font-size: 0.78rem; color: #666; }
+</style>
+
+<p>What came back this time:</p>
+<button data-kind="good">A useful answer</button>
+<button data-kind="wrong">A confident wrong answer</button>
+<button data-kind="none">Nothing</button>
+
+<div class="card" id="card"></div>
+
+<script>
+  const replies = {
+    good: "Four of six participants stopped at the payment step and two mentioned the fee was a surprise.",
+    wrong: "Four of six participants stopped at the payment step, in line with the industry drop-off benchmark of 68 percent.",
+    none: ""
+  };
+
+  const card = document.querySelector("#card");
+
+  function show(kind) {
+    card.replaceChildren();
+
+    const label = document.createElement("p");
+    label.className = "label";
+    label.textContent = "Draft summary, generated from 6 transcripts";
+    card.append(label);
+
+    const body = document.createElement("p");
+    body.className = "text";
+    if (replies[kind]) {
+      body.textContent = replies[kind];
+    } else {
+      body.className = "text empty";
+      body.textContent = "No summary came back. The six transcripts are unchanged and still below.";
+    }
+    card.append(body);
+
+    const actions = document.createElement("p");
+    actions.className = "actions";
+    const keep = document.createElement("button");
+    keep.textContent = replies[kind] ? "Keep in my notes" : "Try again";
+    const drop = document.createElement("button");
+    drop.textContent = "Discard";
+    actions.append(keep, drop);
+    card.append(actions);
+
+    const note = document.createElement("p");
+    note.className = "note";
+    note.textContent = "Check against the transcripts before quoting this anywhere.";
+    card.append(note);
+  }
+
+  document.querySelectorAll("button[data-kind]").forEach(function (b) {
+    b.addEventListener("click", function () { show(b.dataset.kind); });
+  });
+
+  show("good");
+</script>`} />
+
+Look at the first two. The interface cannot tell them apart, because nothing in the wrong one
+looks wrong — it is the true sentence with an invented benchmark welded on. No amount of
+styling detects that. What the design can do is refuse to make a claim the model cannot support:
+say where it came from, keep the source one click away, and never let the summary replace the
+transcripts.
+
+The third case is the one prototypes skip. The model will return nothing, return something
+unusable, refuse, or take thirty seconds — in production, on the day of the assessment, never
+during your demo. An empty state that explains itself is part of the feature, not a polish task.
+
+Five decisions worth making before you write the prompt:
+
+1. **Suggestion, not action.** The model proposes; the person disposes. Editable, dismissable,
+   reversible.
+2. **Nothing irreversible unattended.** Sending, publishing, deleting, paying, contacting a real
+   person — a human sees it first. This is also the defence against
+   [prompt injection](/ares_materials_estudi/ai-as-a-material/calling-a-model/).
+3. **Show the provenance.** What was generated, from what, and how to get to the source.
+4. **Design the wait, the empty and the refusal**, with the same care as the happy path.
+5. **Test the bad path on purpose.** Feed it nonsense, feed it another language, unplug the
+   network, force a failure. What your interface looks like when the model is wrong *is* the
+   design.
+
+:::tip[One question to hold onto]
+If the model is confidently wrong here, what happens to the person in front of it? If the
+answer is "they notice and fix it in two seconds", spend your effort elsewhere. If the answer
+is "they never find out", that is where the design work is.
+:::
+
+<Quiz
+	questions={[
+		{
+			q: 'Why is hallucination a bigger problem in a product you designed than in your own chat window?',
+			options: [
+				'Products use worse models',
+				'The user did not write the prompt, cannot see the sources, and reads your interface as asserting a fact',
+				'Products call the model more often',
+			],
+			answer: 1,
+			explanation:
+				'In chat you are the check: you asked the question, you know the subject, you are already suspicious. A user of your product has none of that, and clean typography in a card reads as a claim your product is making.',
+		},
+		{
+			q: 'You want to summarise twelve interview transcripts from a research study. What is the first thing to settle?',
+			options: [
+				'Which model gives the best summaries',
+				'Whether the participants agreed to their words being sent to a third party, and whether the data can be anonymised or kept local',
+				'How to phrase the prompt so the summary is concise',
+			],
+			answer: 1,
+			explanation:
+				'Consent covered you, not a company you have not named. Anonymise before sending, or run the model locally so nothing leaves your machine — and put the sentence about it in the consent form while you are still writing it.',
+		},
+		{
+			q: 'Your prototype shows a generated summary in a card. What is the most important state to design?',
+			options: [
+				'The animation while the text streams in',
+				'The wrong, empty and slow answers — the cases that will happen in production and never in your demo',
+				'The colour of the generated-content label',
+			],
+			answer: 1,
+			explanation:
+				'The happy path designs itself, and it is the one you will see all week. Models refuse, time out, return nothing, and return plausible nonsense. Provoke each of those deliberately and design what the person in front of the screen sees.',
+		},
+	]}
+/>

@@ -1,0 +1,178 @@
+---
+title: Planning research
+description: Turning a brief into research questions, matching methods to questions, recruiting the right people, and what a research plan document contains.
+sidebar:
+  order: 2
+---
+
+import Quiz from '@components/Quiz.astro';
+
+*User Research Design* is built around three outcomes: writing a research plan and choosing
+the right methods, running the research, and synthesising findings into insights you can
+communicate. This lesson covers the first of those. The third has [its own
+page](/ares_materials_estudi/design-methods/from-findings-to-insights/).
+
+Note the course name. It is research *design* — the graded thinking is in the choices you
+make before anyone is interviewed, not in your manner during the interview.
+
+## From brief to research question
+
+A brief states an intention: *make booking the workshop machines less painful*. It is not
+answerable. A **research question** is a question about people and their situation that
+evidence could settle, and that you do not already know the answer to.
+
+Three tests, and a question has to pass all three:
+
+1. **Could evidence change the answer?** "Would users like a nicer booking screen" fails —
+   you know what they will say.
+2. **Is it about the situation rather than the solution?** "Should the button be at the top"
+   is a design question. You answer that by building two and testing, not by researching.
+3. **Would a different answer change what you do next?** If both answers lead to the same
+   design, do not spend two weeks on it.
+
+The brief above turns into something like:
+
+- How do students currently decide when to book, and what do they check first?
+- What happens when a booking fails or a machine is occupied anyway?
+- Who is involved besides the person booking — technicians, coursemates, staff?
+
+Each of those is answerable, none of them presumes the outcome is a screen, and all three
+would change the design depending on how they come out.
+
+Two or three questions is a research plan. Nine is a wish list, and it will produce shallow
+answers to all nine.
+
+## Matching a method to the question
+
+The unhelpful version of this is a list of methods. The useful version is a single
+distinction: **what people say, what people do, and what people make** are three different
+sources of evidence, and they disagree with each other constantly. People are unreliable
+narrators of their own behaviour, not because they lie, but because habit is invisible from
+the inside.
+
+So the first move is deciding which of the three your question needs.
+
+| Method | Answers | Cannot tell you |
+|---|---|---|
+| **Semi-structured interview** — prepared topics, adapted live | Why people do what they do, how they explain and justify it, their history with the problem | What they actually do. You get the reconstructed version |
+| **Contextual inquiry** — watching someone work in their own setting, asking as you go | The real sequence, the workarounds, the physical and social context | Motivation for things they never mention or notice |
+| **Observation** — watching without intervening | What happens when nobody is being helpful for your benefit | Anything about intent |
+| **Diary study** — participants record their own experience over days or weeks | Change over time, rare events, things that only make sense in sequence | Detail — self-reports are thin, and people drop out |
+| **Survey** — same questions, many people | How common something is, once you already know what to ask about | Anything you did not think to ask. It measures, it does not discover |
+| **Usability test** — a person attempts real tasks on something that exists | Where a specific design fails, and how people recover | Whether the thing is worth building at all |
+| **Co-design session** — participants make something with prepared materials | Aspirations, tacit knowledge, what people would change if allowed | Frequency, or anything about the current system's actual use |
+
+Two rules people learn the expensive way. **A survey is a converging instrument**, so it
+belongs after exploratory work, not before it — you cannot write good options for a
+multiple-choice question about something you have not yet observed. And **a usability test is
+a second-diamond method**: it evaluates a solution. Running one when the real question is
+whether the problem exists tells you only that your prototype's menu is confusing.
+
+## Sampling and recruitment
+
+**Sampling** is deciding who you need. **Recruitment** is finding them, which is the part
+that eats your schedule — start it the day the plan is signed off, not the day before the
+sessions.
+
+Recruit on **behaviour, not demographics**. "Aged 20–30, studies design" describes a hundred
+irrelevant people. "Has booked a machine at least twice this term, and has had at least one
+booking go wrong" describes the eight who can answer your question. A **screener** is the
+short set of questions that sorts one from the other, and it should filter on things people
+have done, with a specific timeframe.
+
+How many? For qualitative work, fewer than you think and more than one. Five to eight people
+per distinct group is a normal starting point, and the honest stopping rule is
+**saturation** — you stop when new sessions stop producing new material. If your fourth
+interview is still surprising you, you are not finished. If your seventh is confirming, you
+probably are. Surveys are the opposite: numbers only mean something at a size worth
+calculating in advance.
+
+Deliberately include **extreme users** — the person who uses the system daily and the person
+who gave up on it. They make the constraints visible in a way the comfortable middle never
+does. And keep track of who you did *not* reach, because that group is where your design
+will fail first.
+
+:::caution[Consent is not paperwork]
+Before you record anything: say who you are, what the session is for, what you are
+recording, who will see it, how long you will keep it, and that they can stop at any point
+without giving a reason. Get it in writing. Then use participant codes (P1, P2) everywhere
+in your notes and never the real names, so the material stays usable when you show it to
+people outside the team. If you are researching with anyone in a vulnerable situation or
+under 18, that raises the bar rather than being an edge case.
+:::
+
+## What the plan document contains
+
+Short — one to two pages. It exists so that everyone agrees on the question before the money
+is spent, and so that in week six you can remember why you did it this way.
+
+- **Background and decision.** What prompted this, and specifically *what decision the
+  research is meant to inform*. If you cannot fill this field in, stop and find out.
+- **Research questions.** Two or three, in the form above.
+- **Method, and why.** Not only which, but why that one answers these questions and what it
+  will miss. This is the paragraph the course title is pointing at.
+- **Participants.** Criteria, how many, how you will find them, screener questions.
+- **Schedule.** Recruitment, sessions, analysis, readout. Analysis always takes longer than
+  people plan for.
+- **Materials.** Discussion guide, consent form, task list, prototype, whatever the session
+  needs.
+- **Analysis approach.** How you will get from recordings to insights, and who is involved
+  in that.
+- **Output and audience.** What gets produced, and who has to act on it.
+- **Assumptions and risks.** What you are taking for granted, and what happens if
+  recruitment fails.
+
+## The discussion guide
+
+The plan says *what*; the guide says *how the hour goes*. Three habits carry most of the
+quality:
+
+**Ask about specific past events, not generalities.** "Tell me about the last time you
+booked a machine" gives you an actual story with details in it. "How do you usually book
+machines" gives you a tidy summary that has been smoothed by memory.
+
+**Do not ask people to predict themselves.** "Would you use a feature that…" is answered by
+politeness, not behaviour. Past behaviour is evidence; future intention is not.
+
+**Leave the silence alone.** The most useful sentence in most interviews is the one that
+comes after you fail to fill a pause. Prepare fewer questions than you think you need, and
+plan to follow what you hear.
+
+<Quiz
+	title="Which method answers the question?"
+	questions={[
+		{
+			q: 'A client is convinced their checkout is confusing. You have three weeks and no prior research. What do you do first?',
+			options: [
+				'A usability test on the current checkout, with real tasks',
+				'A survey asking customers how satisfied they are with the checkout',
+				'Interviews about how people feel about online shopping in general',
+			],
+			answer: 0,
+			explanation:
+				'The claim is specific, the artefact exists, and the question is where it fails — that is exactly what a usability test answers, with five or six people and a fortnight to spare. The survey gives you a satisfaction number that names no cause, and general interviews about online shopping answer a question nobody asked.',
+		},
+		{
+			q: 'You need to know how often a problem occurs across the whole customer base, and you have already run eight interviews that surfaced four distinct causes. What comes next?',
+			options: [
+				'More interviews, until you reach saturation',
+				'A survey with options built from what the interviews found',
+				'A diary study with the same eight participants',
+			],
+			answer: 1,
+			explanation:
+				'Frequency is a counting question, and a survey is the counting instrument. Crucially it now has something worth counting: the interviews gave you the four causes, so the answer options describe the real world rather than your guesses. Running the survey first is the common and expensive mistake.',
+		},
+		{
+			q: 'Participants tell you they always check the machine calendar before walking over. Watching them, most walk over first and check on the way. What is the right reading?',
+			options: [
+				'The participants were being dishonest with you',
+				'The observation is wrong, since people know their own routines',
+				'Both are true data — what people say and what they do are different sources',
+			],
+			answer: 2,
+			explanation:
+				'The gap between the said and the done is a finding, not a failure of the research. People report the version of their behaviour that makes sense as a story, and habits are close to invisible from the inside. When the two disagree, the disagreement itself usually points at where the design opportunity is.',
+		},
+	]}
+/>

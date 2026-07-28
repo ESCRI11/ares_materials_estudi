@@ -1,0 +1,218 @@
+---
+title: Training and prompting
+description: Generating new data with machine learning — what training a model on your own small dataset means, what prompting an existing one means, features and labels, overfitting, and why synthetic data is useful for prototyping and dangerous as evidence.
+sidebar:
+  order: 7
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+The course ends where the pipeline stops being about data you found and starts being about
+data you make: *generating new data through machine learning models, training and
+prompting*. This lesson is the conceptual map of that sentence. No installing, no libraries —
+Intelligence as a Material (ID131.02) is where the tools come out.
+
+## A model is a set of numbers derived from examples
+
+A **model** is what you get when a program looks at many examples and works out a set of
+numbers that turn an input into an output. Show it enough photographs labelled *chair* and
+*table*, and it settles on numbers that answer *chair* for most new photographs of chairs.
+
+What it is not is a copy of the examples. The examples are gone; the numbers stay. This is
+why a model can answer about things it never saw, and why it can be confidently wrong about
+them in ways a lookup table never could.
+
+Two words carry most of the vocabulary.
+
+A **feature** is one thing the model gets to look at: the brightness of a pixel, the length
+of a sentence, the temperature at 8am, the price. Features are the fields of your dataset,
+seen from the model's side.
+
+A **label** is the answer you want back for an example: *chair*, *spam*, *night*, `21.4`.
+Learning from examples that carry labels is called **supervised learning**, and it is nearly
+all of what you will do. (Without labels, a program can still group similar records together —
+clustering — which tells you what the natural piles are but not what to call them.)
+
+So a dataset for training is your familiar table with one column promoted: the features are
+the input fields, the label is the field you want predicted.
+
+## Training, in fifteen lines
+
+Real training adjusts millions of numbers. The idea is visible in a handful. Below, six
+light readings from a sensor, each labelled by hand. "Training" derives one number per
+label — the mean of its examples. "Predicting" asks which of those numbers a new reading is
+closer to.
+
+<LiveCode
+	title="A model with two numbers in it"
+	height={320}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  // Six examples: one feature (light) and one label, decided by a person.
+  const examples = [
+    { light: 820, label: "day" },
+    { light: 760, label: "day" },
+    { light: 910, label: "day" },
+    { light: 120, label: "night" },
+    { light: 60,  label: "night" },
+    { light: 180, label: "night" },
+  ];
+
+  // Training: reduce the examples to one number per label.
+  const totals = {};
+  const counts = {};
+  for (const example of examples) {
+    totals[example.label] = (totals[example.label] || 0) + example.light;
+    counts[example.label] = (counts[example.label] || 0) + 1;
+  }
+
+  const centres = {};
+  for (const label of Object.keys(totals)) {
+    centres[label] = totals[label] / counts[label];
+    console.log("learned centre for", label + ":", centres[label]);
+  }
+
+  // Predicting: which centre is this new reading closest to?
+  function classify(light) {
+    let best = "";
+    let bestDistance = Infinity;
+    for (const label of Object.keys(centres)) {
+      const distance = Math.abs(light - centres[label]);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = label;
+      }
+    }
+    return best;
+  }
+
+  console.log("640 is", classify(640));
+  console.log("200 is", classify(200));
+  console.log("475 is", classify(475));
+</script>`}
+/>
+
+That is a model. Two numbers, learned from data rather than typed in, plus a rule for using
+them. Everything larger differs in scale and in the cleverness of the fitting, not in kind.
+
+Try 475 — halfway between the two centres, where the model has no real opinion and gives a
+confident answer anyway. Then add a seventh example, a reading of 400 labelled `day` from a
+cloudy afternoon, and watch the boundary move. Both behaviours are the interesting ones.
+
+## Overfitting, honestly
+
+**Overfitting** is when a model learns the examples instead of the pattern. With enough
+freedom, a model can fit your training data perfectly — including its noise, its quirks, the
+afternoon the sensor sat in the sun, the fact that all your *chair* photos were taken in the
+same studio with the same grey backdrop. It scores beautifully on the data it has seen and
+falls apart on anything new, because what it actually learned was "grey backdrop means
+chair". The smaller your dataset, the easier this is to do, and design students always have
+small datasets.
+
+The defence is boring and non-negotiable: hold some examples back. Split your data before
+training — most of it to train on, a slice kept aside and never looked at — and judge the
+model only on that held-back **test set**. A model that does well on data it has seen has
+told you nothing. If it does well on data it has not, you have something. And if your
+training examples all came from one room, one week or one kind of person, no split will save
+you, because the test set has the same blind spot.
+
+## Prompting is not training
+
+**Prompting** is using a model somebody else already trained by describing what you want in
+words, and often by including a few examples in the message itself. Nothing is learned. The
+model's numbers are fixed; your prompt is input, and when the conversation ends it is gone.
+
+The practical differences:
+
+|  | Training your own | Prompting an existing one |
+| --- | --- | --- |
+| What you need | Labelled examples, and enough of them | A clear description, and examples in the message |
+| What you produce | A small model that does one narrow thing | Text, images, or structured output on request |
+| Where it runs | Often on your machine or in the browser | Usually a service you call over an API |
+| What it costs | Your time collecting and labelling | Money per request, and time spent evaluating |
+| Repeatable? | Yes — same input, same output | Not exactly — the same prompt can vary |
+
+**Train** when the task is narrow and specific to your material: sorting your own photographs,
+recognising three gestures from your own sensor, telling your own two categories apart on a
+device with no internet.
+
+**Prompt** when the task is broad and language-shaped, and when somebody else's model has
+already seen far more of the world than you can collect: summarising, rephrasing, extracting
+fields from messy text, generating variations.
+
+Both are evaluated the same way — against examples you set aside, judged by a person. A
+model you have not tested is a guess with good manners.
+
+## Generated data: useful, and not evidence
+
+Both routes can produce **synthetic data**: records that were generated rather than observed.
+
+It is genuinely useful. You can fill a prototype with two hundred plausible profiles before
+a single real one exists, so the layout gets tested against realistic name lengths and
+missing fields. You can produce a dataset with a shape you want to try a visualisation on.
+You can test your whole cleaning-and-charting pipeline before the survey closes. In all of
+these the data is scaffolding, and everyone can see that it is.
+
+It is also dangerous in one specific way, and the danger is quiet. Synthetic data is
+generated from a model's expectations, which came from its training data. Any pattern you
+find in it is therefore a fact about the model, not about the world. A generated survey of
+two hundred users tells you what plausible answers look like; it does not tell you what
+anyone thinks. A generated "participant" cannot be surprised by your prototype, which is the
+entire reason for talking to people.
+
+Three habits keep it safe:
+
+- **Label it everywhere it appears** — in the file name, in the chart caption, in the
+  protocol. `visitors-synthetic.csv`, never `visitors.csv`.
+- **Never let it cross into an argument.** Synthetic data can populate a prototype. It cannot
+  support a claim about users, and a chart of it in a presentation will be read as findings
+  no matter what the caption says.
+- **Remember whose expectations you inherited.** A model reproduces the patterns of its
+  training data, including who was over-represented in it and who was missing. Synthetic
+  people are the average of a corpus, and the average has never been the interesting user.
+
+That is the whole pipeline: define, collect, structure, visualise, document — and now a
+sixth move, generating data, which belongs to prototyping rather than to inquiry as long as
+you keep the line between them written down.
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'You have 300 photos of your own ceramic pieces, each tagged glazed or unglazed, and you want a program to sort new photos. Which is this?',
+			options: [
+				'A feature is glazed or unglazed, and the label is the photo',
+				'The features are what the model looks at in the photo, and glazed or unglazed is the label',
+				'Neither — sorting photos does not use labels',
+			],
+			answer: 1,
+			explanation:
+				'Features are the input the model gets to examine; the label is the answer you want back for each example. Examples that carry labels are what supervised learning trains on, and your 300 tagged photos are exactly that.',
+		},
+		{
+			q: 'Your model gets 99% right on the data you trained it on and 55% on photos taken in a different room. What happened?',
+			options: [
+				'The model needs more training on the same photos',
+				'It overfitted — it learned the particulars of your training examples, including the room, rather than the pattern',
+				'55% is a normal result and nothing is wrong',
+			],
+			answer: 1,
+			explanation:
+				'Scoring well on data it has already seen tells you nothing. That is why you hold a test set back before training and judge only on that — and why training examples that all come from one room, one week or one kind of person set a ceiling no amount of training removes.',
+		},
+		{
+			q: 'You generate 200 synthetic survey responses to fill your prototype. What may they be used for?',
+			options: [
+				'Testing the layout and the pipeline, clearly labelled as synthetic',
+				'Reporting what users think, since the model was trained on real people’s writing',
+				'Either, as long as the caption says the data is generated',
+			],
+			answer: 0,
+			explanation:
+				'Synthetic data is generated from a model’s expectations, so any pattern in it describes the model, not the world. As scaffolding for a prototype it is genuinely useful; presented in a chart it will be read as findings, regardless of the caption.',
+		},
+	]}
+/>

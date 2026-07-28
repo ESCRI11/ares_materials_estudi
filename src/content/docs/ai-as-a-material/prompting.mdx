@@ -1,0 +1,221 @@
+---
+title: Prompting
+description: Writing a brief for a very fast, very literal collaborator with no memory of yesterday — roles, examples, output formats, and the failure modes to watch for.
+sidebar:
+  order: 2
+---
+
+import Quiz from '@components/Quiz.astro';
+
+Imagine a collaborator who has read almost everything, works in seconds, never gets bored, is
+extremely literal, and remembers nothing about yesterday, your project, or the last thing you
+asked. Every request has to arrive as a complete brief.
+
+That is the whole of prompting. It is not a secret language and there are no magic words. It is
+a design skill you already have, applied to a reader with unusual properties, and it gets
+better the same way briefs do: by writing one, reading what came back, and changing one thing.
+
+## Roles: the system prompt and the user message
+
+Under any chat interface, what actually gets sent is a list of messages, each labelled with a
+**role**:
+
+| Role | What goes in it |
+|---|---|
+| `system` | Standing instructions for the whole conversation: who the model is acting as, rules it must keep, the output format, what it must never do |
+| `user` | What you are asking for right now |
+| `assistant` | What the model said before, sent back so the conversation appears continuous |
+
+The **system prompt** is the one you will never see in a chat window, because the product wrote
+it. When you build something yourself, it is where the design lives: the constraints that
+should hold for every request go there, and only the changing part goes in the user message.
+
+This split matters more than it looks. If a rule belongs to your product — "answers are at most
+two sentences", "never invent a source" — putting it in the system prompt means you write it
+once rather than gluing it onto every request. Be aware that the boundary is soft: a system
+prompt is a strong hint, not an enforcement mechanism, and a determined user message can drift
+away from it.
+
+## Five things that reliably work
+
+### Be specific about what you want back
+
+The single largest quality jump comes from replacing adjectives with constraints. Vague in,
+average out — and the average of everything ever written about your topic is exactly as bland
+as that sounds.
+
+```text
+Weak:   Write something about our exhibition.
+
+Better: Write three wall-label options for an exhibition of Swiss poster
+        design, 1950 to 1970. Maximum 40 words each. Address a visitor
+        with no design background. No exclamation marks. Do not use the
+        words "iconic" or "timeless".
+```
+
+Say the audience, the length, the register, the format, and what to leave out. The exclusions
+do a surprising amount of work, because they push the answer off the well-worn path.
+
+### Show examples
+
+Giving no examples is called **zero-shot**. Giving two or three is **few-shot**, and it is the
+highest-value habit in this lesson. A designer knows this already: a reference image settles an
+argument that three paragraphs of adjectives cannot.
+
+```text
+Turn each note into a task. Follow this format exactly.
+
+Note: fridge is making a noise again
+Task: Report fridge noise to building maintenance — kitchen, low priority
+
+Note: no one knew where the projector cable was on Tuesday
+Task: Label and assign a home for the projector cable — studio, medium priority
+
+Note: three people missed the deadline for the essay drafts
+Task:
+```
+
+Two examples pin down the tone, the length, the punctuation, the ordering and the vocabulary at
+once. Anything you find yourself explaining twice is usually better shown than described.
+
+### Assign a role
+
+"You are a copy editor at a design museum. You cut adjectives and keep the author's voice."
+
+Roles work, and it is worth understanding *why* so you do not over-trust them. A role narrows
+the register — it makes the language of copy editors more likely and the language of press
+releases less likely. What it does not do is grant expertise the model lacks. "You are a
+structural engineer" gives you the vocabulary of structural engineering, not a correct load
+calculation.
+
+### Ask for a named output format
+
+If a human will read it, ask for a table, a numbered list, or three bullets of at most twelve
+words. If code will read it, ask for JSON, name the keys, and say "return only the JSON, with
+no commentary".
+
+```text
+Return JSON only, in this shape:
+{"sentiment": "positive" | "neutral" | "negative", "theme": string, "quote": string}
+```
+
+Even then, check what arrives before trusting it — models like to wrap JSON in a friendly
+sentence or a code fence. The [next lesson](/ares_materials_estudi/ai-as-a-material/calling-a-model/)
+deals with that from code.
+
+### Let it work before it answers
+
+Asking for the steps, the criteria, or a plan *before* the conclusion usually produces a better
+conclusion. This is not a personality quirk. Every token the model generates becomes part of
+the input for the tokens after it, so text that lays out the problem gives the later text more
+to work from than a bare answer does.
+
+"List the trade-offs first, then recommend one" costs you a few seconds and gives you something
+you can actually argue with, which for a design decision is the point.
+
+## Why the same prompt gives a different answer every time
+
+Because the next token is drawn from a distribution rather than picked outright — the
+[temperature dial](/ares_materials_estudi/ai-as-a-material/what-a-language-model-is/) from the
+previous lesson. Identical input, different draw, different answer. Where you can set the
+temperature yourself, near zero gets you close to repeatable.
+
+Two further sources of drift, both outside your control:
+
+- **The model changes underneath you.** Hosted models are updated. A prompt tuned to perfection
+  against one version can behave differently after an update you were not told about, which is
+  an argument for keeping a few test cases you can re-run.
+- **Your context is not identical.** In a long conversation, everything before your prompt is
+  part of the input. The "same" prompt in turn twelve is a different input from the same prompt
+  in a fresh chat.
+
+Practical consequence: **judge a prompt on several runs, not on one**. A prompt that works once
+may have been lucky, and if you are shipping it to users you will see the unlucky draws.
+
+## Failure modes, and how to notice them
+
+Each of these looks like success at a glance. That is what makes them worth naming.
+
+**Confident fabrication.** Invented sources, invented functions, invented statistics, delivered
+in the same voice as everything true. *Notice it by* checking every specific — every name,
+number, link — rather than reading for tone.
+
+**Agreeing with you.** Push back on a correct answer and it will often fold and produce a wrong
+one. *Notice it by* asking neutrally: "is that right?" rather than "that seems wrong, isn't
+it?".
+
+**Following your framing.** Ask why something is true and you will get reasons it is true, even
+if it is not. *Notice it by* asking the open version of the question — "what is the evidence on
+either side?" — and by asking for the strongest case against its own answer.
+
+**Silently dropping a constraint.** You asked for 40 words and got 90; you said "do not mention
+sustainability" and it is in paragraph two. *Notice it by* counting, which nobody does, which
+is why long lists of rules leak. Fewer, sharper constraints hold better than fifteen.
+
+**Regression to the average.** Technically fine and completely generic, because the middle of
+the distribution is where the mass is. *Notice it by* asking whether a competent person could
+have written it without knowing anything about your project. Fix it by putting the specifics
+that only you know into the prompt.
+
+**Drift over a long conversation.** Instructions given twenty turns ago weaken as the window
+fills. *Notice it by* re-stating what matters, or starting a fresh conversation with a clean
+brief, which is nearly always faster than arguing your way back.
+
+## How to iterate
+
+Treat prompts like any other design artefact.
+
+1. **Keep them in a file**, not in your scroll history. They are source material, and they
+   belong in the repository next to the rest of the project.
+2. **Change one thing at a time.** Rewriting the whole prompt teaches you nothing about which
+   part was doing the work.
+3. **Keep three or four test inputs**, including an awkward one — an empty answer, a hostile
+   question, something in another language. Re-run them when you change the prompt.
+4. **Stop at good enough.** Prompt tuning has a long tail of diminishing returns, and past a
+   point the honest answer is that the task needs a different approach, not a better adjective.
+
+:::tip[Write the brief you would send a person]
+If a freelancer could not do the job from your prompt — because the audience, length, format
+and purpose are missing — the model cannot either. It differs from a person in that it will not
+ask, will not push back, and will hand you something confident regardless.
+:::
+
+<Quiz
+	questions={[
+		{
+			q: 'What belongs in the system prompt rather than the user message?',
+			options: [
+				'The specific question you are asking right now',
+				'Standing rules for every request: the role, the constraints, the output format',
+				'Nothing — it is an advanced feature you can ignore',
+			],
+			answer: 1,
+			explanation:
+				'The system message holds what should be true of every answer, so you write it once instead of repeating it on each request. The user message holds only the part that changes. Note that it is a strong instruction, not an enforced one.',
+		},
+		{
+			q: 'Your prompt keeps producing text that is fine but generic. What is most likely to help?',
+			options: [
+				'Adding "be creative and original" to the prompt',
+				'Adding the specifics only you know — audience, constraints, examples, words to avoid',
+				'Asking the same question several times and picking the best',
+			],
+			answer: 1,
+			explanation:
+				'Generic in, generic out: with nothing to narrow it, the answer lands in the middle of everything ever written on the subject. Adjectives like "creative" barely move it; concrete constraints and two examples move it a long way.',
+		},
+		{
+			q: 'You run the same prompt twice and get two different answers. What does that tell you?',
+			options: [
+				'The model is broken or the service is unstable',
+				'Nothing unusual — each token is drawn from a distribution, so variation is the normal behaviour',
+				'Your prompt contains a contradiction',
+			],
+			answer: 1,
+			explanation:
+				'Variation is built into how the text is produced. It also means one good result is not evidence that a prompt works — judge it over several runs, and lower the temperature when you need repeatability.',
+		},
+	]}
+/>
+
+Next: [calling a model from code](/ares_materials_estudi/ai-as-a-material/calling-a-model/).

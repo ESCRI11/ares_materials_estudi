@@ -1,0 +1,330 @@
+---
+title: Making a chart
+description: Drawing a bar chart from an array of objects onto a canvas — finding the maximum, scaling values to pixels, a baseline, labels — and what a charting library does for you afterwards.
+sidebar:
+  order: 5
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+You have an array of objects and a canvas. That is everything a bar chart needs, and this
+lesson builds one from nothing, in four steps you can run and break as you go.
+
+The point is not that you will draw charts this way for the rest of your life. The point is
+that after this, no chart is a black box.
+
+## Values are not pixels
+
+The first attempt is the one everyone writes: use the number as the height in pixels.
+
+<LiveCode
+	title="One bar per record, no scaling"
+	height={290}
+	code={`<canvas id="c" width="320" height="220" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  const data = [
+    { day: "Mon", visitors: 120 },
+    { day: "Tue", visitors: 340 },
+    { day: "Wed", visitors: 45 },
+    { day: "Thu", visitors: 210 },
+    { day: "Fri", visitors: 90 },
+  ];
+
+  ctx.fillStyle = "#1b1b1b";
+
+  for (let i = 0; i < data.length; i++) {
+    const height = data[i].visitors;
+    ctx.fillRect(10 + i * 60, 210 - height, 40, height);
+  }
+</script>`}
+/>
+
+Tuesday is 340 visitors on a canvas 220 pixels tall, so its bar starts 130 pixels above the
+top edge and the difference between Tuesday and Thursday is invisible. Nothing errors —
+canvas is happy to paint outside itself, as you saw in
+[drawing on canvas](/ares_materials_estudi/javascript/canvas-drawing/).
+
+Notice the shape of the loop, though. `210 - height` is the y-flip: y grows downwards, so a
+bar sitting on a baseline at 210 has to *start* higher up by its own height. Every chart you
+draw will contain that subtraction.
+
+## Scaling
+
+A **scale** is the conversion between the units of your data and pixels on the canvas. For a
+bar chart, one number does it: how many pixels one unit of data is worth.
+
+```js
+const scale = chartHeight / max;
+```
+
+`max` is the largest value in the dataset, so the tallest bar fills the chart exactly and
+everything else is a fraction of it. Find it with a loop rather than typing it in — the
+moment your data changes, a hand-typed maximum becomes a lie.
+
+<LiveCode
+	title="Scaled to fit"
+	height={290}
+	code={`<canvas id="c" width="320" height="220" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  const data = [
+    { day: "Mon", visitors: 120 },
+    { day: "Tue", visitors: 340 },
+    { day: "Wed", visitors: 45 },
+    { day: "Thu", visitors: 210 },
+    { day: "Fri", visitors: 90 },
+  ];
+
+  const baseline = 210;
+  const chartHeight = 200;
+
+  let max = 0;
+  for (const record of data) {
+    if (record.visitors > max) {
+      max = record.visitors;
+    }
+  }
+
+  const scale = chartHeight / max;
+
+  ctx.fillStyle = "#1b1b1b";
+
+  for (let i = 0; i < data.length; i++) {
+    const height = data[i].visitors * scale;
+    ctx.fillRect(10 + i * 60, baseline - height, 40, height);
+  }
+</script>`}
+/>
+
+Change any number in the data and press Run: the chart reshapes itself and every bar stays
+in proportion, because the scale is calculated from the data rather than guessed. Add a
+sixth record and the bars run off the right edge — the horizontal spacing is still
+hard-coded at 60 pixels, which the next step fixes.
+
+That baseline at zero is not a stylistic choice. The bar's length is the quantity, so
+starting anywhere else exaggerates every difference — the axis rule from
+[choosing a visual model](/ares_materials_estudi/data/choosing-a-visual-model/), now as a
+line of code you either write or do not.
+
+## Axis and labels
+
+An unlabelled chart is decoration. Three additions turn this one into something readable:
+space around the plot, an axis, and text.
+
+Text on canvas is one command: `ctx.fillText(text, x, y)`, drawn in whatever `ctx.font`
+holds — a CSS font shorthand such as `"11px sans-serif"`. `ctx.textAlign` decides whether
+that x is the text's left edge, centre or right edge, which is what lets you centre a label
+under a bar without measuring the string.
+
+<LiveCode
+	title="A chart you could show someone"
+	height={340}
+	code={`<canvas id="c" width="360" height="260" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  const data = [
+    { day: "Mon", visitors: 120 },
+    { day: "Tue", visitors: 340 },
+    { day: "Wed", visitors: 45 },
+    { day: "Thu", visitors: 210 },
+    { day: "Fri", visitors: 90 },
+  ];
+
+  // Layout: everything below is derived from these five numbers.
+  const width = 360;
+  const height = 260;
+  const padLeft = 40;
+  const padTop = 20;
+  const padBottom = 34;
+
+  const baseline = height - padBottom;
+  const chartHeight = baseline - padTop;
+  const slot = (width - padLeft - 10) / data.length;
+  const barWidth = slot * 0.7;
+
+  let max = 0;
+  for (const record of data) {
+    if (record.visitors > max) {
+      max = record.visitors;
+    }
+  }
+  const scale = chartHeight / max;
+
+  // The axis. The 0.5 keeps a 1px line on a pixel instead of across two.
+  ctx.strokeStyle = "#1b1b1b";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padLeft + 0.5, padTop);
+  ctx.lineTo(padLeft + 0.5, baseline + 0.5);
+  ctx.lineTo(width - 10, baseline + 0.5);
+  ctx.stroke();
+
+  ctx.font = "11px sans-serif";
+  ctx.fillStyle = "#666";
+  ctx.textAlign = "right";
+  ctx.fillText(max, padLeft - 6, padTop + 4);
+  ctx.fillText("0", padLeft - 6, baseline + 4);
+
+  for (let i = 0; i < data.length; i++) {
+    const barHeight = data[i].visitors * scale;
+    const x = padLeft + i * slot + (slot - barWidth) / 2;
+
+    ctx.fillStyle = "#1b1b1b";
+    ctx.fillRect(x, baseline - barHeight, barWidth, barHeight);
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#666";
+    ctx.fillText(data[i].day, x + barWidth / 2, baseline + 16);
+    ctx.fillText(data[i].visitors, x + barWidth / 2, baseline - barHeight - 6);
+  }
+</script>`}
+/>
+
+Every position in that snippet is calculated from the five layout numbers at the top and
+from `data.length`. Add a sixth day and the bars get narrower instead of falling off the
+edge. Change `width` and the whole thing re-lays itself. That is what makes it a chart
+rather than a drawing of a chart, and it is the same reasoning as a Figma component with
+constraints rather than a flattened frame.
+
+Two honest gaps, both normal:
+
+- The axis maximum is whatever the largest value happens to be, so the top label reads 340.
+  Real charts round that up to a friendly number — 400, with marks at 100, 200 and 300 — so
+  that the reader can estimate a bar without a label on it.
+- There is no title and no unit. `visitors per day, March 2026` belongs above the chart, and
+  a chart that travels without it will be misread.
+
+## Your turn
+
+Two changes to the snippet below, both a few lines.
+
+1. Colour the tallest bar `#ffe100` and leave the rest near-black, so the eye lands on the
+   argument. Inside the drawing loop, compare `data[i].visitors` with `max`.
+2. Draw a dashed horizontal line at the mean — the average — across the chart. Add the
+   values in a loop, divide by `data.length`, and the y for a value is
+   `baseline - value * scale`.
+
+<LiveCode
+	title="Challenge"
+	height={340}
+	code={`<canvas id="c" width="360" height="260" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  const data = [
+    { day: "Mon", visitors: 120 },
+    { day: "Tue", visitors: 340 },
+    { day: "Wed", visitors: 45 },
+    { day: "Thu", visitors: 210 },
+    { day: "Fri", visitors: 90 },
+  ];
+
+  const width = 360;
+  const height = 260;
+  const padLeft = 40;
+  const padTop = 20;
+  const padBottom = 34;
+
+  const baseline = height - padBottom;
+  const chartHeight = baseline - padTop;
+  const slot = (width - padLeft - 10) / data.length;
+  const barWidth = slot * 0.7;
+
+  let max = 0;
+  for (const record of data) {
+    if (record.visitors > max) {
+      max = record.visitors;
+    }
+  }
+  const scale = chartHeight / max;
+
+  // 2. Calculate the mean here, then draw a line at baseline - mean * scale.
+
+  ctx.font = "11px sans-serif";
+
+  for (let i = 0; i < data.length; i++) {
+    const barHeight = data[i].visitors * scale;
+    const x = padLeft + i * slot + (slot - barWidth) / 2;
+
+    ctx.fillStyle = "#1b1b1b";   // 1. Make this depend on data[i].visitors === max
+    ctx.fillRect(x, baseline - barHeight, barWidth, barHeight);
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#666";
+    ctx.fillText(data[i].day, x + barWidth / 2, baseline + 16);
+  }
+</script>`}
+/>
+
+For the dashed line, `ctx.setLineDash([4, 4])` switches dashes on before you stroke, and
+`ctx.setLineDash([])` switches them off again — a setting that stays in force, like
+`fillStyle`.
+
+## What a library does instead
+
+Nobody draws production charts this way. Real projects use a charting library — D3, Chart.js
+and Vega-Lite are the names you will hear — and hand it the data plus a description of the
+chart. The library does the maximum, the scale, the y-flip, the rounded axis, the tick
+marks, the legend, the tooltips, the redraw when the window resizes, and the accessible
+fallback. All of that is a great deal of work you are right not to repeat.
+
+So why spend an hour on the version above?
+
+Because a library gives you configuration, not comprehension. When the axis on your chart
+starts at 45 instead of 0, you have to recognise that its default picked a maximum and a
+minimum from your data — the exact decision `max` and `baseline` make here — and know which
+option to override. When the bars overflow, when a date axis puts the months in the wrong
+order, when the numbers are strings and every bar is the same height, the fix is always one
+of the steps in this lesson. Configuration you do not understand is guessing, and it is
+guessing on top of a picture that people will believe.
+
+The version underneath is also the version you can break on purpose, which is where the
+interesting work in this course usually is.
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'Why calculate max with a loop instead of typing 340?',
+			options: [
+				'Loops are faster than typing',
+				'Because the scale must follow the data — a hand-typed maximum is wrong the moment a value changes',
+				'Because JavaScript cannot store 340 accurately',
+			],
+			answer: 1,
+			explanation:
+				'Everything else in the chart is derived from the scale. Wire it to the data and the drawing stays correct through every edit; type it once and the first new record silently overflows the canvas or squashes the bars.',
+		},
+		{
+			q: 'A bar for the value 120 with a scale of 0.6 and a baseline at 210. What are the y and the height in fillRect?',
+			options: [
+				'y = 120, height = 72',
+				'y = 138, height = 72',
+				'y = 210, height = 120',
+			],
+			answer: 1,
+			explanation:
+				'The height is 120 × 0.6 = 72 pixels. Because y grows downwards, the bar starts at baseline − height = 210 − 72 = 138 and is drawn downwards to the baseline. That subtraction is in every chart you will ever write.',
+		},
+		{
+			q: 'Given that libraries do all of this better, what is the point of drawing it by hand once?',
+			options: [
+				'Libraries are too heavy for small projects',
+				'So that a library’s defaults and failures are readable to you — the axis it chose, the scale it applied, the strings it never converted to numbers',
+				'Because canvas is faster than a library',
+			],
+			answer: 1,
+			explanation:
+				'A library replaces the labour, not the understanding. Every confusing chart it produces is one of the steps in this lesson going wrong, and you can only correct what you can name.',
+		},
+	]}
+/>

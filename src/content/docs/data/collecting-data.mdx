@@ -1,0 +1,233 @@
+---
+title: Collecting data
+description: Designing a form, using open data portals and APIs, why scraping is fraught, sensors as a source, consent and anonymisation, and the collection protocol the course asks you to write.
+sidebar:
+  order: 6
+---
+
+import Quiz from '@components/Quiz.astro';
+
+Cleaning improves a dataset. Collection decides what the dataset can ever say. A field you
+did not record is not recoverable later, and no amount of analysis rescues a question that
+was asked badly — so this is the step to be slow about.
+
+Five sources, then the part that is not optional.
+
+## A form you designed on purpose
+
+A form is a table you are asking strangers to fill in, one row each. Design the table first:
+write out the fields you need, and check that each answers something in your research
+question. Then turn each field into exactly one question.
+
+- **One question, one field.** "How long did you wait, and was it acceptable?" is two
+  questions sharing a box, and the answers cannot be separated afterwards.
+- **Closed questions give you data, open questions give you meaning.** A list of options
+  produces a categorical field you can count. A text box produces a sentence you have to
+  read. Use closed questions for the things you will chart and one or two open ones for the
+  things you have not thought of.
+- **Ask for the number, not the band.** If you collect an exact age you can group it into
+  ranges later. If you collect ranges, the exact ages are gone. Group at analysis time,
+  never at collection time.
+- **Do not lead.** "How much did the new layout improve your visit?" has an answer built
+  into it. "What did you notice about the layout?" does not.
+- **Offer a way out.** No option that fits, prefer not to say, does not apply. Forcing an
+  answer manufactures data.
+- **Make almost everything optional** except the fields the study cannot work without. A
+  form that refuses to submit loses the whole response, not the missing field.
+- **Pilot it on three people** before it goes out, and watch them fill it in. Every
+  ambiguity you have stopped seeing will surface in the first ten minutes.
+
+Any form tool — Google Forms, Microsoft Forms, Typeform, LimeSurvey — exports to CSV, which
+is where the previous two lessons pick up. Check that export early rather than after the
+responses arrive: field names come out long and clumsy, and it is much easier to shorten the
+questions than to rename two hundred columns.
+
+## Open data
+
+**Open data** is data published with a licence that permits reuse, usually free and usually
+downloadable as CSV or JSON. Statistical offices, cities, transport operators, museums,
+libraries and research institutions all publish it. Switzerland has a national portal, the
+EU has one, most large cities have one, and many museums publish their entire collection
+catalogue. Search for the organisation's own site rather than trusting a link in anyone's
+lesson notes, this one included — portals move, and a dead link wastes an afternoon.
+
+Four things to check before you build on a dataset.
+
+1. **The licence.** Open means specific permissions, not "on the internet". Most require
+   attribution; some forbid commercial use. It will be stated on the download page.
+2. **The vintage.** When was it collected, not when was it uploaded. A 2019 mobility dataset
+   describes a world that no longer exists.
+3. **The documentation.** Serious datasets ship a codebook: what each field means, what the
+   codes stand for, how it was gathered, what is known to be missing. Read it before you
+   chart anything. A column called `q7_r2` means nothing without it.
+4. **The unit of observation.** One row per person, per household, per municipality, per
+   year? Averages of averages are a classic way to be confidently wrong.
+
+## APIs
+
+An **API** hands you data over the network on request, in JSON, which you already met in
+[fetching data](/ares_materials_estudi/javascript/fetching-data/). For a data project the
+mechanics are the same and three habits are added.
+
+**Read the documentation for what the fields mean**, not only for the URL. An API that
+returns `temp: 21.4` is useless until you know whether that is Celsius, an hourly average or
+an instantaneous reading.
+
+**Fetch once, save locally.** During development you will run your code hundreds of times.
+Requesting the server hundreds of times is rude, slow, and on many services will get you
+rate-limited or blocked. Fetch the data, write it to a `.json` file next to your project,
+and work from that.
+
+```js
+// Get the data once, look at it, then keep a copy in the project.
+const response = await fetch(url);
+const data = await response.json();
+console.log(JSON.stringify(data, null, 2)); // copy this into data.json
+```
+
+**Keep API keys out of the repository.** A key is a password identifying you. Committed to a
+public repository it will be found by an automated scanner within minutes, and — this is the
+part that surprises people — deleting it in a later commit does not remove it, because
+[git keeps the whole history](/ares_materials_estudi/git-and-github/what-version-control-is/).
+The key has to be revoked and replaced.
+
+## Scraping, and why to be careful
+
+**Scraping** means extracting data from web pages designed for humans — reading the HTML and
+pulling out the bits that look like values. It is the source of last resort, for four
+reasons.
+
+**Legally.** Many sites forbid it in their terms of use. The page's contents may be
+copyrighted, and in Europe a database can be protected in its own right. Whether a
+particular scrape is lawful depends on the site, the data and the country, which is a
+sentence no lesson can resolve for you.
+
+**Ethically.** If the pages contain anything about identifiable people, scraping collects
+personal data from people who never agreed to anything, at scale. The fact that something is
+publicly visible does not make it yours to compile.
+
+**Practically for the site.** A loop with no pause hits a server hundreds of times a second,
+which is indistinguishable from an attack. If you scrape at all: check for an official API or
+download first, request slowly, take only what you need, and cache locally.
+
+**Practically for you.** Scrapers break whenever the site's layout changes, which is often.
+
+The honest order is: official download, then API, then ask the organisation directly — a
+polite email explaining a student project works more often than people expect — and only
+then consider scraping.
+
+## Sensors
+
+A sensor is a data source you build yourself, and it is where this section meets Creating
+Tangible Interfaces. A board reading light, distance, sound or temperature produces a
+timestamped stream of numbers that lands in exactly the same CSV as a survey.
+[Analog sensors](/ares_materials_estudi/physical-computing/analog-sensors/) covers the
+reading, and [serial](/ares_materials_estudi/physical-computing/serial/) covers getting the
+numbers from the board into your computer.
+
+Three things that only apply to sensor data.
+
+- **Calibrate, and record the calibration.** A raw reading of 512 means nothing until you
+  know what it read in a dark room and in daylight, on that day, with that sensor.
+- **Timestamp every reading**, in ISO 8601, and note the time zone. Half of what makes
+  sensor data interesting is *when*.
+- **Choose a sampling rate deliberately.** Once a second for a week is 604,800 rows. Once a
+  minute is 10,080, and for most questions it answers the same one.
+
+## Consent and personal data
+
+Short section, firm content.
+
+**Personal data** is any data that can identify a living person, directly or in combination
+with something else. A name obviously. Also a photograph, a voice recording, an IP address,
+a phone's identifier, or a set of fields that only one person matches — the postcode, the
+job title and the year of birth together are frequently unique.
+
+**Consent** means informed, specific and freely given. The person knows what you are
+collecting, what it is for, who will see it, how long you will keep it, and that they can
+withdraw. In practice: say those things in two sentences at the top of the form, and keep a
+record that they were shown.
+
+**Anonymisation** means removing the identifying information so that no one can work out who
+a record belongs to — and the second half is the hard half. Replacing names with `P01`,
+`P02` is **pseudonymisation**: it is a good habit and it is not anonymisation, because the
+key that maps them back exists somewhere. Real anonymisation also means removing or
+coarsening the combinations that single people out.
+
+Four rules that cover most student projects:
+
+- **Collect the minimum.** Do not record a field because it might be interesting. Every
+  personal field you did not collect is one you cannot leak.
+- **Separate identities from responses.** Names and contact details in one file, responses
+  in another, joined by an id.
+- **Never commit personal data to a public repository.** The history keeps it forever, even
+  after you delete the file.
+- **When the project ends, delete what you promised to delete**, and say in the protocol that
+  you did.
+
+Switzerland's data protection act and the EU's GDPR both apply to this work, and this page
+is not legal advice. For anything involving vulnerable people, health, children or
+recordings in public space, ask your course supervisor before you start, not after.
+
+## The collection protocol
+
+The syllabus asks for *protocol documentation*, and it is a plain document that lives with
+the data — a `README.md` in the same folder, in the repository, so its own history is
+tracked. Write it while you collect, not afterwards, when you will remember the sequence of
+events wrongly.
+
+Use the checklist below as the outline of that document, and tick each line once your
+project has an honest answer to it.
+
+- [ ] The research question, written as a sentence, dated
+- [ ] Where each dataset came from — source, URL or organisation, and the date you got it
+- [ ] The licence or permission you are relying on
+- [ ] Who the participants were and how they were recruited
+- [ ] The exact wording of what you asked, kept verbatim
+- [ ] What people were told and what they consented to
+- [ ] What personal data exists, where it is stored, and when it will be deleted
+- [ ] The instrument: which sensor, which settings, which calibration, which sampling rate
+- [ ] What went wrong during collection, and what you excluded because of it
+- [ ] Every cleaning decision, from the previous lesson's log
+- [ ] What the data cannot answer — the limits you already know about
+
+That last line is the one that makes a project credible rather than merely finished.
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'Your form asks for an age range — 18–25, 26–35, 36–50 — because it looks tidier. What have you lost?',
+			options: [
+				'Nothing, ranges are what you will chart anyway',
+				'The exact ages, permanently — you can always group later, but you cannot ungroup',
+				'Only the ability to calculate the median',
+			],
+			answer: 1,
+			explanation:
+				'Collect at the finest grain you can and group at analysis time. Bands also lock you into boundaries you chose before knowing the data, and the interesting split is often somewhere else.',
+		},
+		{
+			q: 'You replace every participant name with P01, P02, P03 and call the dataset anonymised. Is it?',
+			options: [
+				'Yes, the names are gone',
+				'No — that is pseudonymisation, and combinations of remaining fields can still identify people',
+				'Yes, provided the file is not published',
+			],
+			answer: 1,
+			explanation:
+				'A key linking P01 to a name usually still exists, and even without one, a postcode plus a job title plus a year of birth frequently matches exactly one person. Anonymising also means coarsening or removing the fields that single people out.',
+		},
+		{
+			q: 'A site you need data from publishes no API. What is the right order of moves?',
+			options: [
+				'Write a scraper immediately, since the data is publicly visible',
+				'Look for an official download, then ask the organisation directly, and only then consider scraping — slowly, and never for personal data',
+				'Ask a classmate to scrape it so it is not on your account',
+			],
+			answer: 1,
+			explanation:
+				'Scraping is the last resort: it may breach the site’s terms, it collects personal data from people who never agreed, it loads someone else’s server, and it breaks when the page changes. A polite email from a student often gets you a clean export instead.',
+		},
+	]}
+/>

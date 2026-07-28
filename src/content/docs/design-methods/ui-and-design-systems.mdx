@@ -1,0 +1,150 @@
+---
+title: UI, components and the handoff to code
+description: Components, tokens and states as they exist on both sides of the handoff, and what a developer actually needs from a design file.
+sidebar:
+  order: 6
+---
+
+You can already compose an interface. This page is not about that. It is about the narrow
+gap where what you designed becomes what gets built, and about the fact that you have now
+seen the other side of that gap — the [HTML and CSS](/ares_materials_estudi/html-and-css/what-a-web-page-is/)
+section of this site was, among other things, preparation for this conversation.
+
+The single most useful thing you can carry into a project with developers: **the structures
+in your design file and the structures in the code are the same structures.** When they use
+the same names, the handoff is a translation. When they do not, it is a negotiation, every
+time, forever.
+
+## A component is a component
+
+In a design file: a reusable element with **variants** — a button in primary and secondary,
+small and large. In code: a piece of HTML with a class on it, and a block of CSS that styles
+that class. Variants become extra classes or attributes.
+
+```html
+<button class="button button--primary">Book</button>
+```
+
+Nothing about that mapping is difficult. What breaks it is naming. If your file calls it
+`Btn / Primary / Lg` and the code calls it `.button--primary`, every conversation about it
+starts with two people establishing that they mean the same object. Agree the names once,
+early, and use them in both places — including in the parts of the interface with no visual
+identity of their own, like the spacing between cards.
+
+The useful discipline is the same one code imposes: **if you have designed it twice, it is
+one component with two variants.** Three near-identical cards that differ by four pixels are
+not three designs, they are one design and two mistakes, and a developer will have to ask
+you which one is real.
+
+## Tokens are named decisions
+
+A **design token** is a name given to a single design decision — a colour, a spacing step, a
+type size, a corner radius, an animation duration — so it can be referred to rather than
+repeated.
+
+In CSS that is a custom property, and it looks like this:
+
+```css
+:root {
+	--space-3: 16px;
+	--color-ink: #1b1b1b;
+	--type-body: 16px;
+}
+
+.card {
+	padding: var(--space-3);
+	color: var(--color-ink);
+}
+```
+
+Every use points at one definition. Change the definition and everything using it moves,
+which is the whole point: the alternative is a hex code written into ninety places, eighty-six
+of which get updated when the brand changes. This site is built that way — its palette and
+type live as `--ind-*` tokens in one stylesheet, and no component contains a colour of its
+own.
+
+What makes tokens work is that they are **a scale, not a list of values you happened to
+use.** Six or eight spacing steps, a handful of type sizes, a small palette. The rule "there
+is no 13 pixels" sounds arbitrary until you watch a team implement a design where twelve
+different values appear for what was meant to be the same gap. Constraint here is not
+tidiness. It is the mechanism that makes an interface look like one interface.
+
+## States are what is usually missing
+
+Ask a developer what they most often have to invent themselves, and it is this list:
+
+**Interaction states:** default, hover, focus, active, disabled, loading.
+**Content states:** empty, one item, far too many items, error, offline, first-run.
+**Content extremes:** a name of forty characters, a missing image, a price with no decimals,
+a translation that is twice as long.
+
+Two things about that list are worth knowing precisely.
+
+**Focus is not hover.** Hover follows a pointer and does not exist on touch at all. **Focus**
+is where the keyboard currently is, and a visible focus state is what makes an interface
+usable without a mouse. In CSS these are one line each — `:hover`, `:focus-visible`,
+`:disabled` — which is exactly why leaving them out is not a saving. What looks to you like
+eight extra frames is a handful of lines to build, and a real gap in the product if nobody
+specifies them.
+
+**The empty state is a design, not an absence.** It is the first thing a new user sees, and
+it is the screen most often left as a blank rectangle in the file and shipped as a blank
+rectangle in the product.
+
+## Say the layout rule, not the coordinates
+
+Developers do not place elements at coordinates. They write rules — this row wraps, this
+column stretches, this container stops at 60 characters wide, these items sit in a grid with
+a fixed gap — and the browser computes the pixels for whatever width it finds itself in.
+That is what [flexbox](/ares_materials_estudi/html-and-css/flexbox/) and
+[responsive design](/ares_materials_estudi/html-and-css/responsive-design/) are.
+
+So the information they need from you is the rule, not the arrangement. Which element takes
+the leftover space. What wraps first when it gets narrow. What has a maximum width. What
+stays fixed. A file that shows one width and one content length forces the developer to
+invent the answer for every other case, and they will invent it at 6pm without asking.
+
+Show two or three widths, with the awkward content in them.
+
+## What to hand over
+
+- Components named the same as the code, with their variants.
+- Tokens rather than raw values — and spacing that actually lands on the scale.
+- All the states above, for anything interactive.
+- Behaviour at two or three widths, including where things wrap or reorder.
+- Real content, and the worst-case content beside it.
+- Interaction and motion notes: what triggers it, how long, and what it is meant to
+  communicate. Duration in milliseconds, not adjectives.
+- Assets in the right format — SVG for icons and logos, sensible file names, exported at the
+  size they are used.
+
+And one question to ask on day one, which will save you more than any of the above:
+**what is expensive?** Anything already in the component library is nearly free. Anything new
+is not, and a small change to something that appears in forty places is not small. Asking
+before you design is how you spend your effort where it changes the product rather than where
+it changes the estimate.
+
+:::note[Accessibility decisions are design decisions]
+Contrast between text and background, touch target size, a visible focus state, and never
+encoding meaning in colour alone. These four are decided in the design file, not in the code,
+and no developer can retrofit them without redesigning what you gave them. Everything else in
+this area is a shared responsibility; these four are yours.
+:::
+
+## Your turn
+
+Take a screen you have already designed — any project, any tool — and audit it against the
+handoff.
+
+- [ ] Every repeated element is one component with variants, not several near-copies
+- [ ] Component names in my file are names a developer could use in code
+- [ ] Every colour, spacing value and type size in the screen comes from a named scale
+- [ ] I can list my spacing scale from memory, and it has fewer than ten steps
+- [ ] Hover, focus, active, disabled and loading exist for every interactive element
+- [ ] Empty, error and loading states exist for every region that loads content
+- [ ] I have drawn it with the longest realistic name and with a missing image
+- [ ] I have said what wraps, what stretches and what has a maximum width
+- [ ] The screen exists at a narrow width as well as a wide one
+- [ ] Icons are SVG, named for what they are rather than what they look like
+- [ ] Motion is specified with a trigger and a duration in milliseconds
+- [ ] Text contrast is sufficient, and nothing relies on colour alone to carry meaning

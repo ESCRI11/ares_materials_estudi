@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/make-cheatsheet.mjs",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro build && node scripts/check-links.mjs && node scripts/check-interactive.mjs",
+    "check": "npm run build && node scripts/check-links.mjs && node scripts/check-interactive.mjs",
     "check:links": "node scripts/check-links.mjs"
   },
   "dependencies": {

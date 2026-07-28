@@ -73,6 +73,36 @@ Three formats, in order of preference:
   no sign-in — `https://wokwi.com/projects/new/micropython-pi-pico` gives a full editor,
   board and Run button inline, so physical computing exercises can be done on the page.
 
+## The cheatsheet
+
+`src/pages/cheatsheet.astro` is a two-sided A4 reference card — a plain Astro page, not a
+Starlight one, so it carries no site chrome and prints as-is.
+`scripts/make-cheatsheet.mjs` renders that same page to `dist/cheatsheet.pdf` on every
+build. One source, two outputs; if the PDF is ever missing the page still prints from a
+browser.
+
+To edit it, edit the `SHEETS` array. **Pagination is data**: each entry is one printed side,
+and you move a block between sides by moving it between arrays. Rows are
+`[code, meaning]`, or `[code, meaning, 'warn']` for the highlighter — which is the only
+colour on the card and is reserved for things that cost real time (`rm` has no undo, never
+PVC in a laser cutter).
+
+Four assertions run before the PDF is written, so a bad one is never produced:
+
+- **nothing overflows** — content that does not fit spills out of the fixed-height sheet;
+  the error names the page to cut
+- **every section folder appears** — add a section to the site and the build fails until
+  the card covers it
+- **exactly the expected fonts embed** — Arimo and IBM Plex Mono, nothing else. A glyph
+  missing from a subset makes Chromium quietly embed a third font for that one character.
+  `Ω`, `→` and `≈` are all absent from Plex Mono's latin set; use `ohm`, `->` and `~` in the
+  mono column. `↑` is fine.
+- **the page count matches** the number of sheets
+
+Each block links to the lesson it came from, so `check-links.mjs` fails if that lesson is
+renamed or deleted. That is the entire drift guard — keep the links. Do not put anything on
+the card the site does not teach.
+
 ## Screenshots
 
 `IMAGES-WANTED.md` at the repo root is the running list of images the lessons would be

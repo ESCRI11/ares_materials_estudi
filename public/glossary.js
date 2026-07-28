@@ -637,6 +637,16 @@ const GLOSSARY = {
 
 	// added from claude-code
 	gh: "GitHub\u2019s command-line tool. It lets the terminal do the things you would otherwise click on github.com \u2014 open a pull request, read issues \u2014 after a one-time gh auth login.",
+
+	// added from working-with-files
+	cat: "A command that prints a whole file to the terminal. Short for concatenate, which is a second thing it does and nobody uses it for.",
+	less: "A command for reading a long file one screen at a time. Press q to leave \u2014 the single most useful fact about it.",
+	cp: "A command that copies a file: cp original.js copy.js. Add -r to copy a whole folder.",
+	mv: "A command that moves a file, and therefore also the command that renames one \u2014 a name is just the last part of a path, so changing it is a move.",
+	rm: "A command that deletes a file, permanently. It does not use the Bin and there is no undo, which is why work you care about belongs in git.",
+	touch: "A command that creates an empty file, so you have somewhere to start typing.",
+	wildcard: "The * character, standing for \"anything here\". ls *.png lists every PNG in the folder. The shell expands it before the command runs, so check with ls before pairing it with anything destructive.",
+	man: "A command that opens the manual for another command: man cp. Uses the same reader as less, so q gets you out.",
 };
 
 const API = 'https://api.dictionaryapi.dev/api/v2/entries/en/';

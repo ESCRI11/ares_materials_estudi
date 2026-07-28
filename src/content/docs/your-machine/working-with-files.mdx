@@ -1,0 +1,204 @@
+---
+title: Working with files
+description: Reading a file without opening it, copying, renaming, deleting, and moving a hundred exports at once — plus the one command that can lose you a day.
+sidebar:
+  order: 5
+---
+
+import Quiz from '@components/Quiz.astro';
+
+You can now get to any folder. This lesson is about doing something once you are there:
+reading a file, copying it, renaming it, throwing it away. These are the commands you will
+use every single day, and one of them deserves genuine care.
+
+## Looking inside a file
+
+`cat` prints a whole file to the screen. Good for short things — a note, a config file,
+something you want to check without leaving the terminal.
+
+```bash
+cat notes.md
+```
+
+For anything long, `cat` floods the window. Use `less` instead, which shows one screen at a
+time:
+
+```bash
+less report.md
+```
+
+Arrow keys and Page Up/Down move around. **Press `q` to get out.** Nobody guesses that, and
+being stuck in `less` with no idea how to leave is a rite of passage worth skipping.
+
+Sometimes you only want the beginning or the end — the first few rows of a data file, the
+last few lines of an error log:
+
+```bash
+head sensor-data.csv        # first 10 lines
+tail sensor-data.csv        # last 10 lines
+head -n 3 sensor-data.csv   # first 3
+```
+
+## Making, copying, renaming
+
+`touch` creates an empty file:
+
+```bash
+touch sketch.js
+```
+
+`cp` copies. The first path is what you have, the second is what you want:
+
+```bash
+cp sketch.js sketch-backup.js
+cp -r images/ images-backup/    # -r for a whole folder and everything in it
+```
+
+`mv` moves a file somewhere else:
+
+```bash
+mv poster.pdf submissions/
+```
+
+And here is the surprising part: **`mv` is also how you rename.** There is no separate
+rename command. Moving a file to a new name in the same folder *is* renaming it.
+
+```bash
+mv draft.md final.md
+```
+
+That feels wrong the first time and then never again. A name is just the last part of a
+path, so changing the name is a move.
+
+## Deleting
+
+`rm` removes a file. `rm -r` removes a folder and everything inside it.
+
+```bash
+rm sketch-backup.js
+rm -r images-backup/
+```
+
+:::danger[There is no trash and no undo]
+`rm` does not put things in the Bin or the Recycle Bin. It unlinks them. There is no
+"restore", no confirmation dialogue, and no version of this that a support person can
+recover for you.
+
+Three habits that make this safe:
+
+- **Look before you delete.** Run `ls` first and read what is actually there.
+- **Never run `rm -r` on a path you did not type carefully**, and be especially careful with
+  `*` in the same line.
+- **Keep your work in git.** A committed file that you delete by accident is one command
+  away from coming back. This is the real answer, and it is why the next section of this
+  site exists.
+:::
+
+`rmdir` removes an empty folder and refuses if anything is inside it. That refusal is a
+feature — when you meant to empty a folder first, it stops you.
+
+## Doing something to many files at once
+
+`*` stands for "anything here". The shell expands it before the command runs.
+
+```bash
+ls *.png              # every PNG in this folder
+mv *.png images/      # move all of them at once
+rm *.tmp              # delete every temporary file
+```
+
+This is where the terminal starts genuinely beating the mouse. Moving two hundred exports
+into a folder is one line and no dragging.
+
+Because `*` expands before the command sees it, **check what it matches before you attach it
+to something destructive**. `ls *.png` first, then `rm *.png` if the list was what you
+expected. That two-second habit costs nothing and has saved a lot of work.
+
+## When you do not know what a command does
+
+Almost every command explains itself:
+
+```bash
+cp --help
+```
+
+For the long version, `man` opens the manual:
+
+```bash
+man cp
+```
+
+`man` uses the same viewer as `less`, so `q` gets you out of that too.
+
+## How much space is left
+
+```bash
+df -h      # free space on the whole disk
+du -sh *   # how big is each thing in this folder
+```
+
+`-h` means "human readable" — gigabytes rather than a count of blocks. `du -sh *` is how
+you find the folder quietly eating 40 GB, which on a laptop full of 3D prints and video
+happens sooner than you would think.
+
+## Getting back to the graphical world
+
+You do not have to choose. To open the folder you are standing in:
+
+```bash
+open .              # macOS
+explorer.exe .      # Windows, from inside WSL2
+```
+
+`.` means "here", which you met in
+[files and paths](/ares_materials_estudi/your-machine/files-and-paths/).
+
+## Do this on your machine
+
+- [ ] I made a file with `touch`, then printed it with `cat`
+- [ ] I copied it with `cp` and gave the copy a different name
+- [ ] I renamed something with `mv` and understood why there is no rename command
+- [ ] I opened a long file with `less` and got out again with `q`
+- [ ] I ran `ls *.png` in a folder with images before running anything destructive
+- [ ] I deleted a file I created on purpose, and I know it did not go to the Bin
+- [ ] I ran `df -h` and know how much space I have left
+- [ ] I opened my current folder in Finder or Explorer from the terminal
+
+<Quiz
+	title="Check yourself"
+	questions={[
+		{
+			q: 'How do you rename a file from the terminal?',
+			options: [
+				'rename old.md new.md',
+				'mv old.md new.md',
+				'cp old.md new.md, then delete the original',
+			],
+			answer: 1,
+			explanation:
+				'There is no rename command. A name is the last part of a path, so moving a file to a new name in the same folder is exactly what renaming is. Copying then deleting also works but does more, and leaves you a step where the file exists twice.',
+		},
+		{
+			q: 'You run rm portfolio.pdf and immediately realise you needed it. Where is it?',
+			options: [
+				'In the Bin, until you empty it',
+				'Recoverable with an undo command',
+				'Gone, unless it was committed to git or backed up',
+			],
+			answer: 2,
+			explanation:
+				'rm does not use the Bin and there is no undo. This is the reason to keep work in git — a committed file is one command away from returning. Without that, deleted means deleted.',
+		},
+		{
+			q: 'You are about to run rm *.png in a folder you are not sure about. What is the cheap safety check?',
+			options: [
+				'Run ls *.png first and read the list',
+				'Run rm -r *.png instead, which is more careful',
+				'There is no way to check — type it carefully',
+			],
+			answer: 0,
+			explanation:
+				'The shell expands the * before the command runs, so ls *.png shows you the exact list rm would act on. Two seconds, no risk. And -r is the opposite of careful: it adds folders and their contents to what gets removed.',
+		},
+	]}
+/>

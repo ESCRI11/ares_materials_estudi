@@ -1,0 +1,640 @@
+---
+/*
+ * The printed reference card. This is a plain Astro page, NOT a Starlight one, so it
+ * arrives with no header, sidebar or table of contents to fight — which is what makes it
+ * printable. scripts/make-cheatsheet.mjs renders this exact page to dist/cheatsheet.pdf.
+ *
+ * Pagination is data, not flow: each entry of SHEETS is one printed side. To move a block
+ * to the other side, move it between the arrays. The build asserts nothing overflows.
+ *
+ * Every block carries the slug of the lesson it came from and renders as a link, so
+ * scripts/check-links.mjs fails the build if that lesson is ever renamed or deleted. That
+ * is the whole drift guard — keep the links.
+ */
+import '../styles/custom.css';
+
+/** [code, meaning] — or [code, meaning, 'warn'] to mark it with the highlighter. */
+const SHEETS = [
+	[
+		{
+			title: 'Terminal',
+			slug: 'your-machine/moving-around',
+			rows: [
+				['pwd', 'where am I'],
+				['ls · ls -l · ls -a', 'list · with detail · include hidden'],
+				['cd folder · cd ..', 'go in · go up one'],
+				['cd ~', 'home, from anywhere'],
+				['mkdir name', 'make a folder'],
+				['Tab', 'complete the name — the habit that matters'],
+				['↑', 'the command you ran last'],
+				['Ctrl + C', 'stop whatever is running'],
+				['cd "two words"', 'quote anything with a space'],
+				['', 'silence means it worked'],
+			],
+		},
+		{
+			title: 'Files',
+			slug: 'your-machine/working-with-files',
+			rows: [
+				['cat file', 'print a short file'],
+				['less file', 'read a long one — q to leave'],
+				['head · tail', 'first · last 10 lines'],
+				['touch file', 'make an empty file'],
+				['cp a b · cp -r a/ b/', 'copy a file · a folder'],
+				['mv a b', 'move — and therefore rename'],
+				['rm file · rm -r folder', 'delete. No Bin. No undo.', 'warn'],
+				['ls *.png', 'check what * matches before deleting', 'warn'],
+				['mv *.png images/', 'move every match at once'],
+				['cmd --help · man cmd', 'what does this do'],
+				['df -h · du -sh *', 'free space · size of each thing here'],
+				['open . · explorer.exe .', 'open here in Finder · Explorer'],
+			],
+		},
+		{
+			title: 'WSL2',
+			slug: 'your-machine/wsl2',
+			rows: [
+				['wsl --install', 'in an Administrator PowerShell'],
+				['/mnt/c/Users/you', 'your Windows drive, from Linux'],
+				['~', 'your Linux home — keep projects here'],
+				['\\\\wsl$\\Ubuntu', 'your Linux files, from Explorer'],
+			],
+		},
+		{
+			title: 'Installing',
+			slug: 'your-machine/installing-software',
+			rows: [
+				['sudo apt update', 'refresh the catalogue first'],
+				['sudo apt install git', 'Windows, inside WSL2'],
+				['brew install git', 'macOS'],
+				['brew install --cask figma', 'macOS, for apps with windows'],
+			],
+		},
+		{
+			title: 'Git',
+			slug: 'git-and-github/your-first-repository',
+			rows: [
+				['git config --global user.name "…"', 'once, ever — and user.email'],
+				['git init', 'start tracking this folder'],
+				['git status', 'look before you commit'],
+				['git add . · git add file', 'stage everything · one thing'],
+				['git commit -m "Describe it"', 'save a snapshot'],
+				['git log --oneline', 'the history, briefly'],
+				['', 'folder → add → staging → commit → history'],
+			],
+		},
+		{
+			title: 'GitHub',
+			slug: 'git-and-github/github',
+			rows: [
+				['git remote add origin <url>', 'point at the copy on GitHub'],
+				['git push -u origin main', '-u only the first time'],
+				['git push · git pull', 'send · fetch'],
+				['git clone <url>', 'get someone else’s'],
+				['', 'a password will not work — token or browser', 'warn'],
+			],
+		},
+		{
+			title: 'Branches',
+			slug: 'git-and-github/branches-and-pull-requests',
+			rows: [
+				['git switch -c name', 'make one and move to it'],
+				['git branch', 'list them, star is you'],
+				['git switch main', 'go back'],
+				['git merge name', 'bring the work in'],
+				['git branch -d name', 'tidy up after merging'],
+			],
+		},
+		{
+			title: 'Markdown',
+			slug: 'git-and-github/markdown',
+			rows: [
+				['# · ## · ###', 'heading levels'],
+				['**bold** · *italic*', ''],
+				['- item · 1. item', 'bullet · numbered'],
+				['[text](url)', 'link'],
+				['![alt](path)', 'image'],
+				['`code` · ``` fence ```', 'inline · block'],
+				['- [ ] · - [x]', 'task list'],
+			],
+		},
+		{
+			title: 'HTML',
+			slug: 'html-and-css/html-elements',
+			rows: [
+				['<!doctype html>', 'first line, always'],
+				['<html lang="en">', 'then head, then body'],
+				['<meta charset="utf-8">', 'in the head'],
+				['<meta name="viewport" …>', 'width=device-width, initial-scale=1'],
+				['<link rel="stylesheet" href="…">', 'attach the CSS'],
+				['<img src="…" alt="…">', 'no closing tag'],
+				['', 'close in the reverse order you opened'],
+				['', 'h1–h6 for hierarchy, never for size'],
+			],
+		},
+		{
+			title: 'CSS',
+			slug: 'html-and-css/css-selectors',
+			rows: [
+				['p { } · .card { } · #id { }', 'element · class · id'],
+				['', 'wins: inline > id > class > element'],
+				['', 'then: later beats earlier'],
+				['line-height: 1.5', 'no unit — it multiplies'],
+				['font-weight: 400 · 700', 'regular · bold'],
+				['rgb(27 27 27 / 50%)', 'colour with transparency'],
+			],
+		},
+		{
+			title: 'Box model',
+			slug: 'html-and-css/the-box-model',
+			rows: [
+				['', 'content → padding → border → margin'],
+				['padding: 10px 20px', 'top-bottom, left-right'],
+				['padding: 10px 20px 30px 40px', 'clockwise from the top'],
+				['* { box-sizing: border-box }', 'why your 300px box was 342px'],
+				['', 'inline ignores width and vertical margin'],
+				['', 'vertical margins collapse: 30 + 20 = 30'],
+			],
+		},
+		{
+			title: 'Flexbox',
+			slug: 'html-and-css/flexbox',
+			rows: [
+				['display: flex', 'on the container'],
+				['gap: 1rem', 'reach for this first'],
+				['flex-direction: row | column', 'this picks the main axis'],
+				['justify-content', 'along the main axis'],
+				['align-items', 'across it'],
+				['', 'those two swap when direction changes', 'warn'],
+				['flex-grow: 1', 'on an item, not the container'],
+				['flex-wrap: wrap', 'or they squeeze instead'],
+			],
+		},
+		{
+			title: 'Units & responsive',
+			slug: 'html-and-css/responsive-design',
+			rows: [
+				['rem', 'root size, normally 16px'],
+				['em · % · ch · vw', 'own size · parent · characters · viewport'],
+				['img { max-width: 100%; height: auto }', ''],
+				['@media (min-width: 40rem) { }', 'mobile first — min, not max'],
+			],
+		},
+		{
+			title: 'Research & UX',
+			slug: 'design-methods/from-findings-to-insights',
+			rows: [
+				['observation', 'one participant, one moment'],
+				['finding', 'a pattern across participants'],
+				['insight', 'explains it, and changes a decision'],
+				['user flow', 'where do people drop out'],
+				['journey map', 'where to intervene over time'],
+				['service blueprint', 'who owns the broken step'],
+				['', 'diverge, converge, diverge, converge'],
+				['', 'focus is not hover — touch has no hover', 'warn'],
+			],
+		},
+	],
+	[
+		{
+			title: 'JavaScript',
+			slug: 'javascript/variables',
+			rows: [
+				['const x = 5', 'first choice, every time'],
+				['let x = 5', 'only when it must change'],
+				['', 'never var'],
+				['"16" vs 16', 'string vs number — the early bug', 'warn'],
+				['typeof x', 'when something behaves oddly'],
+				['`${name} is ${age}`', 'backtick, key left of 1'],
+				['if / else if / else', ''],
+				['=== · !==', 'not == — "16" == 16 is true', 'warn'],
+				['falsy:', 'false 0 "" null undefined NaN'],
+				['&& · || · !', 'and · or · not'],
+				['for (let i = 0; i < 5; i++)', 'runs 5 times; <= runs 6'],
+				['for (const c of list)', 'each item in turn'],
+				['function f(a) { return a }', ''],
+				['const f = (a) => a * 2', 'arrow form'],
+				['list[0] · list.length · list.push(x)', ''],
+				['obj.key · Object.keys(obj)', ''],
+			],
+		},
+		{
+			title: 'DOM & events',
+			slug: 'javascript/the-dom',
+			rows: [
+				['querySelector("#id")', 'first match only'],
+				['querySelectorAll(".c")', 'all of them, loop with for…of'],
+				['el.textContent = "…"', 'change the text'],
+				['el.classList.add("on")', 'prefer this over el.style'],
+				['createElement · append', 'build and attach'],
+				['', 'the script must run after the elements exist', 'warn'],
+				['el.addEventListener("click", fn)', 'fn, not fn() — the classic slip', 'warn'],
+				['event.target · .key · .offsetX', ''],
+				['click · input · keydown · pointerdown', 'pointerdown for drawing'],
+			],
+		},
+		{
+			title: 'Canvas',
+			slug: 'javascript/canvas-drawing',
+			rows: [
+				['getContext("2d")', 'the object you draw with'],
+				['', 'y grows downward', 'warn'],
+				['fillRect(x, y, w, h)', 'x,y is the top-left corner'],
+				['beginPath() … fill() / stroke()', 'arcs and paths need it'],
+				['arc(x, y, r, 0, Math.PI * 2)', 'a full circle'],
+				['fillStyle · strokeStyle · lineWidth', ''],
+				['requestAnimationFrame(draw)', 'clear → change → draw → repeat'],
+				['', 'canvas is paint, not objects — redraw'],
+			],
+		},
+		{
+			title: 'When it breaks',
+			slug: 'javascript/when-it-breaks',
+			rows: [
+				['SyntaxError: Unexpected token', 'a bracket or quote missing above'],
+				['ReferenceError: x is not defined', 'spelling, or wrong braces'],
+				['Cannot read properties of null', 'querySelector matched nothing'],
+				['x is not a function', 'misspelled method name'],
+				['nothing happens, no error', 'wrong element, event, or never called'],
+				['', 'change one thing at a time'],
+				['', 'search the message, not your situation'],
+				['', 'stop after forty minutes'],
+			],
+		},
+		{
+			title: 'MicroPython',
+			slug: 'physical-computing/from-javascript-to-micropython',
+			rows: [
+				['print(x)', 'was console.log'],
+				['#', 'was //'],
+				['True · False · None', 'capitals; was null/undefined'],
+				['and · or · not', 'was && || !'],
+				['== · !=', 'was === !=='],
+				['len(list) · list.append(x)', 'was .length · .push'],
+				['f"total: {n}"', 'was a template literal'],
+				['def f():', 'was function f() {'],
+				['elif', 'was else if'],
+				['for i in range(n):', ''],
+				['', 'four spaces per level — indentation IS the syntax', 'warn'],
+			],
+		},
+		{
+			title: 'Pins & sensors',
+			slug: 'physical-computing/analog-sensors',
+			rows: [
+				['from machine import Pin', 'and import time'],
+				['Pin(15, Pin.OUT)', '.value(1) · .on() · .toggle()'],
+				['Pin(14, Pin.IN, Pin.PULL_UP)', 'no external resistor needed'],
+				['', 'pull-up: released 1, pressed 0', 'warn'],
+				['ADC(Pin(26)).read_u16()', 'always 0–65535, whatever the chip'],
+				['', 'ADC pins vary by board — check the pinout', 'warn'],
+				['PWM(Pin(15))', '.freq(1000) · .duty_u16(0–65535)'],
+				['', 'servo wants 50 Hz, ~500–2500 µs — tune it'],
+				['time.sleep(0.5)', 'seconds · sleep_ms() for milliseconds'],
+				['while True:', 'the forever loop'],
+			],
+		},
+		{
+			title: 'Electricity',
+			slug: 'physical-computing/electricity-for-designers',
+			rows: [
+				['V = I × R', 'so I = V / R'],
+				['220 ohm', 'the practical LED resistor'],
+				['', 'a small LED wants roughly 5–20 mA'],
+				['', 'every GND is the same point'],
+				['', '5 V into a 3.3 V pin destroys the chip', 'warn'],
+				['', 'breadboard: columns of five, split down the middle'],
+				['', 'motors need a driver, not a pin', 'warn'],
+			],
+		},
+		{
+			title: 'Serial',
+			slug: 'physical-computing/serial',
+			rows: [
+				['115200', 'the usual baud rate'],
+				['print(…)', 'appears in the serial monitor'],
+				['input("prompt: ")', 'read what you type back'],
+				['Ctrl + C', 'stop the program, get >>>'],
+			],
+		},
+		{
+			title: 'Fabrication',
+			slug: 'digital-fabrication/designing-for-3d-printing',
+			rows: [
+				['model -> STL/3MF -> slicer -> gcode', '3D printing'],
+				['sketch -> DXF/SVG -> lab software', 'laser cutting'],
+				['0.1–0.3 mm', 'layer height; 0.2 typical'],
+				['10–20%', 'infill; more walls beats more infill'],
+				['45°', 'the overhang limit from vertical'],
+				['0.3–0.5 mm · 0.1–0.2 mm', 'loose fit · press fit, roughly'],
+				['kerf ~0.1–0.3 mm', 'a starting point, not a fact', 'warn'],
+				['', 'holes come out big, tabs come out small'],
+				['', 'never PVC or anything chlorinated in a laser', 'warn'],
+				['', 'one thickness per job, no undercuts'],
+			],
+		},
+		{
+			title: 'Data',
+			slug: 'data/spreadsheets-csv-json',
+			rows: [
+				['', 'one row per observation'],
+				['', 'one column per variable'],
+				['', 'one header row, short names, no units in them'],
+				['', 'nothing else below it — no totals, no notes'],
+				['ISO 8601', '2026-04-03, because 03/04 is ambiguous'],
+				['', 'never edit the raw file; keep a cleaning log'],
+				['comparison -> bar', 'composition -> stacked bar'],
+				['distribution -> histogram', 'relationship -> scatter'],
+				['over time -> line', 'bar charts start at zero', 'warn'],
+				['', 'position beats length beats angle beats colour'],
+				['', 'never let hue be the only difference', 'warn'],
+			],
+		},
+		{
+			title: 'Language models',
+			slug: 'ai-as-a-material/calling-a-model',
+			rows: [
+				['', 'never commit a key; never in front-end JS', 'warn'],
+				['401 · 403', 'key missing, wrong, or not permitted'],
+				['429', 'rate limit — wait, retry slower'],
+				['5xx', 'their problem — retry after a pause'],
+				['', '≈ ¾ of a word per token'],
+				['', 'output costs more than input'],
+				['', 'you resend the whole history every turn'],
+				['temperature 0', 'repeatable, not correct', 'warn'],
+				['invents:', 'citations, URLs, function names, dates', 'warn'],
+			],
+		},
+		{
+			title: 'Claude Code',
+			slug: 'claude-code/permissions',
+			rows: [
+				['claude', 'in the project folder'],
+				['claude --continue', 'resume the last session here'],
+				['/help · /init · /clear · /context', ''],
+				['@src/file.js', 'point at a file'],
+				['Shift + Tab', 'cycle to plan mode — changes nothing'],
+				['Esc · Esc Esc', 'interrupt · undo'],
+				['', 'reads run; anything that changes asks first'],
+				['free:', 'git status, log, diff, branch'],
+				['asks:', 'git commit, push, pull, switch, merge'],
+				['gh auth login', 'needed once before it can open a PR'],
+				['', 'never trust it on security or accessibility', 'warn'],
+			],
+		},
+	],
+];
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Cheatsheet — InD Prep</title>
+		<meta
+			name="description"
+			content="A two-page printable reference card for the technical material of the MA SUPSI in Interaction Design."
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		{/* Arimo is Arial-metric, which is what the site falls back to on most machines.
+		    IBM Plex Mono 500 is exactly the face the syllabus embeds. */}
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+		/>
+	</head>
+	<body>
+		<p class="screen-only">
+			Two pages, made to be printed double-sided on one A4 sheet.
+			{/* check-links.mjs has no `pdf` in its ASSET regex, so it validates this as a page —
+			    meaning the build fails if the PDF is missing. Do not "fix" that regex. */}
+			<a href="/ares_materials_estudi/cheatsheet.pdf">Download the PDF</a>, or print this page
+			directly. <a href="/ares_materials_estudi/">Back to the site</a>.
+		</p>
+
+		{
+			SHEETS.map((blocks, sheet) => (
+				<section class="sheet">
+					<span class="mark tl" /><span class="mark tr" />
+					<span class="mark bl" /><span class="mark br" />
+
+					{sheet === 0 && (
+						<header class="masthead">
+							<h1>Interaction Design — technical cheatsheet</h1>
+							<p>
+								Everything on this card is taught in full at
+								escri11.github.io/ares_materials_estudi
+							</p>
+						</header>
+					)}
+
+					<div class="cols">
+						{blocks.map((block) => (
+							<div class="block" data-section={block.slug.split('/')[0]}>
+								<h2>
+									<a href={`/ares_materials_estudi/${block.slug}/`}>{block.title}</a>
+								</h2>
+								<dl>
+									{block.rows.map(([code, meaning, flag]) => (
+										<div class:list={['row', flag]}>
+											<dt>{code}</dt>
+											<dd>{meaning}</dd>
+										</div>
+									))}
+								</dl>
+							</div>
+						))}
+					</div>
+
+					<span class="folio">p.{String(sheet + 1).padStart(2, '0')}</span>
+				</section>
+			))
+		}
+	</body>
+</html>
+
+<style is:global>
+	@page {
+		size: A4;
+		margin: 0;
+	}
+
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+		background: #d8d8d8;
+	}
+
+	.screen-only {
+		max-width: 210mm;
+		margin: 0 auto;
+		padding: 1rem 12mm;
+		font-family: Arimo, Arial, sans-serif;
+		font-size: 0.9rem;
+	}
+
+	/*
+	 * A fixed-size sheet rather than flowed pagination: a page break can then only ever
+	 * fall between sheets, so a block physically cannot be split across pages.
+	 * 296.8mm, not 297 — at exactly 297 Chromium rounds up and emits a blank trailing page.
+	 */
+	.sheet {
+		position: relative;
+		width: 210mm;
+		height: 296.8mm;
+		box-sizing: border-box;
+		padding: 13mm 11mm 15mm;
+		margin: 0 auto 8mm;
+		background: #fff;
+		color: var(--ind-black);
+		font-family: Arimo, Arial, sans-serif;
+		font-size: 8pt;
+		line-height: 1.32;
+		break-after: page;
+		print-color-adjust: exact;
+		-webkit-print-color-adjust: exact;
+	}
+
+	.sheet:last-of-type {
+		break-after: auto;
+	}
+
+	.masthead {
+		margin: 0 0 3mm;
+		padding-bottom: 2mm;
+		border-bottom: 0.4pt solid var(--ind-black);
+	}
+
+	.masthead h1 {
+		margin: 0;
+		font-size: 13pt;
+		font-weight: 700;
+		letter-spacing: -0.01em;
+	}
+
+	.masthead p {
+		margin: 0.6mm 0 0;
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 6pt;
+		color: #555;
+	}
+
+	.cols {
+		columns: 3;
+		column-gap: 5mm;
+		column-rule: 0.25pt solid var(--ind-light-gray);
+	}
+
+	.block {
+		break-inside: avoid;
+		margin: 0 0 3.4mm;
+	}
+
+	/* The syllabus's signature device: a tight inverted block behind a short label. */
+	.block h2 {
+		display: inline-block;
+		margin: 0 0 1.2mm;
+		padding: 0.4mm 1.2mm;
+		background: var(--ind-black);
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 6.9pt;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+	}
+
+	.block h2 a {
+		color: #fff;
+		text-decoration: none;
+	}
+
+	dl {
+		margin: 0;
+	}
+
+	.row {
+		display: flex;
+		gap: 1.5mm;
+		padding: 0.35mm 0;
+		align-items: baseline;
+	}
+
+	dt {
+		flex: 0 0 auto;
+		max-width: 62%;
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 7pt;
+		font-weight: 500;
+		overflow-wrap: anywhere;
+	}
+
+	dd {
+		flex: 1;
+		margin: 0;
+		color: #333;
+	}
+
+	/* The only colour on the card. Reserved for things that cost you real time. */
+	.row.warn dd {
+		background: var(--ind-marker);
+		color: var(--ind-black);
+		padding: 0 0.8mm;
+	}
+
+	.folio {
+		position: absolute;
+		right: 11mm;
+		bottom: 8mm;
+		padding: 0.4mm 1.2mm;
+		background: var(--ind-black);
+		color: #fff;
+		font-family: 'IBM Plex Mono', monospace;
+		font-size: 6.4pt;
+		font-weight: 500;
+	}
+
+	/* Inset from the trim, not on it — home print dialogues shrink a margin-0 A4. */
+	.mark {
+		position: absolute;
+		width: 3mm;
+		height: 3mm;
+	}
+	.mark.tl {
+		top: 6mm;
+		left: 6mm;
+		border-top: 0.25pt solid #999;
+		border-left: 0.25pt solid #999;
+	}
+	.mark.tr {
+		top: 6mm;
+		right: 6mm;
+		border-top: 0.25pt solid #999;
+		border-right: 0.25pt solid #999;
+	}
+	.mark.bl {
+		bottom: 6mm;
+		left: 6mm;
+		border-bottom: 0.25pt solid #999;
+		border-left: 0.25pt solid #999;
+	}
+	.mark.br {
+		bottom: 6mm;
+		right: 6mm;
+		border-bottom: 0.25pt solid #999;
+		border-right: 0.25pt solid #999;
+	}
+
+	@media print {
+		html,
+		body {
+			background: #fff;
+		}
+		.screen-only {
+			display: none;
+		}
+		.sheet {
+			margin: 0;
+		}
+	}
+</style>

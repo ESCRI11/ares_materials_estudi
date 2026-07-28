@@ -69,6 +69,29 @@ Three formats, in order of preference:
 **Do not build an in-page code sandbox** (CodeMirror + live preview). It was considered and
 deliberately deferred. Revisit only if the p5 embed proves inadequate.
 
+## The glossary
+
+Selecting a word in a lesson opens a definition panel (`public/glossary.js`). It checks our
+own `GLOSSARY` object first and only falls through to dictionaryapi.dev for ordinary English.
+
+**When you define a term in a lesson, add it to `GLOSSARY` in the same edit.** This is not
+optional busywork — a general dictionary defines *terminal* as part of an airport, *library*
+as a building full of books and *breadboard* as something you cut bread on. Every technical
+term left out of the glossary gets a confidently wrong answer, which is worse than none.
+
+Entries are one or two sentences in the same voice as the lessons. Add the abbreviation or
+plural as its own key when people use both. Multi-word keys work; the dictionary fallback
+is single-word only.
+
+## Verifying
+
+`npm run build` catches broken links, bad frontmatter and malformed props. It cannot catch
+anything that only happens in a browser, so `npm run check` drives a real one over the quiz,
+the checklist and the glossary. Run it after touching `src/components/` or `public/`.
+
+It needs a browser: `npx playwright install chromium`, or set `CHROMIUM_PATH` to a system
+one. The check stubs the dictionary API, so it does not depend on that service being up.
+
 ## Visual identity
 
 Taken from the syllabus PDF and maind.supsi.ch, which share one system:

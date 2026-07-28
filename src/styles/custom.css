@@ -187,6 +187,41 @@ h1 {
 	line-height: 1.45;
 }
 
+/* --- Select-a-word definitions (public/glossary.js) ----------------------- */
+
+.ind-define {
+	position: absolute;
+	z-index: 100;
+	max-width: min(24rem, calc(100vw - 2rem));
+	padding: 0.75rem 0.9rem;
+	background: var(--sl-color-black);
+	border: 1px solid var(--sl-color-white);
+	color: var(--sl-color-white);
+	font-size: var(--sl-text-sm);
+	line-height: 1.5;
+}
+
+.ind-define-term {
+	margin: 0 0 0.4rem;
+	display: inline-block;
+	padding: 0.1em 0.3em;
+	background: var(--ind-marker);
+	color: var(--ind-black);
+	font-family: var(--sl-font-mono);
+	font-size: var(--sl-text-xs);
+}
+
+.ind-define-body {
+	margin: 0;
+}
+
+.ind-define-source {
+	margin: 0.5rem 0 0;
+	font-family: var(--sl-font-mono);
+	font-size: var(--sl-text-xs);
+	color: var(--sl-color-gray-3);
+}
+
 /* --- Self-check task lists ------------------------------------------------ */
 
 .sl-markdown-content ul:has(> li > input[type='checkbox']) {

@@ -20,12 +20,14 @@ addEventListener('DOMContentLoaded', () => {
 });
 `;
 
+// Project page deploy: both `site` and `base` are required, or assets 404 in
+// production while working fine on localhost.
+const base = '/ares_materials_estudi';
+
 // https://astro.build/config
 export default defineConfig({
-	// Project page deploy: both of these are required, or assets 404 in production
-	// while working fine on localhost.
 	site: 'https://escri11.github.io',
-	base: '/ares_materials_estudi',
+	base,
 	integrations: [
 		starlight({
 			title: 'InD Prep',
@@ -48,6 +50,9 @@ export default defineConfig({
 					},
 				},
 				{ tag: 'script', content: checklistScript },
+				// Select-a-word definitions. Lives in public/ because it has to run on
+				// every page and Starlight has no global component slot.
+				{ tag: 'script', attrs: { src: `${base}/glossary.js`, defer: true } },
 			],
 			social: [
 				{

@@ -20,7 +20,10 @@ interface Props {
 const { code, title = 'Try it', height = 260 } = Astro.props;
 ---
 
-<live-code data-height={height}>
+{/* not-content opts every descendant out of Starlight's markdown spacing, which
+    otherwise adds a top margin to any two adjacent siblings — including the Run
+    and Reset buttons, which then sit at different heights. */}
+<live-code class="not-content" data-height={height}>
 	<p class="live-title">{title}</p>
 	<div class="live-editor">
 		<pre class="live-highlight" aria-hidden="true"><code></code></pre>

@@ -16,7 +16,9 @@ interface Props {
 const { questions, title = 'Check yourself' } = Astro.props;
 ---
 
-<quiz-block data-total={questions.length}>
+{/* not-content keeps Starlight's markdown spacing out of the option list — it
+    adds a top margin between adjacent siblings, which fights the flex gap. */}
+<quiz-block class="not-content" data-total={questions.length}>
 	<h3 class="quiz-title">{title}</h3>
 	{
 		questions.map((question) => (

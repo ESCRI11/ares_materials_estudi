@@ -20,7 +20,7 @@ const { src, title, height = 680, href = src } = Astro.props;
 {/* The height goes through a custom property because Starlight's markdown CSS
     sets `iframe { height: auto }`, which beats the HTML height attribute and
     collapses the frame to ~150px. */}
-<figure class="embed" style={`--embed-height: ${height}px`}>
+<figure class="embed not-content" style={`--embed-height: ${height}px`}>
 	<iframe {src} {title} loading="lazy" allow="fullscreen"></iframe>
 	<figcaption>
 		<a {href} target="_blank" rel="noopener">Open “{title}” in a new tab →</a>
@@ -42,5 +42,18 @@ const { src, title, height = 680, href = src } = Astro.props;
 	.embed figcaption {
 		margin-top: 0.5rem;
 		font-size: var(--sl-text-sm);
+	}
+
+	/* not-content also opts the caption out of prose link styling, so restate it. */
+	.embed figcaption a {
+		color: inherit;
+		text-decoration: underline;
+		text-underline-offset: 0.22em;
+	}
+
+	.embed figcaption a:hover {
+		background: var(--ind-marker);
+		color: var(--ind-black);
+		text-decoration-color: transparent;
 	}
 </style>

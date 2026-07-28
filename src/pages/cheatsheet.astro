@@ -401,10 +401,20 @@ const SHEETS = [
 		    which is the fallback the site itself names; Plex Mono Medium is the face the
 		    syllabus embeds. See public/fonts/README.md for licences. */}
 		<style is:inline>
+			/* Two discrete weights, not a `font-weight: 400 700` range. A range descriptor
+			   that the browser rejects invalidates the whole rule, and the family then
+			   falls back silently — which is what happened on the CI runner, where
+			   fontconfig quietly aliases Arimo to Liberation Sans. */
 			@font-face {
 				font-family: 'Arimo';
 				src: url('/ares_materials_estudi/fonts/arimo.woff2') format('woff2');
-				font-weight: 400 700;
+				font-weight: 400;
+				font-display: block;
+			}
+			@font-face {
+				font-family: 'Arimo';
+				src: url('/ares_materials_estudi/fonts/arimo.woff2') format('woff2');
+				font-weight: 700;
 				font-display: block;
 			}
 			@font-face {

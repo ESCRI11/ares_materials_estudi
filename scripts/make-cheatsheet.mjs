@@ -48,8 +48,14 @@ try {
 
 	// A failed webfont must be fatal. This machine resolves "IBM Plex Mono" to Noto Sans —
 	// a proportional face — so a silent substitution looks subtly wrong rather than broken.
+	// requestfailed covers network-level failures only — a 404 is a *successful* request
+	// with an error status, so watch responses too. A missing font file 404s silently and
+	// the page then falls back to whatever fontconfig offers.
 	const failed = [];
-	page.on('requestfailed', (r) => failed.push(r.url()));
+	page.on('requestfailed', (r) => failed.push(`${r.url()} (no response)`));
+	page.on('response', (r) => {
+		if (r.status() >= 400) failed.push(`${r.url()} (HTTP ${r.status()})`);
+	});
 
 	await page.goto(PAGE, { waitUntil: 'networkidle' });
 	await page.evaluate(() => document.fonts.ready);

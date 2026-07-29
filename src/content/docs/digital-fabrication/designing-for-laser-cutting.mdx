@@ -29,8 +29,9 @@ How you signal the difference is **not standard**. Common conventions:
 
 - **By line colour** — pure red means cut, blue means score, black means engrave, with the
   mapping set up in the machine's driver.
-- **By line width** — a hairline or 0.001 mm stroke means cut, anything thicker gets
-  engraved.
+- **By line width** — a *hairline* stroke means cut, anything thicker gets engraved. Software
+  that has no hairline setting usually wants **0.001 inch** (about 0.025 mm), which is the
+  same convention written as a number.
 
 Which one applies depends on the machine and its software, and getting it wrong means either
 a scorched sheet or a part that never separates. **Ask Fablab SUPSI for their convention and
@@ -55,8 +56,13 @@ Because the beam is centred on your line, half a kerf comes off each side of it.
   arriving at maybe 10.2 mm.
 - **Parts come out smaller than drawn.** A 10 mm tab loses material from its outside edge,
   arriving at maybe 9.8 mm.
-- **Therefore a press-fit joint comes out loose**, by a whole kerf, because both errors work
-  in the same direction. A tab drawn exactly the width of its slot will rattle.
+- **Therefore a press-fit joint comes out loose by two kerfs**, because the two errors add.
+  The slot gained a kerf and the tab lost one: 10.2 mm of hole around 9.8 mm of tab is 0.4 mm
+  of slack. A tab drawn exactly the width of its slot will rattle.
+
+That factor of two is the one to remember. Compensating by a single kerf halves the gap and
+leaves you with a joint that still moves, which feels like bad luck rather than arithmetic.
+Either take a whole kerf off the slot *and* add one to the tab, or take two off one of them.
 
 Kerf on a typical CO2 laser is somewhere around **0.1–0.3 mm**, and it changes with the
 material, the thickness, the power and how well the lens was cleaned this morning. Treat any
@@ -176,19 +182,19 @@ you do not want to breathe.
 		{
 			q: 'You draw a 3 mm slot and a 3 mm tab, cut both from the same sheet, and the joint is loose. Why?',
 			options: [
-				'The material was thinner than labelled',
-				'The kerf removed material from both parts, widening the slot and narrowing the tab',
-				'The laser was out of focus',
+				'The plywood was thinner than the label claimed',
+				'The kerf widened the slot and narrowed the tab',
+				'The laser was out of focus when it cut them',
 			],
 			answer: 1,
 			explanation:
-				'The beam is centred on your line and vaporises a channel about a tenth to three tenths of a millimetre wide. Inside a hole that makes the hole bigger; outside a tab it makes the tab smaller. Both errors add up in the same direction, so a nominally exact fit always comes out loose by roughly one kerf.',
+				'The beam is centred on your line and vaporises a channel a tenth to three tenths of a millimetre wide. Inside the slot that makes the slot bigger; outside the tab it makes the tab smaller. The two errors add, so an exact-looking fit comes out loose by two kerfs — which is why compensating by one still rattles.',
 		},
 		{
 			q: 'A classmate offers you an offcut of synthetic leather for a laser-cut cover. What do you do?',
 			options: [
-				'Cut it at low power to be safe',
-				'Do not cut it until someone can confirm it contains no PVC',
+				'Cut it at low power, which keeps the fumes down',
+				'Leave it out until someone confirms it holds no PVC',
 				'Cut it, since leather is on the approved list',
 			],
 			answer: 1,
@@ -198,9 +204,9 @@ you do not want to breathe.
 		{
 			q: 'Why can a laser cutter not produce a part that is 3 mm thick at one end and 6 mm at the other?',
 			options: [
-				'It can, by cutting two passes at different powers',
-				'The beam travels straight down through one sheet, so every part has the sheet thickness and the same profile top and bottom',
-				'The software only accepts one thickness per file',
+				'It can, with two passes at different power settings',
+				'The beam goes straight down, so parts are one sheet thick',
+				'The lab software accepts only one thickness per file',
 			],
 			answer: 1,
 			explanation:
@@ -208,3 +214,32 @@ you do not want to breathe.
 		},
 	]}
 />
+
+## Do this before the next lesson
+
+You have no lab, no induction and no machine yet, and none of that stops the design work. The
+cutting waits for Fablab SUPSI; the file, the arithmetic and the fit do not. Everything below
+happens in Fusion, in a PDF viewer, and with a knife and a cereal box.
+
+Model a small open tray — four walls press-fitted into a base, nothing more — and put the
+material thickness in a
+[named parameter](/ares_materials_estudi/digital-fabrication/parametric-modelling/) from the
+first sketch.
+
+- [ ] I measured a piece of card or plywood with a ruler and used the number I measured, not
+      the number on the label
+- [ ] Every slot and tab in my sketch is driven by a `material_thickness` parameter rather than
+      by a typed number
+- [ ] I changed that parameter from 3 mm to 2.6 mm and watched every joint follow
+- [ ] I added a 100 mm reference square to the sketch, so scale can be checked in one glance
+- [ ] I exported a sketch as DXF with right-click → Save As DXF
+- [ ] I opened the DXF in Inkscape, Illustrator or a free online DXF viewer and measured the
+      reference square — it came out 100 mm
+- [ ] I printed the DXF or a PDF of it at 100% scale, checked the square with a ruler, and cut
+      the parts out of cardboard by hand
+- [ ] I assembled the cardboard version and found at least one thing about the design I would
+      not have noticed on screen
+- [ ] I drew a kerf test strip — five slots at 2.7, 2.8, 2.9, 3.0 and 3.1 mm — ready to cut on
+      the first day I get access to a machine
+- [ ] I can say out loud why a joint drawn to exact size comes out loose by two kerfs rather
+      than one

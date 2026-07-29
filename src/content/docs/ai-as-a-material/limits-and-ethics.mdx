@@ -2,7 +2,7 @@
 title: Limits and ethics
 description: Hallucination inside a product, bias from training data, where your users' words go, the costs behind the invoice, and how to design the moment the model is wrong.
 sidebar:
-  order: 5
+  order: 6
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -221,9 +221,9 @@ is "they never find out", that is where the design work is.
 		{
 			q: 'Why is hallucination a bigger problem in a product you designed than in your own chat window?',
 			options: [
-				'Products use worse models',
-				'The user did not write the prompt, cannot see the sources, and reads your interface as asserting a fact',
-				'Products call the model more often',
+				'Products are given less context, so the model guesses more',
+				'The user did not ask, cannot see the source, and reads it as fact',
+				'Products call the model far more often than one person can',
 			],
 			answer: 1,
 			explanation:
@@ -232,9 +232,9 @@ is "they never find out", that is where the design work is.
 		{
 			q: 'You want to summarise twelve interview transcripts from a research study. What is the first thing to settle?',
 			options: [
-				'Which model gives the best summaries',
-				'Whether the participants agreed to their words being sent to a third party, and whether the data can be anonymised or kept local',
-				'How to phrase the prompt so the summary is concise',
+				'Which model summarises interview transcripts most accurately',
+				'Whether the participants consented to a third party seeing their words',
+				'How to phrase the prompt so the summaries stay short and comparable',
 			],
 			answer: 1,
 			explanation:
@@ -243,9 +243,9 @@ is "they never find out", that is where the design work is.
 		{
 			q: 'Your prototype shows a generated summary in a card. What is the most important state to design?',
 			options: [
-				'The animation while the text streams in',
-				'The wrong, empty and slow answers — the cases that will happen in production and never in your demo',
-				'The colour of the generated-content label',
+				'The animation while the generated text streams into the card',
+				'The wrong, empty and slow answers — the ones your demo never shows',
+				'The label marking the text as generated, and where it sits',
 			],
 			answer: 1,
 			explanation:

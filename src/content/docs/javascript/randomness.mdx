@@ -1,0 +1,307 @@
+---
+title: Randomness and variation
+description: Math.random, turning it into the range you need, and writing a program that produces many outcomes rather than one fixed drawing.
+sidebar:
+  order: 12
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+Everything you have drawn so far has come out the same way every time. This lesson changes what
+you are making: not a picture, but a **system** that produces pictures — a set of rules with
+some room left in them, run again and again, giving a different result each time.
+
+That shift is the whole idea behind generative and experimental coding, which has a course of
+its own later in the programme. It costs one function.
+
+## One number
+
+`Math.random()` gives back a decimal number that is at least 0 and always less than 1. A
+different one every call, with no pattern you could predict.
+
+<LiveCode
+	title="Four numbers"
+	height={190}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  console.log(Math.random());
+  console.log(Math.random());
+  console.log(Math.random());
+  console.log(Math.random());
+</script>`}
+/>
+
+Press Run a few times. Nothing repeats, and nothing ever reaches 1 — the range runs from 0 up to
+but never including 1, which matters in a moment.
+
+By itself that number is useless. It becomes useful when you stretch it to the range you
+actually need.
+
+## Getting the range you want
+
+Three moves, and everything else is a combination of them.
+
+```js
+Math.random() * 300;             // 0 up to 300 — multiply to stretch
+20 + Math.random() * 40;         // 20 up to 60 — add to shift the start
+Math.floor(Math.random() * 3);   // 0, 1 or 2 — floor for whole numbers
+```
+
+`Math.floor()` throws away everything after the decimal point, so `2.97` becomes `2`. That is
+why `* 3` gives you three possibilities rather than four: the number never reaches 3, so the
+floor never reaches 3 either.
+
+The general form is worth copying somewhere you will find it again:
+
+```js
+const value = min + Math.random() * (max - min);       // any decimal between min and max
+const whole = Math.floor(Math.random() * list.length); // any index in a list
+```
+
+That second line is how you pick something at random out of an array — a colour from a palette,
+a word from a list — because a valid index is a whole number from 0 to `length - 1`, which is
+exactly what it produces.
+
+<LiveCode
+	title="Pick from a list"
+	height={200}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const words = ["soft", "rigid", "loud", "slow", "warm"];
+
+  for (let i = 0; i < 5; i++) {
+    const index = Math.floor(Math.random() * words.length);
+    console.log(words[index]);
+  }
+</script>`}
+/>
+
+Repeats are expected — each pick knows nothing about the ones before it. A random list is not a
+shuffled list.
+
+## A loop that varies
+
+Put a random number inside a loop and one instruction draws a hundred different things. This is
+the moment the technique earns its place.
+
+<LiveCode
+	title="A hundred circles"
+	height={340}
+	code={`<canvas id="c" width="300" height="200" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  for (let i = 0; i < 100; i++) {
+    const x = Math.random() * 300;
+    const y = Math.random() * 200;
+    const r = 2 + Math.random() * 14;
+
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = "#1b1b1b";
+    ctx.fill();
+  }
+</script>`}
+/>
+
+Press Run repeatedly. Every result is a different drawing and all of them are recognisably from
+the same piece of code. What you have written is not the image on screen; it is the description
+of a family the image belongs to.
+
+Change `100` to `600`. Change `14` to `40`. Each edit moves the whole family at once, and that
+is what makes this a design tool rather than a trick — you are working on the rules, and seeing
+a sample of the outcomes.
+
+## Constraints are the design
+
+Unrestricted randomness looks like static, and static is not interesting for long. The
+judgement is in what you *refuse* to leave open.
+
+<LiveCode
+	title="Random inside a grid, from a fixed palette"
+	height={360}
+	code={`<canvas id="c" width="300" height="220" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+  const palette = ["#1b1b1b", "#ffe100", "#f7f7f7"];
+  const step = 20;
+
+  for (let x = 0; x < 300; x = x + step) {
+    for (let y = 0; y < 220; y = y + step) {
+      ctx.fillStyle = palette[Math.floor(Math.random() * palette.length)];
+
+      if (Math.random() < 0.3) {
+        ctx.fillRect(x, y, step, step);          // a full square, 30% of the time
+      } else {
+        ctx.fillRect(x + 6, y + 6, step - 12, step - 12);   // a small one otherwise
+      }
+    }
+  }
+</script>`}
+/>
+
+Position is not random at all here — the grid decides it. Colour is random but only from three
+you chose. Size is random between two values you set. The result reads as composed rather than
+noisy, and every knob in that description is a decision you can move.
+
+`Math.random() < 0.3` is worth its own note: since the number is evenly spread between 0 and 1,
+it lands below 0.3 roughly three times in ten. That is how you write "sometimes" in code, at a
+probability you control. Change `0.3` to `0.9` and press Run.
+
+## When the random number is drawn
+
+Nothing above moves, and none of it should. The moment you add animation, *where* you call
+`Math.random()` becomes the whole question.
+
+<LiveCode
+	title="New numbers every frame"
+	height={330}
+	code={`<canvas id="c" width="300" height="180" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  function draw() {
+    ctx.clearRect(0, 0, 300, 180);
+
+    for (let i = 0; i < 12; i++) {
+      const x = Math.random() * 300;      // a new position, 60 times a second
+      const y = Math.random() * 180;
+
+      ctx.beginPath();
+      ctx.arc(x, y, 8, 0, Math.PI * 2);
+      ctx.fillStyle = "#1b1b1b";
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+</script>`}
+/>
+
+That is not twelve moving circles. It is twelve circles thrown away and reinvented every frame,
+which the eye reads as flicker. It is the most common thing to get wrong with randomness, and
+the fix is to decide the values **once**, keep them, and animate something else.
+
+<LiveCode
+	title="Decided once, then moved"
+	height={330}
+	code={`<canvas id="c" width="300" height="180" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  const dots = [];
+  for (let i = 0; i < 12; i++) {
+    dots.push({
+      x: Math.random() * 300,
+      y: Math.random() * 180,
+      speed: 0.3 + Math.random() * 1.2,     // each one gets its own pace
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, 300, 180);
+
+    for (const dot of dots) {
+      dot.y = dot.y + dot.speed;
+      if (dot.y > 188) dot.y = -8;
+
+      ctx.beginPath();
+      ctx.arc(dot.x, dot.y, 8, 0, Math.PI * 2);
+      ctx.fillStyle = "#1b1b1b";
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+</script>`}
+/>
+
+Same twelve dots throughout, each with a speed of its own. The randomness ran once, before the
+animation started, and what it produced became the material the loop works on. An array of
+objects built by a loop, then read every frame, is the standard shape for anything with more
+than one moving part.
+
+## Getting the same one back
+
+`Math.random()` cannot be told to repeat itself. There is no way to ask for the sequence you had
+at four o'clock yesterday, which is a real problem the first time a result is better than
+anything you can produce again.
+
+Two honest answers, both used professionally:
+
+- **Keep the outcome, not the process.** Screenshot or export the results you like as you go.
+  For coursework this is almost always enough.
+- **Keep the numbers.** If the values live in an array, as in the example above, you can print
+  that array to the console, paste it back into your file as a fixed list, and the drawing is
+  reproducible from then on.
+
+There is a third route — a random generator you write yourself, which produces the same sequence
+every time from a starting number called a **seed** — and it is what tools like this rely on for
+reproducible work. It is a good thing to know exists and not something to build this semester.
+
+## Evaluation
+
+The sketch below draws one line across the canvas. Turn it into a family: twenty lines, each
+starting at a random height on the left, each with a random thickness between 1 and 6, and each
+either black or yellow.
+
+<LiveCode
+	title="Challenge"
+	height={330}
+	code={`<canvas id="c" width="300" height="200" style="border: 1px solid #ccc"></canvas>
+
+<script>
+  const ctx = document.querySelector("#c").getContext("2d");
+
+  // Wrap this in a loop and make three of these numbers random.
+  ctx.strokeStyle = "#1b1b1b";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, 100);
+  ctx.lineTo(300, 100);
+  ctx.stroke();
+</script>`}
+/>
+
+<Quiz
+	questions={[
+		{
+			q: 'console.log(Math.floor(Math.random() * 3)); — which numbers can this print?',
+			options: ['0, 1 or 2', '1, 2 or 3', '0, 1, 2 or 3'],
+			answer: 0,
+			explanation:
+				'Math.random never reaches 1, so the multiplication never reaches 3, so the floor never reaches 3 either. Counting from zero again — and it is exactly the set of valid indexes for a list of three.',
+		},
+		{
+			q: 'You want a radius between 10 and 30. Which expression gives you that?',
+			options: ['10 + Math.random() * 20', 'Math.random() * 30', 'Math.random() * 10 + 30'],
+			answer: 0,
+			explanation:
+				'Multiplying stretches the range and adding shifts where it starts, so you need the width of the range (30 - 10 = 20) and the smallest value (10). The second option can return 2, the third never returns less than 30.',
+		},
+		{
+			q: 'Your dots flicker in new positions every frame instead of drifting. What is the cause?',
+			options: [
+				'Math.random is called inside draw, so every frame invents new values',
+				'Math.random was called once, before the animation loop started',
+				'The canvas is being cleared too often for the eye to follow',
+			],
+			answer: 0,
+			explanation:
+				'Anything inside draw happens sixty times a second. Values you want to keep are generated once, before the loop, and stored — usually in an array of objects that the loop then reads and nudges.',
+		},
+	]}
+/>

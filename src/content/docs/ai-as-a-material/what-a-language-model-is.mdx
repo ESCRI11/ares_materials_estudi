@@ -122,10 +122,14 @@ flowchart LR
 That loop is why answers arrive word by word rather than appearing whole, and why a long answer
 takes longer than a short one: the work is per token, every time.
 
-It also means there is no draft. The text is composed as it is emitted, not typed out from an
-outline written beforehand. Whatever forward planning happens, happens inside the same single
-step — which is why asking a model to "think through it first" changes the answer, a trick the
-[prompting lesson](/ares_materials_estudi/ai-as-a-material/prompting/) puts to work.
+It also means nothing is composed in advance and then typed out. Each token is chosen with only
+the text so far to go on, so whatever forward planning happens either fits inside that one step
+or has to be written down as tokens like everything else. That is why asking a model to "think
+through it first" changes the answer, a trick the
+[prompting lesson](/ares_materials_estudi/ai-as-a-material/prompting/) puts to work — and why
+some models are trained to produce a stretch of visible working before the answer proper. That
+working is not an outline the model is reading from. It is more generated text, produced the
+same way, which the tokens after it then get to see.
 
 ## Temperature
 
@@ -277,9 +281,10 @@ answer is sound, the reasoning reads well, and one specific inside it is invente
 specifics — the name, the number, the link — and treat the rest as a good draft.
 :::
 
-Retrieval, tool use and citation features reduce hallucination by changing what is in the
-context window, not by making the mechanism truth-seeking. They help. They do not convert a
-prediction engine into a database, and any interface you build should assume that.
+Retrieval, [tool use](/ares_materials_estudi/ai-as-a-material/beyond-text/) and citation
+features reduce hallucination by changing what is in the context window, not by making the
+mechanism truth-seeking. They help. They do not convert a prediction engine into a database, and
+any interface you build should assume that.
 
 ## What this makes it good at
 
@@ -295,9 +300,9 @@ human at the end.
 		{
 			q: 'Why does a language model invent a citation that does not exist?',
 			options: [
-				'Its training data contained that fake citation',
-				'It produces plausible continuations, and a well-formed false reference is as plausible as a real one',
-				'The temperature was set too high',
+				'Its training data must have contained that particular fake citation',
+				'A well-formed false reference is as plausible a continuation as a real one',
+				'The temperature was set too high for a factual question like that',
 			],
 			answer: 1,
 			explanation:
@@ -306,9 +311,9 @@ human at the end.
 		{
 			q: 'You correct a model in a long conversation. Does the model now know better?',
 			options: [
-				'Yes — it learns from every conversation',
-				'Only within that conversation, while your correction is still inside the context window',
-				'Yes, but only after the provider retrains it',
+				'Yes — each conversation adjusts the model a little',
+				'Only in that conversation, while it is still in the window',
+				'Yes, but only after the provider retrains it on your chats',
 			],
 			answer: 1,
 			explanation:
@@ -317,9 +322,9 @@ human at the end.
 		{
 			q: 'What does turning the temperature down to zero do?',
 			options: [
-				'Makes the model more accurate',
-				'Makes it pick the highest-scoring token every time, so the same input gives the same output',
-				'Shortens the answer',
+				'It makes the model more accurate, because it stops it guessing',
+				'It picks the highest-scoring token, so one input gives one answer',
+				'It shortens the answer by cutting off the unlikely tokens entirely',
 			],
 			answer: 1,
 			explanation:

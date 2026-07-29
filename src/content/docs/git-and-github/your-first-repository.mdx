@@ -1,6 +1,6 @@
 ---
 title: Your first repository
-description: Install git, turn a folder into a repository, and make your first commits.
+description: Turn a folder into a repository, make your first commits, and undo the three mistakes everyone makes in the first week.
 sidebar:
   order: 2
 ---
@@ -9,22 +9,23 @@ This lesson is done in the terminal — the window where you type commands to yo
 instead of clicking. Every command below is meant to be copied and pasted one at a time.
 Nothing here touches the internet.
 
-## Install git
+## Where to type all of this
 
-Check whether you already have it:
+On Windows, every command in this section goes into the **Ubuntu terminal** you set up in
+the [WSL2 lesson](/ares_materials_estudi/your-machine/wsl2/) — the same window you have been
+using since, not PowerShell. On macOS it is the terminal you already have.
 
-```bash
-git --version
-```
+You installed git there in
+[installing software from the terminal](/ares_materials_estudi/your-machine/installing-software/),
+so it is ready. If `git --version` answers "command not found", go back to that lesson:
+`sudo apt install git` inside Ubuntu, `brew install git` on macOS.
 
-If you get a version number, you are done. If not:
-
-- **macOS** — running the command above pops up a dialog offering to install the developer
-  command line tools. Accept it; that installs git.
-- **Windows** — download the installer from [git-scm.com/downloads](https://git-scm.com/downloads)
-  and accept every default. It also gives you a terminal called Git Bash, which is a good
-  place to run these commands.
-- **Linux** — `sudo apt install git` on Debian and Ubuntu, or your distribution's equivalent.
+:::note[Tutorials that tell you to download git from a website]
+There are a great many of them, and on Windows they end with a separate terminal called Git
+Bash. You do not need it. You have git inside Ubuntu, which is where your project files
+live and where every later lesson expects you to be. A second git, on the Windows side,
+with your work sitting on `C:`, is the arrangement this site spent a lesson avoiding.
+:::
 
 ## Tell git who you are, once
 
@@ -49,9 +50,13 @@ git config --global init.defaultBranch main
 
 ## Make a repository
 
-Create a folder to experiment in, move into it, and turn it into a repository:
+Create a folder to experiment in, move into it, and turn it into a repository. Put it in the
+`ind-prep` folder you made in
+[moving around](/ares_materials_estudi/your-machine/moving-around/), which is in your home
+directory — on Windows that is the Linux home, not anywhere under `/mnt/c`:
 
 ```bash
+cd ~/ind-prep
 mkdir git-practice
 cd git-practice
 git init
@@ -65,6 +70,11 @@ Put something in it. Any file will do:
 ```bash
 echo "# Git practice" > notes.md
 ```
+
+Two new pieces of shell there, both worth having. `echo` prints whatever you give it, and
+`>` sends what a command prints into a file instead of onto the screen — creating that file,
+or **replacing it entirely** if it already exists. So that line writes one heading into a new
+`notes.md`.
 
 ## Look before you commit
 
@@ -100,8 +110,28 @@ git commit -m "Add a notes file"
 ```
 
 `git commit` takes whatever is in the tray and writes it into the history as one snapshot.
-`-m` supplies the message inline; leave it out and git opens a text editor, which is
-disorienting the first time it happens.
+`-m` supplies the message inline. Leave it out and git opens a text editor *inside the
+terminal*, waiting for the message — and since it has no menus and no visible way out, this
+is where a lot of people's first commit stalls.
+
+:::tip[Getting out of the editor]
+Which editor opens depends on your machine, and the two you will meet leave in completely
+different ways.
+
+- **nano**, the usual one on Ubuntu, lists its shortcuts along the bottom of the screen.
+  Type the message, then **Ctrl+X**, then `Y`, then Enter.
+- **vim**, the usual one on macOS, starts in a mode where the keys are commands rather than
+  letters. Press `i` to start typing, Esc when the message is written, then `:wq` and Enter.
+
+In both, leaving without saving anything cancels the commit — `Ctrl+X` then `N` in nano,
+`:q!` and Enter in vim. Nothing is lost; the staged changes are still staged.
+
+If you would rather never find out which one you have, choose once:
+
+```bash
+git config --global core.editor nano
+```
+:::
 
 Run `git status` again and it reports a clean working tree — no changes waiting.
 
@@ -130,9 +160,14 @@ git commit -m "Add a line about the staging area"
 git log --oneline
 ```
 
-`git log` shows your commits, newest first. Plain `git log` gives the full entries and opens
-them in a pager, which fills your terminal and appears to freeze it — **press `q` to get
-out**. `--oneline` gives one commit per line and no pager, which is what you want most days.
+`git log` shows your commits, newest first. Any git output too long for the window goes into
+a **pager** — the one-screen-at-a-time viewer you met as `less` in
+[working with files](/ares_materials_estudi/your-machine/working-with-files/). It looks like
+the terminal has frozen, and it has not: **press `q` to get out**.
+
+`--oneline` gives one commit per line rather than a paragraph each, which is what you want
+most days. It does not switch the pager off — it takes far more commits to fill a screen
+that way, so early on you will not see one.
 
 To add every changed file at once instead of naming them:
 
@@ -164,21 +199,58 @@ Yes — Increase card padding for readability on mobile
 Yes — Remove unused typeface files
 ```
 
-:::note[Undoing things]
-Git can recover almost anything you have committed, which is exactly why committing early
-matters. The commands for going back are worth learning later; for now, commit often, and
-know that a bad commit is a recoverable mistake rather than a lost afternoon.
+## Undoing things
+
+Three mistakes cover nearly everything you will do wrong this week, and each has a one-line
+answer. They are also the reason committing often is worth the habit: anything already
+committed is recoverable, and these commands are how you reach back for it.
+
+**You edited a file and want it back the way it was.**
+
+```bash
+git restore notes.md
+```
+
+That throws away your changes to `notes.md` and returns it to how it looked in the last
+commit. `git restore .` does it for every file in the folder at once.
+
+:::caution[This one is not recoverable]
+`git restore` discards work that was never committed, and uncommitted work has no copy
+anywhere. Git can only give you back what it was told to record. Read the filename before
+you press Enter.
 :::
+
+**You staged a file you did not mean to.**
+
+```bash
+git restore --staged notes.md
+```
+
+That takes the file back out of the tray. Your edit is untouched — you are only telling git
+not to include it in the next commit. `git status` shows it as changed but no longer staged.
+
+**You committed with a bad message, or forgot a file.**
+
+```bash
+git commit --amend -m "The message you meant to write"
+```
+
+`--amend` replaces the last commit rather than adding another. Stage a forgotten file first
+with `git add` and it goes into that same commit. Do this only for a commit that is still on
+your machine: once a commit has been sent to GitHub, other people may have it, and replacing
+it underneath them causes exactly the confusion you were trying to avoid.
 
 ## Do this now
 
 Work in the `git-practice` folder you made above.
 
-- [ ] `git --version` prints a version number
 - [ ] `git config --global user.name` and `user.email` are set to my details
 - [ ] I made a folder and ran `git init` in it
 - [ ] I ran `git status` and understood what "untracked" meant
 - [ ] I made a first commit with `git add` and `git commit -m`
 - [ ] I changed a file, committed again, and saw both commits in `git log --oneline`
 - [ ] I know that `q` gets me out of the pager
+- [ ] I ran `git commit` without `-m` on purpose, met the editor, and got out of it again
+- [ ] I edited a file, ran `git restore` on it, and watched the change disappear
+- [ ] I fixed a commit message with `git commit --amend`
 - [ ] I can say what the difference between `git add` and `git commit` is, in my own words

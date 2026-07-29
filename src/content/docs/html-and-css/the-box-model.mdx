@@ -66,12 +66,22 @@ padding-top: 10px;            /* or name one side at a time */
 padding-left: 40px;
 ```
 
-`margin` and `border` follow the same pattern. The two-value form is the one you will use
-constantly, because vertical and horizontal spacing are almost never the same number.
+`margin` follows exactly the same pattern, and so does `border-width`. The two-value form is
+the one you will use constantly, because vertical and horizontal spacing are almost never the
+same number.
 
-A border needs three pieces of information — thickness, style, colour — in one declaration:
-`border: 1px solid #333`. Other styles exist (`dashed`, `dotted`), and `border-radius`
-rounds the corners.
+`border` itself is the exception, and it catches everybody once. Its three values are not
+four sides — they are thickness, style and colour, in one declaration:
+
+```css
+border: 1px solid #333;             /* thickness, style, colour */
+border-width: 10px 20px 30px 40px;  /* then vary the four sides, clockwise from the top */
+```
+
+So `border: 10px 20px 30px 40px` is not a thick top and a thin bottom. It is invalid, and an
+invalid declaration is thrown away, so it draws no border at all. When you want different
+thicknesses per side, name the property that takes four values: `border-width`. Other styles
+exist (`dashed`, `dotted`), and `border-radius` rounds the corners.
 
 ## Why your 300px box is 342px wide
 
@@ -194,13 +204,13 @@ how you centre a block.
 		{
 			q: 'You set width: 300px on a span and nothing changes. Why?',
 			options: [
-				'The span needs a class before width applies',
-				'Inline elements ignore width and height; you need display: block or inline-block',
-				'Width only works on images',
+				'A span needs a class before width applies to it',
+				'Inline elements ignore width; change display to fix it',
+				'The width has to go on the paragraph that contains it',
 			],
 			answer: 1,
 			explanation:
-				'A span is inline, so it flows inside a line of text like a word and takes its size from its content. Switching display to inline-block keeps it in the line but lets it accept dimensions and vertical spacing.',
+				'A span is inline, so it flows inside a line of text like a word and takes its size from its content — nothing about the parent or the class is involved. Switching display to inline-block keeps it in the line but lets it accept dimensions and vertical spacing.',
 		},
 	]}
 />

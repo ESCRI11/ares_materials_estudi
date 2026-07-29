@@ -102,7 +102,8 @@ properties, *is* a table — the objects are the records and the properties are 
 `Object.keys(someObject)` hands you the object's property names as an array, which is how
 you ask a record what fields it has. Add a fourth record and press Run; add a field to only
 *one* record and notice that nothing complains — a dataset where the records disagree about
-their fields is the normal state of real data, and the next two lessons are about that.
+their fields is the normal state of real data, and the lessons on file formats and cleaning
+are about exactly that.
 
 ## The pipeline
 
@@ -136,7 +137,7 @@ dataset and a re-run.
 :::tip[Your design training already covers a third of this]
 Choosing a visual model is a composition problem with correctness attached, and structuring
 a dataset is the same instinct as naming layers properly in Figma. The unfamiliar part is
-only the middle: the file formats and the loops. Those are the two lessons that follow.
+only the middle: the file formats and the loops.
 :::
 
 <Quiz
@@ -156,9 +157,9 @@ only the middle: the file formats and the loops. Those are the two lessons that 
 		{
 			q: 'You count how many interviewees mentioned the broken door: eleven of nineteen. What have you done?',
 			options: [
-				'Replaced weak qualitative data with strong quantitative data',
-				'Turned qualitative data into quantitative by coding it, gaining comparison and losing what they actually said',
-				'Nothing meaningful, because interviews cannot be counted',
+				'Replaced weak qualitative evidence with strong quantitative evidence',
+				'Coded it — comparison gained, what they actually said lost',
+				'Nothing that counts as data, because interviews are not measurements',
 			],
 			answer: 1,
 			explanation:
@@ -167,9 +168,9 @@ only the middle: the file formats and the loops. Those are the two lessons that 
 		{
 			q: 'Which step of the pipeline is most often skipped, and what does skipping it cost?',
 			options: [
-				'Visualise — without it the data stays unreadable',
-				'Define — without a written question you collect the wrong fields and later read meaning into whatever you happen to have',
-				'Collect — most projects reuse someone else’s data anyway',
+				'Visualise — without a chart nobody can see what is in the data',
+				'Define — without a written question you record the wrong fields',
+				'Collect — most projects can reuse someone else’s dataset',
 			],
 			answer: 1,
 			explanation:

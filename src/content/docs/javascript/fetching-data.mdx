@@ -2,7 +2,7 @@
 title: Fetching data
 description: What an API is, asking for data with fetch, waiting for an answer with await, reading JSON, and coping when it fails.
 sidebar:
-  order: 12
+  order: 14
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -204,9 +204,9 @@ The reference for all of this is on
 		{
 			q: 'What does await do?',
 			options: [
-				'Pauses the whole browser until the data arrives',
-				'Waits for the promised value inside an async function, then continues with the real value',
-				'Repeats the request until it succeeds',
+				'Pauses the whole browser, including animation, until the data arrives',
+				'Waits for the promised value, then continues with the real one',
+				'Keeps retrying the request until the server finally answers',
 			],
 			answer: 1,
 			explanation:
@@ -215,9 +215,9 @@ The reference for all of this is on
 		{
 			q: 'Your fetch returns a 404 and your catch block never runs. Why not?',
 			options: [
-				'404 responses are silently retried',
-				'A 404 is a successful reply whose content is an error, so fetch does not throw — you check response.ok',
-				'catch only works with JSON.parse',
+				'The status has to be read before the await, or catch never sees it',
+				'The server answered, so fetch did not throw — you check response.ok yourself',
+				'A catch block only runs for errors you threw yourself with new Error',
 			],
 			answer: 1,
 			explanation:
@@ -226,9 +226,9 @@ The reference for all of this is on
 		{
 			q: 'Why does JSON.parse exist, if JSON already looks like a JavaScript object?',
 			options: [
-				'Because what arrives over the network is text, and parse turns that text into values',
-				'Because JSON uses different brackets',
-				'Because it makes the data smaller',
+				'What arrives over the network is text, and parse turns it into values',
+				'JSON uses double quotes everywhere, which JavaScript has to convert',
+				'Parsing checks the data against the shape your program expects',
 			],
 			answer: 0,
 			explanation:

@@ -65,7 +65,8 @@ while True:
     time.sleep(0.5)
 ```
 
-Press play. The LED blinks twice a second.
+Press play. The LED blinks once a second — half a second lit, half a second dark. Two changes
+of state per second, one blink.
 
 ## Line by line
 
@@ -94,13 +95,18 @@ Set the pin high — hold it at the board's operating voltage, 3.3 V here. `led.
 it low, at 0 V. High means current can flow through your LED to ground; low means both ends
 sit at the same voltage, so nothing flows and the LED is dark.
 
-Three spellings do the same job, and you will see all of them:
+The first two of these say the same thing; the third is a different instruction, and you will
+see all three:
 
 ```python
-led.value(1)   # explicit
-led.on()       # shorter
-led.toggle()   # flip to whatever it is not
+led.value(1)   # explicit: set it high
+led.on()       # shorter: the same thing
+led.toggle()   # different: flip to whatever it is not
 ```
+
+`toggle()` needs no `1` or `0` because it reads the pin's current state and sets the opposite.
+That makes a blink loop half the length — one `toggle()` and one sleep — and it is why you
+cannot use it when you want a pin at a *known* state rather than the other one.
 
 ```python
 time.sleep(0.5)
@@ -148,9 +154,9 @@ debugging hardware.
 		{
 			q: 'What does Pin.OUT do in Pin(15, Pin.OUT)?',
 			options: [
-				'Tells the board the LED is connected on the outside of the circuit',
-				'Configures the pin to drive a voltage rather than to listen for one',
-				'Sets the pin high immediately',
+				'Tells the board the LED sits outside the circuit',
+				'Sets the pin to drive a voltage rather than read one',
+				'Sets the pin high the moment that line is reached',
 			],
 			answer: 1,
 			explanation:
@@ -159,9 +165,9 @@ debugging hardware.
 		{
 			q: 'You delete both time.sleep(0.5) lines. What do you see?',
 			options: [
-				'The LED blinks much faster but still visibly',
-				'The LED appears constantly on but dim, because it switches faster than the eye can follow',
-				'The program crashes',
+				'The LED blinks much faster, but still visibly',
+				'The LED looks constantly on but dim, too fast to see',
+				'The program crashes with an error in the loop',
 			],
 			answer: 1,
 			explanation:
@@ -170,9 +176,9 @@ debugging hardware.
 		{
 			q: 'Why does the program end in while True rather than running the four lines once?',
 			options: [
-				'Because MicroPython requires every program to contain a loop',
-				'Because there is no operating system to return to — when the code runs out, nothing happens next',
-				'Because the pin resets itself after each command',
+				'Because MicroPython requires every program to loop',
+				'Because nothing happens next when the code runs out',
+				'Because the pin resets itself after every command',
 			],
 			answer: 1,
 			explanation:

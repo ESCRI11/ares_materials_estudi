@@ -86,7 +86,9 @@ like the rest of my project does.
 ```
 
 It picks up from there with the correction, rather than starting over. Pressing `Esc`
-twice undoes what it did.
+twice on an empty prompt is a bigger move: it opens the rewind menu, where you can send
+the conversation and its edits back to an earlier message. Use the single `Esc` unless
+the whole direction was wrong.
 
 Interrupting early is a skill worth building deliberately. The instinct is to let it
 finish out of politeness, which is a strange thing to feel toward a program and costs you
@@ -151,13 +153,13 @@ hypotheses and checks, and watching someone form one is how you learn to do it.
 		{
 			q: 'You have a vague idea of what you want but you are not sure what the options even are. What gets you the best result?',
 			options: [
-				'Describe it as precisely as you can manage and accept what comes back',
-				'Ask it to lay out several approaches with trade-offs and to stop before implementing',
-				'Ask for the simplest possible version and change it afterwards',
+				'Describe it as precisely as you can manage and take what comes back',
+				'Ask for several approaches with trade-offs, and to stop there',
+				'Ask for the smallest working version and change it afterwards',
 			],
 			answer: 1,
 			explanation:
-				'Not knowing which decisions exist is exactly the situation options-with-trade-offs solves. The "stop before implementing" half matters too — without it you often get an explanation plus an implementation of whichever one it preferred.',
+				'Not knowing which decisions exist is exactly the situation options-with-trade-offs solves. The "stop there" half matters too — without it you often get an explanation plus an implementation of whichever one it preferred.',
 		},
 		{
 			q: 'It is halfway through doing something you can already see is wrong. What should you do?',
@@ -168,14 +170,14 @@ hypotheses and checks, and watching someone form one is how you learn to do it.
 			],
 			answer: 1,
 			explanation:
-				'A single Esc stops it where it is and you redirect from there, keeping everything that was already right. Esc twice undoes the work, which you only want when the whole direction was wrong. Waiting politely just costs you the time.',
+				'A single Esc stops it where it is and you redirect from there, keeping everything that was already right. Esc twice opens the rewind menu, for sending the session back to an earlier message — more than you need when the next sentence would fix it. Waiting politely only costs you the time.',
 		},
 		{
 			q: 'Why add "change only what is needed for this, do not refactor anything else" to a bug-fix request?',
 			options: [
-				'It makes the fix run faster',
-				'Otherwise it is not allowed to edit the file at all',
-				'It keeps the diff small enough that you can see what the actual fix was',
+				'A narrower request is answered faster and costs fewer tokens',
+				'Without it, it is not permitted to edit more than one file',
+				'It keeps the diff small enough to see what the fix was',
 			],
 			answer: 2,
 			explanation:

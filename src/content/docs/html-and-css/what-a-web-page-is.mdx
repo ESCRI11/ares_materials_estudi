@@ -80,28 +80,58 @@ CSS, and it changes how the same content is drawn without touching the content i
 
 Try changing `#666` to `crimson`, or `2rem` to `4rem`. Nothing here is precious.
 
+`rem` is a unit of size, and it is the one used throughout this section. One `rem` is the
+browser's base text size — normally 16 pixels, unless the reader has changed it — so `2rem`
+is twice that and `0.5rem` is half. Sizes written this way follow someone's own text-size
+setting instead of overriding it. The
+[responsive design lesson](/ares_materials_estudi/html-and-css/responsive-design/) comes back
+to why that matters; for now, read `rem` as "multiples of the base text size".
+
 ## Make one on your own machine
 
 Reading in a box on this site is useful; having a file of your own is the point.
 
-1. Open **VS Code**, the code editor you installed earlier. A code editor is a text editor
-   that understands the language you are typing — it colours the parts and warns you about
-   typos.
-2. **File → New Text File**.
+1. Open your `ind-prep` folder in **VS Code**, the code editor you installed earlier. A code
+   editor is a text editor that understands the language you are typing — it colours the
+   parts and warns you about typos.
+
+   On Windows, open Ubuntu and type `cd ~/ind-prep` then `code .`; on macOS, **File → Open
+   Folder**. The bottom-left corner should read **WSL: Ubuntu** on Windows. Your work stays
+   in the Linux home directory, which is where it belongs.
+2. In the **Explorer** panel on the left, hover over the folder name and press the *new file*
+   icon. Name the file `index.html`, extension included.
+
+   The `.html` at the end is the **file extension** — the part of a filename that tells your
+   computer what kind of file it is. Without it, your machine treats the file as plain text
+   and the browser shows you the tags instead of rendering them.
 3. Type the two lines from the first example above.
-4. **File → Save As**, name it `index.html`, and save it to your Desktop. The `.html` at the
-   end is the **file extension** — the part of a filename that tells your computer what kind
-   of file it is. Without it, your machine treats the file as plain text and the browser will
-   show you the tags instead of rendering them.
-5. Find `index.html` on your Desktop and double-click it.
+4. Save with `Ctrl+S`, or `Cmd+S` on macOS.
+5. Open the file in a browser.
+
+   **Windows.** In the VS Code terminal (Ctrl and the backtick key), run `explorer.exe .` —
+   your Linux folder opens as an ordinary File Explorer window. Double-click `index.html`
+   there and your usual browser opens it. You can also drag the file from that window onto an
+   already-open browser window.
+
+   **macOS.** In the terminal, `open index.html`. Or find the file in Finder and double-click
+   it.
 
 Your browser opens and shows your page.
 
+:::note[Windows: why not the Desktop]
+It is a habit from every other program to save onto the Desktop, and here it is the wrong
+one. Your Linux home has no Desktop folder, and the Windows one sits across the filesystem
+boundary that the [WSL2 lesson](/ares_materials_estudi/your-machine/wsl2/) tells you to keep
+project work away from. `~/ind-prep` is the Desktop now.
+:::
+
 ## Nothing has been published
 
-Look at the address bar. It reads something like `file:///Users/you/Desktop/index.html`, not
-an address starting with `https://`. That prefix, `file://`, means the browser is reading a
-file straight off your hard disk.
+Look at the address bar. It starts with `file://`, not with `https://`. On macOS it reads
+something like `file:///Users/you/ind-prep/index.html`; on Windows the file lives in your
+Linux home, so the address is longer and goes through the `wsl` network path — but the
+prefix is the same, and it is the part that matters. `file://` means the browser is reading a
+file straight off your own disk.
 
 This matters more than it sounds:
 
@@ -127,10 +157,23 @@ flowchart LR
 
 Save is `Cmd+S` on macOS, `Ctrl+S` on Windows; reload is `Cmd+R` or `Ctrl+R`.
 
-Nothing compiles. Nothing builds. The browser re-reads the file from scratch every time you
-reload, so if you saved it, you are looking at it. When a change appears not to have worked,
-the first thing to check is always whether the file was actually saved — VS Code marks an
-unsaved file with a dot instead of an × on its tab.
+Nothing compiles. Nothing builds. Reload and the browser draws your HTML again from the file
+on disk, so if you saved it, you are looking at it.
+
+Two things break that promise, and between them they account for most of "but I changed it".
+
+- **The file was not saved.** Check this first, every time. VS Code marks an unsaved file
+  with a dot instead of an × on its tab, and File → Auto Save removes the problem for good.
+- **The browser kept an old copy.** Files a page *links to* rather than contains — a
+  stylesheet, an image, a script — get **cached**: stored locally so they do not have to be
+  fetched again. Usually invisible and helpful. Occasionally you save `style.css`, reload,
+  and are shown yesterday's version. A **hard reload** forces fresh copies of everything:
+  `Ctrl+Shift+R` on Windows and Linux, `Cmd+Shift+R` on macOS, or hold `Shift` while
+  clicking the reload button.
+
+Everything in this lesson lives in one file, so caching cannot bite you yet. It can as soon
+as your CSS moves into a file of its own, which is where this section is heading — so the
+shortcut is worth learning now.
 
 ## Try it
 
@@ -151,7 +194,8 @@ more `p` element in the content, and one line in the `style` block.
 
 ## Check yourself
 
-- [ ] I made `index.html` on my Desktop and opened it in a browser
+- [ ] I made `index.html` inside `ind-prep` and opened it in a browser
+- [ ] Windows: `explorer.exe .` opened the folder and double-clicking the file opened the page
 - [ ] I changed the text, saved, reloaded, and saw the change
 - [ ] I looked at the address bar and found `file://` there
 - [ ] I opened View Page Source on a website I use every day
@@ -162,7 +206,7 @@ more `p` element in the content, and one line in the `style` block.
 		{
 			q: 'You double-click your HTML file and the browser shows the tags as visible text instead of a formatted page. What is the most likely cause?',
 			options: [
-				'The file was saved without the .html extension',
+				'It was saved without the .html extension',
 				'You are not connected to the internet',
 				'You need to install a web server first',
 			],
@@ -178,15 +222,15 @@ more `p` element in the content, and one line in the `style` block.
 				'HTML labels what each piece of content is. CSS then decides what a heading looks like — 48px or 12px, black or grey. The two questions are deliberately kept apart, which is what lets one stylesheet restyle a thousand pages.',
 		},
 		{
-			q: 'What does the address file:///Users/you/Desktop/index.html tell you?',
+			q: 'The address bar reads file:///Users/you/ind-prep/index.html. What does that tell you?',
 			options: [
-				'The page is published and anyone with the link can see it',
-				'The browser is reading a file directly from your hard disk',
-				'The page is stored in your browser cache',
+				'The page is published and anyone with the link sees it',
+				'The browser is reading the file off your own disk',
+				'The page is a cached copy the browser saved earlier',
 			],
 			answer: 1,
 			explanation:
-				'file:// means local disk. The page exists only on your machine, works with the wifi off, and is invisible to everyone else until you deliberately publish it somewhere.',
+				'file:// means local disk. The page exists only on your machine, works with the wifi off, and is invisible to everyone else until you deliberately publish it somewhere. A published page would start with https:// instead.',
 		},
 	]}
 />

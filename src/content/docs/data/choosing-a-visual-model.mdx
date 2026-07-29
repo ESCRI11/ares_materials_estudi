@@ -2,7 +2,7 @@
 title: Choosing a visual model
 description: Matching a question to a chart form, ranking visual encodings by how accurately people read them, honest axes, and colour that survives being colour-blind or photocopied.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -66,6 +66,11 @@ as:
 
 The list is not about beauty. It is about error: the further down you go, the further people's
 estimates land from the real numbers. You can see the gap between rank 2 and rank 4 directly.
+
+One canvas command below did not come up in the JavaScript section. `ctx.fillText(text, x, y)`
+draws text, in whatever `ctx.font` holds — a CSS font shorthand such as `"11px sans-serif"` —
+and in whatever `ctx.fillStyle` holds, the same as a rectangle. That is the whole of putting a
+number on a chart.
 
 <LiveCode
 	title="The same three numbers, twice"
@@ -183,8 +188,8 @@ that reaction and then go and find which one it was.
 		{
 			q: 'You size circles so that the radius is proportional to the value. What do readers see?',
 			options: [
-				'The differences accurately, since the radius is exact',
-				'The differences exaggerated, because the eye reads area — doubling the radius quadruples it',
+				'The differences accurately, since the radius is exactly proportional',
+				'The differences exaggerated, because the eye reads area, not radius',
 				'The differences understated, because circles look smaller than squares',
 			],
 			answer: 1,
@@ -194,9 +199,9 @@ that reaction and then go and find which one it was.
 		{
 			q: 'Your bar chart uses red and green bars to separate two groups. What is the problem?',
 			options: [
-				'Red and green clash',
-				'Roughly one man in twelve cannot tell them apart, and hue is the only thing distinguishing the groups',
-				'Bar charts should never use more than one colour',
+				'Red and green clash, and the chart would read better in one hue',
+				'About one man in twelve cannot tell them apart, and hue is the only cue',
+				'A bar chart should never carry more than one colour at a time',
 			],
 			answer: 1,
 			explanation:

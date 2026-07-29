@@ -2,14 +2,15 @@
 title: Collecting data
 description: Designing a form, using open data portals and APIs, why scraping is fraught, sensors as a source, consent and anonymisation, and the collection protocol the course asks you to write.
 sidebar:
-  order: 6
+  order: 2
 ---
 
 import Quiz from '@components/Quiz.astro';
 
-Cleaning improves a dataset. Collection decides what the dataset can ever say. A field you
-did not record is not recoverable later, and no amount of analysis rescues a question that
-was asked badly — so this is the step to be slow about.
+Collection decides what a dataset can ever say. A field you did not record is not
+recoverable later, and no amount of cleaning or analysis rescues a question that was asked
+badly — so this is the step to be slow about, and the reason it comes second in the pipeline
+rather than after the interesting parts.
 
 Five sources, then the part that is not optional.
 
@@ -38,7 +39,7 @@ question. Then turn each field into exactly one question.
   ambiguity you have stopped seeing will surface in the first ten minutes.
 
 Any form tool — Google Forms, Microsoft Forms, Typeform, LimeSurvey — exports to CSV, which
-is where the previous two lessons pick up. Check that export early rather than after the
+is where the next two lessons pick up. Check that export early rather than after the
 responses arrive: field names come out long and clumsy, and it is much easier to shorten the
 questions than to rename two hundred columns.
 
@@ -80,10 +81,18 @@ and work from that.
 
 ```js
 // Get the data once, look at it, then keep a copy in the project.
-const response = await fetch(url);
-const data = await response.json();
-console.log(JSON.stringify(data, null, 2)); // copy this into data.json
+async function grab() {
+  const response = await fetch(url);
+  const data = await response.json();
+  console.log(JSON.stringify(data, null, 2)); // copy this into data.json
+}
+
+grab();
 ```
+
+`await` only works inside a function marked `async`, which is why the two lines are wrapped
+and then called — the same shape as every `fetch` in
+[fetching data](/ares_materials_estudi/javascript/fetching-data/).
 
 **Keep API keys out of the repository.** A key is a password identifying you. Committed to a
 public repository it will be found by an automated scanner within minutes, and — this is the
@@ -188,7 +197,7 @@ project has an honest answer to it.
 - [ ] What personal data exists, where it is stored, and when it will be deleted
 - [ ] The instrument: which sensor, which settings, which calibration, which sampling rate
 - [ ] What went wrong during collection, and what you excluded because of it
-- [ ] Every cleaning decision, from the previous lesson's log
+- [ ] Every cleaning decision, from the [cleaning log](/ares_materials_estudi/data/structuring-and-cleaning/) you will keep two lessons from now
 - [ ] What the data cannot answer — the limits you already know about
 
 That last line is the one that makes a project credible rather than merely finished.
@@ -199,9 +208,9 @@ That last line is the one that makes a project credible rather than merely finis
 		{
 			q: 'Your form asks for an age range — 18–25, 26–35, 36–50 — because it looks tidier. What have you lost?',
 			options: [
-				'Nothing, ranges are what you will chart anyway',
-				'The exact ages, permanently — you can always group later, but you cannot ungroup',
-				'Only the ability to calculate the median',
+				'Nothing, since ranges are what you were going to chart anyway',
+				'The exact ages, permanently — you can group later but never ungroup',
+				'Only the mean and the median, which bands cannot be used to calculate',
 			],
 			answer: 1,
 			explanation:
@@ -210,9 +219,9 @@ That last line is the one that makes a project credible rather than merely finis
 		{
 			q: 'You replace every participant name with P01, P02, P03 and call the dataset anonymised. Is it?',
 			options: [
-				'Yes, the names are gone',
-				'No — that is pseudonymisation, and combinations of remaining fields can still identify people',
-				'Yes, provided the file is not published',
+				'Yes — with the names gone there is nothing left to identify anyone',
+				'No — that is pseudonymisation; the other fields can still single people out',
+				'Yes, as long as the file is never published outside the project team',
 			],
 			answer: 1,
 			explanation:
@@ -221,13 +230,13 @@ That last line is the one that makes a project credible rather than merely finis
 		{
 			q: 'A site you need data from publishes no API. What is the right order of moves?',
 			options: [
-				'Write a scraper immediately, since the data is publicly visible',
-				'Look for an official download, then ask the organisation directly, and only then consider scraping — slowly, and never for personal data',
-				'Ask a classmate to scrape it so it is not on your account',
+				'Write a scraper straight away, since the pages are publicly visible',
+				'Look for an official download, then ask the organisation, then consider scraping',
+				'Copy the pages into a spreadsheet by hand, which avoids the legal question',
 			],
 			answer: 1,
 			explanation:
-				'Scraping is the last resort: it may breach the site’s terms, it collects personal data from people who never agreed, it loads someone else’s server, and it breaks when the page changes. A polite email from a student often gets you a clean export instead.',
+				'Scraping is the last resort: it may breach the site’s terms, it collects personal data from people who never agreed, it loads someone else’s server, and it breaks when the page changes. Doing it by hand dodges only the last two — the terms and the personal data are the same either way. A polite email from a student often gets you a clean export instead.',
 		},
 	]}
 />

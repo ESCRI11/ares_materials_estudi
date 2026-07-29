@@ -178,9 +178,9 @@ past in the serial panel — all of it here, without leaving the page.
 		{
 			q: 'What does read_u16() return?',
 			options: [
-				'The voltage on the pin, in volts',
-				'A number from 0 to 65535, proportional to the voltage between 0 V and the reference',
-				'A number whose range depends on the converter in your particular chip',
+				'The exact voltage present on the pin, in volts',
+				'A number from 0 to 65535, proportional to that voltage',
+				'A number whose range depends on your particular chip',
 			],
 			answer: 1,
 			explanation:
@@ -189,9 +189,9 @@ past in the serial panel — all of it here, without leaving the page.
 		{
 			q: 'Your photoresistor reads between 8000 and 30000 in the room you are working in, but you map from 0 to 65535. What goes wrong?',
 			options: [
-				'Nothing — the mapping is mathematically correct',
-				'The output only uses a small part of its range, so the result barely changes',
-				'The ADC reports an error',
+				'Nothing at all: the mapping is arithmetically correct',
+				'The output uses a sliver of its range and barely moves',
+				'The ADC reports an error outside the range you gave',
 			],
 			answer: 1,
 			explanation:
@@ -200,8 +200,8 @@ past in the serial panel — all of it here, without leaving the page.
 		{
 			q: 'You wire a potentiometer to a pin that is not connected to the ADC. What should you expect?',
 			options: [
-				'It works, but with lower resolution',
-				'An error or a meaningless constant reading — only certain pins reach the converter',
+				'It works, but at a lower resolution than usual',
+				'An error, or one constant meaningless number',
 				'The board reads it as a digital input instead',
 			],
 			answer: 1,

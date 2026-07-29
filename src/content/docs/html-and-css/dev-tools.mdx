@@ -80,8 +80,9 @@ highlights that layer on the page. When a gap is the wrong size and you cannot t
 is padding or margin, this answers it in one look.
 
 Two more buttons in that pane earn their place: **`:hov`** forces a state, so you can inspect
-a hover or focus style without keeping the mouse still, and **Computed** lists the final value
-of every property after everything has been resolved.
+a [hover or focus style](/ares_materials_estudi/html-and-css/css-selectors/) without keeping
+the mouse still, and **Computed** lists the final value of every property after everything has
+been resolved.
 
 ## Nothing you do here is saved
 
@@ -154,8 +155,8 @@ Do these on a real website, not on this one. Pick any site with a layout you lik
 		{
 			q: 'In the styles pane, a declaration appears with a line through it. What does that mean?',
 			options: [
-				'It contains a syntax error',
-				'It matched the element but was overridden by a more specific or later rule',
+				'It contains a syntax error the browser rejected',
+				'It matched, then lost to a more specific rule',
 				'It is disabled because the file failed to load',
 			],
 			answer: 1,
@@ -165,9 +166,9 @@ Do these on a real website, not on this one. Pick any site with a layout you lik
 		{
 			q: 'You spend twenty minutes perfecting spacing by editing values in the dev tools. Then you reload the page. What happens?',
 			options: [
-				'The changes are saved to your CSS file',
-				'The changes are lost — dev tools edits live in memory only',
-				'The browser asks whether to keep them',
+				'They are written back into your CSS file',
+				'They are lost — the edits live in memory only',
+				'The browser asks whether you want to keep them',
 			],
 			answer: 1,
 			explanation:
@@ -176,8 +177,8 @@ Do these on a real website, not on this one. Pick any site with a layout you lik
 		{
 			q: 'A page you built shows a blank space where an image should be. Where do you look first?',
 			options: [
-				'The Console tab, for a failed request or an error',
-				'The Elements tree, to add the image again',
+				'The Console tab, for a failed request',
+				'The Elements tree, to check the img tag',
 				'The device toolbar, to check the width',
 			],
 			answer: 0,

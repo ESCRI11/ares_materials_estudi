@@ -114,11 +114,11 @@ breadboard part, and they apply to the real one you get in class.
 <Quiz
 	questions={[
 		{
-			q: 'You push both legs of an LED into holes 12a and 12b of a breadboard — same column, same half. What happens when you power the circuit?',
+			q: 'You push both legs of an LED into two holes of the same five-hole column, on one side of the centre channel. What happens when you power the circuit?',
 			options: [
-				'The LED lights normally',
-				'Nothing lights, because both legs are now the same electrical point',
-				'The LED lights at half brightness',
+				'It lights, because the column carries current to it',
+				'Nothing lights: both legs are now the same point',
+				'It lights dimly, since the column splits the current',
 			],
 			answer: 1,
 			explanation:
@@ -127,9 +127,9 @@ breadboard part, and they apply to the real one you get in class.
 		{
 			q: 'On a schematic, two lines cross but there is no dot at the crossing. What does that mean?',
 			options: [
-				'They are connected — the dot is optional',
-				'They are not connected; they are two separate wires drawn over each other',
-				'The diagram has an error',
+				'They are joined, because the dot is optional',
+				'They are separate wires drawn over each other',
+				'The drawing is wrong and should be redrawn',
 			],
 			answer: 1,
 			explanation:
@@ -138,9 +138,9 @@ breadboard part, and they apply to the real one you get in class.
 		{
 			q: 'An LED and its current-limiting resistor are wired in series. What does that tell you?',
 			options: [
-				'Each one gets the full supply voltage',
-				'The same current flows through both, and the supply voltage divides between them',
-				'The resistor only works if it comes before the LED',
+				'Each of them gets the whole supply voltage',
+				'One current through both, with the voltage shared',
+				'The resistor must come before the LED to work',
 			],
 			answer: 1,
 			explanation:

@@ -2,7 +2,7 @@
 title: Spreadsheets, CSV and JSON
 description: Tidy tables, what a CSV file really is when you open it in a text editor, how JSON maps onto arrays and objects, and choosing between the two.
 sidebar:
-  order: 2
+  order: 3
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -156,11 +156,18 @@ throw away.
 ## Two things that will bite you
 
 **The delimiter is not always a comma.** A **delimiter** is the character that separates one
-value from the next. In countries that write decimals with a comma — Italy and Switzerland
-among them — a comma inside `21,4` would break the file, so spreadsheet software exports
-semicolons instead. The file is still called `.csv`. If your import produces one giant field
-per row, look at the file in a text editor and check what is actually separating the values,
-then tell your tool to use that character.
+value from the next. Spreadsheet software takes it from the machine's regional settings, and
+across most of Europe that means a semicolon — in the many countries that write decimals with
+a comma, a `21,4` sitting in a comma-separated file would split in half, so the whole export
+switches. The file is still called `.csv`, and it may not contain a single comma. If your
+import produces one giant field per row, open the file in a text editor, see what is actually
+separating the values, and tell your tool to use that character.
+
+Switzerland is not one of those countries, which is worth knowing since you are in one of its
+Italian-speaking cantons: a Swiss number is `1'234.56` — a point for the decimal, an
+apostrophe for thousands. That apostrophe is its own problem, and the
+[next lesson](/ares_materials_estudi/data/structuring-and-cleaning/) strips it. The delimiter
+is still whatever the exporting machine felt like, so check rather than assume.
 
 Values containing a comma are wrapped in double quotes: `Lugano,"Ticino, CH",120`. The
 splitting loop above does not handle that, which is honest — it is a teaching snippet, not a
@@ -181,8 +188,8 @@ one. Check a freshly opened CSV against the text file before trusting it.
 		{
 			q: 'In your spreadsheet, rows highlighted yellow mean "unverified". You export to CSV and the code sees no yellow. What should you have done?',
 			options: [
-				'Exported to .xlsx instead, which keeps colours',
-				'Added a verified column holding yes or no, and coloured it afterwards for yourself',
+				'Exported to .xlsx instead, since that format keeps the colours',
+				'Added a verified column holding yes or no, then coloured it for yourself',
 				'Sorted the yellow rows to the bottom so their position carries the meaning',
 			],
 			answer: 1,
@@ -192,24 +199,24 @@ one. Check a freshly opened CSV against the text file before trusting it.
 		{
 			q: 'You read visitors from a CSV and add 10, and get "12010" instead of 130. Why?',
 			options: [
-				'The CSV file is corrupted',
-				'Every value in a CSV arrives as text, and + joins text — convert it with Number() first',
-				'JavaScript cannot add numbers larger than 100',
+				'The spreadsheet exported that column as text, so re-export it as numbers',
+				'Every value from a CSV arrives as text, and + joins text — use Number()',
+				'The file was saved in the wrong encoding, so the digits are not digits',
 			],
 			answer: 1,
 			explanation:
-				'CSV has no types; everything is characters. Some operators convert quietly (* and -), + does not, because joining strings is also a valid meaning for it. Convert on the way in and the rest of your program can stop worrying.',
+				'CSV has no types at all, so there is no export setting that would have helped and no encoding involved: everything in the file is characters. Some operators convert quietly (* and -), + does not, because joining strings is also a valid meaning for it. Convert on the way in and the rest of your program can stop worrying.',
 		},
 		{
 			q: 'A collaborator sends a dataset where each museum object has a list of materials. Which format fits, and why?',
 			options: [
-				'CSV, because it is smaller',
+				'CSV, because the materials fit in one cell separated by commas',
 				'JSON, because a record can hold a list and a CSV cell cannot',
-				'Either — a CSV cell can hold an array',
+				'Either — a CSV cell holds an array if you quote it',
 			],
 			answer: 1,
 			explanation:
-				'A CSV cell holds one flat value. Nesting — a list or another record inside a record — is what JSON is for. The usual workaround in CSV is one row per object per material, which duplicates every other field.',
+				'A CSV cell holds one flat value. Nesting — a list or another record inside a record — is what JSON is for. Packing the materials into one quoted cell means inventing a second format inside the first and parsing it yourself; the honest CSV workaround is one row per object per material, which duplicates every other field.',
 		},
 	]}
 />

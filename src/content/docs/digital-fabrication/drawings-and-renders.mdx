@@ -91,8 +91,10 @@ its case better.
 The `Animation` workspace exists for one purpose: showing how the parts of a thing go
 together.
 
-You get a storyboard along the bottom and a model made of components. The two moves that
-cover most needs:
+You get a storyboard along the bottom and a model made of
+[components rather than bodies](/ares_materials_estudi/digital-fabrication/parametric-modelling/) —
+this is the workspace that cashes in that habit, because only a component can be moved. The two
+moves that cover most needs:
 
 - **Auto-explode**, which pulls every component apart along its own axis in one command. A
   serviceable exploded view in about ten seconds.
@@ -107,11 +109,12 @@ it shows something a still image genuinely cannot: how a joint engages, where a 
 which way a lid comes off. If a photograph would have said the same thing, use the
 photograph.
 
-:::note[Components, not bodies]
-Animation only moves **components** — the named parts of an assembly. If you modelled
-everything as separate *bodies* inside one part, there is nothing for it to explode. Making
-components as you go, and naming them, is a small habit that pays for itself the first time
-you need this workspace.
+:::note[Nothing to explode?]
+If `Auto Explode` does nothing, the design is one component made of several bodies. Select the
+bodies in the browser, right-click, and choose `Create Components from Bodies` — the rescue
+described in
+[parametric modelling](/ares_materials_estudi/digital-fabrication/parametric-modelling/) — then
+come back. Naming the components before you animate them saves doing it twice.
 :::
 
 <Quiz
@@ -119,9 +122,9 @@ you need this workspace.
 		{
 			q: 'What belongs in the title block of a technical drawing?',
 			options: [
-				'A statement of design intent for the project',
-				'Part name, author, date, scale, units, material and revision',
-				'A render of the finished object',
+				'A short statement of the design intent behind the part',
+				'Part name, author, date, scale, units, material, revision',
+				'A small render of the finished object, for context',
 			],
 			answer: 1,
 			explanation:
@@ -130,9 +133,9 @@ you need this workspace.
 		{
 			q: 'You dimension the total width of a part, and also each of the three sections that add up to it. Why is that a problem?',
 			options: [
-				'It is not — more information is always better',
-				'It states the same distance twice, so rounding or a later edit can make the drawing contradict itself',
-				'Drawings can only carry one dimension per view',
+				'It is not a problem: more information is always better',
+				'It states one distance twice, so the two can disagree',
+				'A drawing can carry only one dimension per view',
 			],
 			answer: 1,
 			explanation:
@@ -140,3 +143,25 @@ you need this workspace.
 		},
 	]}
 />
+
+## Do this before the semester starts
+
+All of this is software, so none of it waits for the lab. Use the two-part model from
+[parametric modelling](/ares_materials_estudi/digital-fabrication/parametric-modelling/) — the
+`base` and the `lid` — and produce the two documents that model owes you. A drawing and a
+render of a simple box is a better portfolio page than a complicated model with neither.
+
+- [ ] I switched to the `Drawing` workspace and created a drawing from my design
+- [ ] I placed a front view, dragged out a top and a side view, and added an isometric one
+- [ ] I added a section view and can see the wall thickness in it
+- [ ] I dimensioned only what a maker would need, and no distance twice
+- [ ] I filled in the title block: part name, my name, the date, the scale, millimetres,
+      the material and a revision number
+- [ ] I exported the sheet as a PDF and opened it to check it is readable at A4
+- [ ] I changed a dimension back in `Design` and watched the drawing views update
+- [ ] I switched to `Render`, applied two different appearances, and turned on a ground shadow
+- [ ] I produced a local render — not a cloud one, which a personal-use licence may not offer —
+      and saved the image
+- [ ] I switched to `Animation`, ran `Auto Explode`, and got my parts separating rather than
+      nothing at all
+- [ ] I published a twenty-second video of the lid coming off

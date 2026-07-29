@@ -1,0 +1,281 @@
+---
+title: Array methods
+description: Handing a function to a function — forEach, map, filter and reduce, and which loop each of them replaces.
+sidebar:
+  order: 7
+---
+
+import LiveCode from '@components/LiveCode.astro';
+import Quiz from '@components/Quiz.astro';
+
+You can already walk through a list with `for...of`, and that never stops working. But four of
+those loops turn up so often that JavaScript gives each one a name of its own. The names are
+worth learning for two reasons: they make your intention visible on the line where the loop
+starts, and you cannot read anybody else's JavaScript without them — examples, documentation,
+the code a classmate hands you.
+
+A **method** is a function that belongs to a value and is written after a dot. You have used
+two already: `palette.push("#fff")` and `name.trim()`. The four below are methods on arrays.
+
+## Handing over a function
+
+All four work the same way. You give them a function, and they call it once for each item in
+the list, passing the item in as the argument.
+
+A function passed to something else so that it can be run later is a **callback**. You are not
+calling it — you are handing it over. This is the second time you have written a function as a
+*value* rather than a name, after the arrow functions lesson, and from here it is everywhere.
+
+<LiveCode
+	title="forEach: do something with each item"
+	height={180}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const palette = ["#1b1b1b", "#f7f7f7", "#ffe45c"];
+
+  palette.forEach((colour) => {
+    console.log(colour);
+  });
+</script>`}
+/>
+
+`forEach` is the plainest of the four and does exactly what the `for...of` loop in the previous
+lesson did. It produces no value; you use it for its effects — printing, drawing, adding
+elements to a page. If you want a second parameter for the position, it is there:
+`palette.forEach((colour, i) => …)`.
+
+The other three each hand something back, and that is the reason to prefer them.
+
+## map: the same list, changed
+
+`map` builds a **new** list of the same length. Whatever your callback returns becomes the item
+at that position. The original list is left alone.
+
+<LiveCode
+	title="Numbers in, strings out"
+	height={200}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const sizes = [12, 16, 24];
+
+  const pixels = sizes.map((size) => size + "px");
+
+  console.log(pixels);
+  console.log(sizes);
+</script>`}
+/>
+
+Both lines print, and `sizes` still holds numbers. That is the habit `map` encourages: derive a
+new list rather than edit the one you have, so the original is still there when you need it.
+
+One mistake to expect. With curly brackets, the callback needs a `return`:
+
+```js
+sizes.map((size) => size + "px");            // returns each value
+sizes.map((size) => {
+	return size + "px";
+});                                          // the same thing
+sizes.map((size) => {
+	size + "px";
+});                                          // a list of undefined
+```
+
+The third calculates the string and throws it away. Nothing errors, and you get
+`[undefined, undefined, undefined]`, which is the sort of quiet failure the
+[debugging lesson](/ares_materials_estudi/javascript/when-it-breaks/) is about.
+
+## filter: the same items, fewer of them
+
+`filter` also builds a new list, but the callback answers a question instead of producing a
+value. Return `true` and the item is kept, `false` and it is dropped. The items themselves are
+never changed.
+
+<LiveCode
+	title="Keep the ones that pass"
+	height={220}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const responses = [
+    { name: "Ana", age: 24, consented: true },
+    { name: "Bruno", age: 31, consented: false },
+    { name: "Chiara", age: 19, consented: true },
+  ];
+
+  const usable = responses.filter((person) => person.consented);
+
+  console.log(usable.length, "of", responses.length, "can be used");
+
+  const adults = responses.filter((person) => person.age >= 21);
+  console.log(adults.length, "are 21 or over");
+</script>`}
+/>
+
+The second one shows the usual shape: a comparison inside the callback, which is an expression
+that is already `true` or `false`. Change `21` to `35` and press Run.
+
+This is the loop you wrote by hand at the end of the last lesson, with the `if` moved into the
+callback.
+
+## reduce: many values, one value
+
+`reduce` boils a whole list down to a single thing — a total, a maximum, the longest string.
+Its callback takes **two** parameters: the result so far, and the current item.
+
+<LiveCode
+	title="A total and an average"
+	height={220}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const readings = [4, 9, 14];
+
+  const total = readings.reduce((sum, value) => sum + value, 0);
+
+  console.log("total", total);
+  console.log("average", total / readings.length);
+</script>`}
+/>
+
+The `0` at the end is easy to miss and it is not decoration: it is the starting value of `sum`,
+before any item has been seen. Step by step, that call is:
+
+| `sum` so far | current `value` | returns |
+| --- | --- | --- |
+| 0 | 4 | 4 |
+| 4 | 9 | 13 |
+| 13 | 14 | 27 |
+
+The last `returns` is what `reduce` hands back. Sum, count and average cover almost everything
+you will need it for, and they are the ones you will meet again in
+[Making Sense of Data](/ares_materials_estudi/data/what-data-is-in-design/).
+
+`reduce` is also the one people write unreadably. If a `for` loop with a `total` variable is
+clearer to you on a given day, write that instead — it is the same arithmetic and nobody is
+marking you on brevity.
+
+## Chaining them
+
+Each of these hands back a list, and a list has these methods on it, so they can be written one
+after another. Read the chain left to right as a sentence.
+
+<LiveCode
+	title="Filter, then map, then reduce"
+	height={240}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const responses = [
+    { name: "Ana", age: 24, consented: true },
+    { name: "Bruno", age: 31, consented: false },
+    { name: "Chiara", age: 19, consented: true },
+  ];
+
+  const names = responses
+    .filter((person) => person.consented)
+    .map((person) => person.name);
+
+  console.log(names);
+
+  const meanAge = responses
+    .filter((person) => person.consented)
+    .reduce((sum, person) => sum + person.age, 0) / names.length;
+
+  console.log("mean age", meanAge);
+</script>`}
+/>
+
+*Keep the ones who consented, then take their names.* Breaking the chain across lines with each
+method at the start of a line is the convention, and it keeps a long chain readable. Two or
+three steps is comfortable; at five, give the middle result a name and start a new statement.
+
+## Which one
+
+| What you want | Method |
+| --- | --- |
+| One new item for each old item | `map` |
+| The same items, fewer of them | `filter` |
+| One value out of the whole list | `reduce` |
+| To do something for each and keep nothing | `forEach` |
+
+Three more you will reach for, all in the same shape: `find` returns the first item that passes
+a test, or `undefined`; `includes("Figma")` answers `true` or `false` for a value being present;
+`sort` puts a list in order. The
+[MDN array page](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)
+lists the rest, and is worth opening once so you know what is in there.
+
+## Evaluation
+
+The list below holds every response. Print the names of the people who consented **and** are
+under 30, using two methods.
+
+<LiveCode
+	title="Challenge"
+	height={240}
+	code={`<pre id="out"></pre>
+<script>
+  console.log = (...values) => out.textContent += values.join(" ") + "\\n";
+
+  const responses = [
+    { name: "Ana", age: 24, consented: true },
+    { name: "Bruno", age: 31, consented: true },
+    { name: "Chiara", age: 19, consented: false },
+    { name: "Dario", age: 27, consented: true },
+  ];
+
+  // Your two lines here. Expected: Ana,Dario
+  console.log(responses);
+</script>`}
+/>
+
+<Quiz
+	questions={[
+		{
+			q: 'const a = [1, 2, 3]; const b = a.map((n) => n * 2); console.log(a, b); — what is printed?',
+			options: ['1,2,3 2,4,6', '2,4,6 2,4,6', '1,2,3 1,2,3'],
+			answer: 0,
+			explanation:
+				'map builds a second list and leaves the first one exactly as it was. That is the difference between it and a loop that edits items in place, and it is why map is the safer habit: the original is still there when you need it later.',
+		},
+		{
+			q: 'const out = [1, 2, 3].map((n) => { n * 2; }); console.log(out); — what is in out?',
+			options: ['2,4,6', 'undefined,undefined,undefined', 'An error saying the callback returned nothing'],
+			answer: 1,
+			explanation:
+				'The curly brackets make the callback a block, and a block hands back undefined unless you write return. The multiplication happens and the result is discarded. Either add return, or drop the brackets and write (n) => n * 2.',
+		},
+		{
+			q: 'readings.reduce((sum, value) => sum + value, 0) — what is the 0 for?',
+			options: [
+				'It is the value of sum before the first item is seen',
+				'It is the index of the item reduce should start at',
+				'It rounds the result to zero decimal places',
+			],
+			answer: 0,
+			explanation:
+				'reduce needs somewhere to start. For a total that is 0; for multiplying it would be 1. Leaving it out is legal and makes reduce use the first item as the starting value, which behaves differently on an empty list — so write it.',
+		},
+		{
+			q: 'You have an array of objects and want the names of everyone who consented. Which is the right shape?',
+			options: [
+				'people.filter((p) => p.consented).map((p) => p.name)',
+				'people.map((p) => p.consented).filter((p) => p.name)',
+				'people.forEach((p) => p.consented).map((p) => p.name)',
+			],
+			answer: 0,
+			explanation:
+				'Narrow the list first, then take one property from each of the survivors. The second option maps to a list of true and false, which no longer has any names in it. The third fails immediately: forEach hands nothing back, so there is nothing to call map on.',
+		},
+	]}
+/>
+
+That is the last of the language itself. The rest of this section puts it to work on a web page:
+reading and changing what is on screen, responding to clicks and keys, drawing, sound, and
+fetching data from the internet.

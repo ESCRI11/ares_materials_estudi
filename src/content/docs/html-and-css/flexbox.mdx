@@ -269,8 +269,8 @@ gap between the links. You need `display: flex` and two other declarations on `.
 			q: 'Where does display: flex go?',
 			options: [
 				'On each item you want to arrange',
-				'On the parent element that contains them',
-				'On the body, once per page',
+				'On the element that contains them',
+				'On the body, once for the whole page',
 			],
 			answer: 1,
 			explanation:
@@ -286,9 +286,9 @@ gap between the links. You need `display: flex` and two other declarations on `.
 		{
 			q: 'A row of three cards should sit side by side on a wide screen and stack on a narrow one, with no media query. What gets you closest?',
 			options: [
-				'flex-wrap: wrap on the container plus a min-width on the cards',
-				'align-items: stretch on the container',
-				'flex-direction: column on the container',
+				'flex-wrap: wrap plus a min-width on the cards',
+				'align-items: stretch on the flex container',
+				'flex-direction: column on the flex container',
 			],
 			answer: 0,
 			explanation:

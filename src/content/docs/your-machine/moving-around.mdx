@@ -47,9 +47,11 @@ ls -a      # include hidden files
 Those are **flags**, from the terminal lesson: a dash and a letter that change how the
 command behaves. They combine, so `ls -la` does both.
 
-**Hidden files** are ones whose name starts with a dot, like `.git` or `.gitignore`. They
-are not secret; the convention exists to keep configuration out of your way. You will meet
-several of them in the git section, and they are invisible until you ask.
+**Hidden files** are ones whose name starts with a dot. They are not secret; the convention
+exists to keep configuration out of your way, and they are invisible until you ask. Two of
+them are waiting in the git section: `.git`, the folder holding a project's history, and
+[`.gitignore`](/ares_materials_estudi/git-and-github/what-not-to-commit/), the file listing
+what git must leave alone.
 
 ## Going somewhere else
 
@@ -182,9 +184,9 @@ often one capital letter. Use lowercase and stop thinking about it.
 		{
 			q: 'You press Tab after typing cd Desk and nothing happens. What is the most likely explanation?',
 			options: [
-				'Tab completion is switched off in your terminal',
-				'There is nothing here whose name starts with Desk — you are probably in the wrong folder',
-				'The folder is hidden, so Tab refuses to complete it',
+				'Tab completion has to be switched on in the terminal settings',
+				'Nothing here starts with Desk — you are in the wrong folder',
+				'The folder is hidden, and Tab does not complete hidden names',
 			],
 			answer: 1,
 			explanation:
@@ -193,9 +195,9 @@ often one capital letter. Use lowercase and stop thinking about it.
 		{
 			q: 'On Windows, inside Ubuntu, you type cd /mnt/c/Users. Where have you gone?',
 			options: [
-				'Into the Linux home directory',
-				'Into the users folder of your Windows C: drive',
-				'Nowhere — /mnt is not a real path',
+				'Into the Linux home directory, which is where ~ points',
+				'Into the Users folder of your Windows C: drive',
+				'Nowhere — Windows drives are not visible from Ubuntu',
 			],
 			answer: 1,
 			explanation:

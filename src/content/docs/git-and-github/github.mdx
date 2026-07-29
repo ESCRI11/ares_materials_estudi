@@ -2,7 +2,7 @@
 title: Putting a repository on GitHub
 description: Make an account, create a repository online, connect your local one to it, and clone someone else's.
 sidebar:
-  order: 3
+  order: 4
 ---
 
 Your repository currently exists in one place: a folder on your laptop. That is fine until
@@ -72,21 +72,29 @@ Refresh the GitHub page and your files are there, with your commit messages besi
 ## Authentication: not a password
 
 The first push will ask who you are. **A GitHub account password will not work here** — that
-was switched off in 2021 and every old tutorial that says otherwise is wrong. You have three
-working options:
+was switched off in 2021 and every old tutorial that says otherwise is wrong. Two things do
+work, and both behave the same inside Ubuntu as they do on a Mac:
 
-- **Sign in through the browser.** On macOS and Windows, git usually opens a browser window
-  the first time and remembers the result. If that happens, take it: nothing else to do.
-- **A personal access token** — a long generated string you paste in place of a password.
-  You make one in GitHub's settings, under developer settings.
+- **A personal access token** — a long generated string you paste where git asks for a
+  password. You make one in GitHub's settings, under developer settings. It works
+  immediately, and git asks for it again on the next push unless something on your machine
+  has stored it.
 - **An SSH key** — a pair of files on your machine that proves your identity without typing
-  anything. More setup once, less friction forever. If you plan to use git for the whole
+  anything. More setup once, nothing to type ever again. If you plan to use git for the whole
   master, this is the one worth doing.
+
+:::note[If a browser window opens, take it]
+On a Mac, and on Windows installs that came with git's own bundle, a helper program
+sometimes pops up a browser sign-in the first time and remembers the answer afterwards.
+Inside Ubuntu on WSL2 that does not happen by default: you get a plain `Username` and
+`Password` prompt in the terminal, and the "password" it wants is the token. That is the
+prompt working correctly, not a broken install.
+:::
 
 The exact screens move around, so rather than reproduce steps that will be stale by the time
 you read them: the authentication section of GitHub's own documentation at
-[docs.github.com/en/authentication](https://docs.github.com/en/authentication) covers all
-three, with current screenshots.
+[docs.github.com/en/authentication](https://docs.github.com/en/authentication) covers both,
+with current screenshots.
 
 :::caution[If a token appears on screen, copy it immediately]
 GitHub shows a personal access token exactly once. Close the page without copying it and you
@@ -163,7 +171,7 @@ question, and the subject of the next lesson.
 - [ ] I created an empty repository on GitHub, without a README
 - [ ] I connected my practice folder with `git remote add origin ...`
 - [ ] `git push -u origin main` succeeded and I can see my files on the website
-- [ ] I got past authentication (browser sign-in, a token, or an SSH key)
+- [ ] I got past authentication with a token or an SSH key, and I know my account password is not it
 - [ ] I edited a file locally, committed, pushed, and watched the website change
 - [ ] I edited the same file on the website, then ran `git pull` and saw the change locally
 - [ ] I cloned a repository — mine or a public one — into a different folder

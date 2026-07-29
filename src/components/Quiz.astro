@@ -14,19 +14,57 @@ interface Props {
 }
 
 const { questions, title = 'Check yourself' } = Astro.props;
+
+/*
+ * Options are shuffled at build time, because written by hand they are not random:
+ * across the site 80% of correct answers sat in the middle position, so the whole
+ * quiz apparatus could be beaten at 80% by always clicking option two, without
+ * reading a word.
+ *
+ * The shuffle is seeded from the question text rather than random, so a given
+ * question always shuffles the same way. That keeps builds reproducible and means
+ * a reader who returns to a page sees the order they remember.
+ */
+const seeded = (text: string) => {
+	let h = 2166136261;
+	for (const ch of text) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+	return () => {
+		h = Math.imul(h ^ (h >>> 15), 2246822507);
+		return ((h ^= h >>> 13) >>> 0) / 4294967296;
+	};
+};
+
+const shuffled = questions.map((question) => {
+	const rand = seeded(question.q);
+	const order = question.options.map((option, i) => ({ option, i }));
+	for (let i = order.length - 1; i > 0; i--) {
+		const j = Math.floor(rand() * (i + 1));
+		[order[i], order[j]] = [order[j], order[i]];
+	}
+	return {
+		...question,
+		options: order.map((o) => o.option),
+		answer: order.findIndex((o) => o.i === question.answer),
+	};
+});
+
+// One key for the whole block rather than a data-correct on every button: the site
+// teaches readers to open the element inspector, and a true/false sitting on each
+// option turns that lesson into a way to cheat this one.
+const key = Buffer.from(shuffled.map((q) => q.answer).join(',')).toString('base64');
 ---
 
 {/* not-content keeps Starlight's markdown spacing out of the option list — it
     adds a top margin between adjacent siblings, which fights the flex gap. */}
-<quiz-block class="not-content" data-total={questions.length}>
+<quiz-block class="not-content" data-total={shuffled.length} data-k={key}>
 	<h3 class="quiz-title">{title}</h3>
 	{
-		questions.map((question) => (
+		shuffled.map((question) => (
 			<div class="quiz-q">
 				<p class="quiz-prompt">{question.q}</p>
 				<div class="quiz-options">
-					{question.options.map((option, oi) => (
-						<button type="button" class="quiz-option" data-correct={oi === question.answer}>
+					{question.options.map((option) => (
+						<button type="button" class="quiz-option">
 							{option}
 						</button>
 					))}
@@ -47,19 +85,23 @@ const { questions, title = 'Check yourself' } = Astro.props;
 			connectedCallback() {
 				const total = Number(this.dataset.total);
 				const score = this.querySelector('.quiz-score') as HTMLElement;
+				const answers = atob(this.dataset.k ?? '')
+					.split(',')
+					.map(Number);
 				let answered = 0;
 				let correct = 0;
 
-				this.querySelectorAll<HTMLElement>('.quiz-q').forEach((question) => {
+				this.querySelectorAll<HTMLElement>('.quiz-q').forEach((question, qi) => {
 					question.addEventListener('click', (event) => {
 						const picked = (event.target as HTMLElement).closest('.quiz-option');
 						if (!picked || question.dataset.done) return;
 
 						question.dataset.done = 'true';
-						const isRight = picked.getAttribute('data-correct') === 'true';
+						const options = [...question.querySelectorAll('.quiz-option')];
+						const isRight = options.indexOf(picked) === answers[qi];
 						picked.classList.add(isRight ? 'is-correct' : 'is-wrong');
 						if (!isRight) {
-							question.querySelector('[data-correct="true"]')?.classList.add('is-correct');
+							options[answers[qi]]?.classList.add('is-correct');
 						}
 						(question.querySelector('.quiz-explanation') as HTMLElement).hidden = false;
 

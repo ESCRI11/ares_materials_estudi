@@ -19,9 +19,10 @@ binary. Half brightness, forty-five degrees, a note rather than a click.
 
 **Pulse width modulation**, always written **PWM**, is the standard answer. Instead of holding
 the pin high, you switch it on and off very fast and change the *proportion* of each cycle that
-it spends on. That proportion is the **duty cycle**. A pin at 25 percent duty delivers a
-quarter of the energy, and an LED driven that way looks about a quarter as bright, because your
-eye averages a flicker it cannot resolve.
+it spends on. That proportion is the **duty cycle**. A pin at 25 percent duty delivers a quarter
+of the energy, and an LED driven that way looks dimmer rather than flickering, because your eye
+averages a flicker it cannot resolve. How *much* dimmer is a separate question, and the answer
+is not "a quarter" — see the note below.
 
 This is the same effect as the sleepless blink loop in lesson 5, done deliberately and by
 hardware rather than by your code.
@@ -40,10 +41,17 @@ led = PWM(Pin(15))
 led.freq(1000)
 
 while True:
-    for level in range(0, 65536, 1000):
+    for level in range(0, 65536, 1000):      # up
+        led.duty_u16(level)
+        time.sleep_ms(10)
+    for level in range(65000, -1, -1000):    # and back down
         led.duty_u16(level)
         time.sleep_ms(10)
 ```
+
+Two loops, because one would ramp up and then snap to zero. A negative third argument to
+`range()` counts downwards, and the `-1` is the stopping point it never reaches — the same
+off-by-one rule as `range(10)` giving you 0 to 9.
 
 `duty_u16()` takes 0 to 65535, the same range `read_u16()` produced in the last lesson —
 which means a knob can drive a lamp with no conversion at all:
@@ -121,7 +129,7 @@ feed it, which means you can play notes:
 from machine import Pin, PWM
 import time
 
-buzzer = PWM(Pin(17))
+buzzer = PWM(Pin(18))
 
 def tone(hz, ms):
     buzzer.freq(hz)
@@ -137,6 +145,18 @@ for note in (262, 294, 330, 349):
 Here the frequency carries the meaning and the duty cycle only needs to be somewhere in the
 middle. Setting duty to 0 stops the sound; `buzzer.deinit()` releases the pin entirely when
 you are finished with it.
+
+:::caution[Why the buzzer is on `GP18` and not `GP17`]
+This is the shared-timer trap from the top of the lesson, in the flesh. On the Pico's chip the
+GPIO pins are paired — `GP16` with `GP17`, `GP18` with `GP19`, and so on up — and each pair
+shares one PWM generator, so the two halves of a pair cannot run at different frequencies. Put
+the buzzer on `GP17` beside the servo on `GP16` and every note you play drags the servo off its
+50 Hz and makes it twitch or go limp.
+
+`GP18` is in the next pair along, so the two are independent. The pairing is a fact about this
+chip: on the board you are handed in class, check its pinout for which pins share a generator
+before you put two PWM outputs side by side.
+:::
 
 ## Why motors need help
 
@@ -181,9 +201,12 @@ simulator drives all three without leaving the page, and nothing you wire wrongl
 - [ ] I changed the PWM frequency to 5 Hz and saw the fade turn into a visible flicker
 - [ ] I squared the level before sending it and compared how even the fade looks
 - [ ] I added a potentiometer and used `duty_u16(knob.read_u16())` to dim the LED by hand
-- [ ] I added a servo, set 50 Hz, and made it move between two positions
+- [ ] I added a servo on `GP16`, set 50 Hz, and made it move between two positions
 - [ ] I changed `MIN_US` and `MAX_US` and watched the travel change
-- [ ] I added a buzzer and played four different notes with PWM
+- [ ] I added a buzzer on `GP18` and played four different notes with PWM
+- [ ] I ran the servo and the buzzer together and the servo held its positions
+- [ ] I moved the buzzer to `GP17` on purpose, played a note, and watched what happens to the
+      servo — then moved it back to `GP18`
 - [ ] I can explain why the servo's signal wire is fine on a pin but its power wire is not
 
 <Quiz
@@ -191,9 +214,9 @@ simulator drives all three without leaving the page, and nothing you wire wrongl
 		{
 			q: 'What does changing the duty cycle of a PWM signal do?',
 			options: [
-				'Lowers the voltage the pin outputs',
-				'Changes the proportion of each cycle the pin spends switched on',
-				'Changes how many cycles per second the pin produces',
+				'Lowers the steady voltage the pin puts out',
+				'Changes how much of each cycle the pin spends on',
+				'Changes how many cycles per second the pin makes',
 			],
 			answer: 1,
 			explanation:
@@ -202,9 +225,9 @@ simulator drives all three without leaving the page, and nothing you wire wrongl
 		{
 			q: 'A servo is driven at 50 Hz. What actually tells it what position to take?',
 			options: [
-				'The frequency of the signal',
-				'The length of the on-pulse in each cycle, roughly 1 to 2 milliseconds',
-				'The voltage of the signal',
+				'The frequency, set here to 50 cycles a second',
+				'The length of the on-pulse, roughly 1 to 2 ms',
+				'The voltage the signal wire is held at',
 			],
 			answer: 1,
 			explanation:
@@ -213,9 +236,9 @@ simulator drives all three without leaving the page, and nothing you wire wrongl
 		{
 			q: 'Why should a DC motor not be connected directly to a GPIO pin?',
 			options: [
-				'The pin voltage is too low to turn a motor',
-				'The motor draws far more current than a pin can supply, and produces voltage spikes when switched off',
-				'Motors can only be controlled from analog pins',
+				'The pin voltage is too low to turn a motor at all',
+				'It draws far more current than any pin can supply',
+				'Motors can only be driven from an analog pin',
 			],
 			answer: 1,
 			explanation:

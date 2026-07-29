@@ -84,7 +84,7 @@ faster than writing three paragraphs about what you are looking at.
 Run it inside a cloned repository and it can see the branch you are on, your uncommitted
 changes, and the recent history. It reads that as context without being asked.
 
-Git commands are just shell commands, so the permission rules you already know apply:
+Git commands are shell commands, so the permission rules you already know apply:
 
 | It runs freely | It asks first |
 |---|---|
@@ -155,7 +155,7 @@ are keeping the thing it built inside the set of things you understand.
 			],
 			answer: 1,
 			explanation:
-				'Finding the responsible file is the work you wanted done. Use @ when you can already name the file; describe the behaviour when you cannot. Referencing everything just fills the conversation with material that is not relevant.',
+				'Finding the responsible file is the work you wanted done. Use @ when you can already name the file; describe the behaviour when you cannot. Referencing everything fills the conversation with material that is not relevant.',
 		},
 		{
 			q: 'Which of these will it run without stopping to ask you?',
@@ -167,9 +167,9 @@ are keeping the thing it built inside the set of things you understand.
 		{
 			q: 'You ask it to open a pull request and it cannot. What is the most likely reason?',
 			options: [
-				'Pull requests can only be created on the GitHub website',
-				'The gh command-line tool is not installed or not authenticated',
-				'It never has permission to interact with GitHub',
+				'Pull requests can only be opened from the GitHub website itself',
+				'The gh command-line tool is missing or not authenticated',
+				'Claude Code is not allowed to reach GitHub over the network',
 			],
 			answer: 1,
 			explanation:
@@ -178,9 +178,9 @@ are keeping the thing it built inside the set of things you understand.
 		{
 			q: 'Why is committing before you start a session worth doing?',
 			options: [
-				'It is required — sessions will not start in a dirty repository',
-				'It makes git diff a straight answer to "what did this session change?"',
-				'It stops the tool from editing files you have already committed',
+				'It is required — a session will not start in a dirty repository',
+				'It makes git diff answer "what did this session change?"',
+				'It stops the tool from touching files you have already committed',
 			],
 			answer: 1,
 			explanation:

@@ -71,6 +71,8 @@ Six images where the prose is genuinely doing worse than a picture would.
 | `devtools-elements-styles.png` | The browser dev tools | *Priority 1 — see above* |
 | `devtools-box-model.png` | The box model | The **box-model diagram** in the Computed pane, with content, padding, border and margin numbered. This lesson has no diagram — mermaid can't draw nested rectangles — so a real one fills a genuine gap. |
 | `devtools-device-toolbar.png` | Responsive design | The device toolbar on, page rendered at a narrow width, with the pixel dimensions readable. |
+| `vscode-two-file-project.png` | HTML & CSS → Build a page from two files | The VS Code Explorer showing `index.html` and `style.css` side by side inside a `portfolio` folder, with the editor open. The new lesson has the reader create both by hand and there is currently no picture of the result. |
+| `devtools-hover-state.png` | HTML & CSS → CSS and selectors | Dev tools with `:hov` open and `:hover` forced on, so the reader can see the state being simulated rather than only read about it. |
 
 ### 4 · JavaScript
 

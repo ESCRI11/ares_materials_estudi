@@ -2,7 +2,7 @@
 title: Animating a canvas
 description: requestAnimationFrame, clearing and redrawing, a variable that changes every frame, bouncing and easing.
 sidebar:
-  order: 10
+  order: 11
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -246,9 +246,9 @@ reverse the growth when it gets too big or too small, so it breathes.
 		{
 			q: 'Why call requestAnimationFrame inside the function it runs, rather than using a for loop that repeats 10000 times?',
 			options: [
-				'A for loop would run every repetition before the browser could draw anything, freezing the page',
-				'for loops cannot contain drawing commands',
-				'requestAnimationFrame is faster arithmetic',
+				'The browser cannot repaint until your loop finishes, so the page would freeze',
+				'A for loop cannot repeat often enough to keep up with the screen',
+				'requestAnimationFrame runs your arithmetic faster than a loop does',
 			],
 			answer: 0,
 			explanation:
@@ -257,9 +257,9 @@ reverse the growth when it gets too big or too small, so it breathes.
 		{
 			q: 'What does x = x + (targetX - x) * 0.1 do over several frames?',
 			options: [
-				'Moves x at a constant ten pixels per frame',
-				'Moves x a tenth of the remaining distance each frame, so it decelerates as it arrives',
-				'Sets x to a tenth of targetX',
+				'Moves x at a constant ten pixels per frame until it reaches targetX',
+				'Moves x a tenth of the way to targetX each frame, so it slows as it arrives',
+				'Sets x to a tenth of targetX, and then leaves it there for good',
 			],
 			answer: 1,
 			explanation:

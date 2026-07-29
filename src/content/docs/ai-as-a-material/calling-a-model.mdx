@@ -15,6 +15,11 @@ that this would be the same `fetch` you already wrote, with a key added. It is. 
 the key, the shape of the request, and the four practical facts — cost, latency, streaming,
 rate limits — that decide how the thing feels to use.
 
+One difference from every JavaScript lesson so far: this code runs from your terminal rather
+than in a browser tab, because a browser cannot be trusted with the key. That means Node, so
+[JavaScript outside the browser](/ares_materials_estudi/javascript/outside-the-browser/) is the
+lesson to have done first. The next section explains why the browser is out.
+
 ## What an API key is
 
 An **API key** is a long secret string that identifies your account to the service. It is not a
@@ -29,12 +34,9 @@ first two get broken constantly by people who then find out what it cost.
 A key committed to git is in the history for ever, even if your next commit deletes it. Public
 repositories are scanned by bots within minutes of a push — this is not a hypothetical.
 
-Keep keys out of your project files entirely, and add the file that holds them to
-`.gitignore`, the list of things git must never record:
-
-```text
-.env
-```
+So keep keys out of your project files entirely. Not in the JavaScript, not in a config file,
+not in a comment, not in a screenshot of your editor. The third rule below is where they go
+instead, and it puts the key nowhere git can see it.
 
 If you do commit one: revoke it in the provider's dashboard immediately and generate a new one.
 Do not attempt to scrub it from the history first — every minute it stays valid is the risk.
@@ -52,11 +54,12 @@ That has a real consequence for your setup: **GitHub Pages serves static files a
 a secret.** A site published there cannot call a paid API with your key. The ways around it, in
 order of effort:
 
-- **Prototype locally.** Run the code on your own machine from the terminal, where the key
-  lives in your environment and no visitor exists. This covers almost all coursework.
-- **Use a model that runs on the visitor's own machine or on yours** — the subject of the
-  [next lesson](/ares_materials_estudi/ai-as-a-material/running-a-model-locally/), and the
-  reason local models matter for installations.
+- **Prototype locally.** Run the code on your own machine
+  [with Node](/ares_materials_estudi/javascript/outside-the-browser/), where the
+  key lives in your environment and no visitor exists. This covers almost all coursework.
+- **Use a model that runs on the visitor's own machine or on yours** — the subject of
+  [running a model locally](/ares_materials_estudi/ai-as-a-material/running-a-model-locally/),
+  and the reason local models matter for installations.
 - **Put a small server of your own in the middle.** Your page calls your server, your server
   holds the key and calls the provider. This is the real answer for a public product, and it
   is a hosting problem rather than a code problem.
@@ -80,14 +83,14 @@ run from your own terminal is the same picture with the first participant remove
 
 ### Put the key in an environment variable
 
-An **environment variable** is a named value that belongs to the environment a program runs in
-rather than to the program's source. Your code reads it by name, so the secret never appears in
-a file you might share.
-
-Setting one for the current terminal session:
+An **environment variable** is a named value that belongs to the terminal session a program runs
+in rather than to the program's source. Your code reads it by name, so the secret never appears
+in a file you might share. This is the setup from
+[JavaScript outside the browser](/ares_materials_estudi/javascript/outside-the-browser/), and
+it is the whole of it:
 
 ```bash
-# macOS and Linux
+# macOS, Linux and WSL
 export MODEL_API_KEY="paste-the-key-here"
 ```
 
@@ -95,9 +98,6 @@ export MODEL_API_KEY="paste-the-key-here"
 # Windows PowerShell
 $env:MODEL_API_KEY = "paste-the-key-here"
 ```
-
-Reading it in JavaScript run by **Node** — the program that runs JavaScript outside a browser,
-which is what makes this possible at all:
 
 ```js
 const key = process.env.MODEL_API_KEY;
@@ -107,8 +107,9 @@ if (!key) {
 }
 ```
 
-That check is three lines of politeness to your future self, who will otherwise spend twenty
-minutes debugging an authentication error caused by a new terminal window.
+That check is three lines of politeness to your future self. The variable lives in the terminal
+window you set it in and nowhere else, so a new window means an authentication error that has
+nothing to do with your code — set it again, in the window you are running from.
 
 ## The shape of a request
 
@@ -183,11 +184,21 @@ a call actually cost you.
 
 The consequence people miss: in a conversation, you resend the entire history on every turn.
 Turn twenty costs twenty turns' worth of input tokens. Long documents pasted into a system
-prompt are paid for on every single request, not once.
+prompt are paid for on every single request, not once — with one exception, which is the next
+paragraph.
 
-Two habits that follow: cap what you send, and cap what you ask for. Most APIs have a setting
-for the maximum length of the reply, and setting it is cheaper than reading a three-page answer
-you did not want.
+**Caching** is that exception. Providers commonly let you mark the unchanging front of your
+input — the system prompt, the examples, the long document — so that on the following requests
+it is charged at a reduced rate instead of the full one. It is not automatic, it applies to a
+prefix rather than to text scattered through the request, and the saving expires after a period
+of inactivity. The design consequence is worth knowing even before you switch it on: **put the
+stable material first and the changing part last**. Written that way round, a long standing
+brief stops being the expensive mistake it otherwise is; written the other way round, nothing
+can be cached at all.
+
+Two habits that follow anyway: cap what you send, and cap what you ask for. Most APIs have a
+setting for the maximum length of the reply, and setting it is cheaper than reading a
+three-page answer you did not want.
 
 ## Latency, and why streaming exists
 
@@ -228,9 +239,9 @@ turns into a bill.
 		{
 			q: 'Why can a page published on GitHub Pages not call a paid model API with your key?',
 			options: [
-				'GitHub blocks requests to AI providers',
-				'The page is static files, so any key in its JavaScript is readable by every visitor',
-				'GitHub Pages does not support fetch',
+				'GitHub blocks browser requests to AI providers by default',
+				'It serves static files, so any key in its JavaScript is public',
+				'A browser cannot send an Authorization header to another site',
 			],
 			answer: 1,
 			explanation:
@@ -239,26 +250,26 @@ turns into a bill.
 		{
 			q: 'Your conversation is twenty turns long and each request costs more than the last. Why?',
 			options: [
-				'The provider charges more for later requests',
-				'The model has no memory, so the whole history is sent again on every turn and you pay for those input tokens each time',
-				'The model gets slower as it learns your style',
+				'Long conversations are billed at the output rate, not the input rate',
+				'The model has no memory, so the whole history is re-sent and re-billed',
+				'The provider raises its rate as a conversation gets longer',
 			],
 			answer: 1,
 			explanation:
-				'Each call is independent. Continuity is an illusion produced by resending the previous messages, and every resent token is billed again. Long documents in a system prompt are paid for on every request too.',
+				'Each call is independent. Continuity is an illusion produced by resending the previous messages, and every resent token is billed again — at the ordinary input rate, unless you have marked the unchanging front of the request for caching.',
 		},
 		{
 			q: 'What does streaming change?',
 			options: [
-				'The answer is generated faster',
-				'The answer costs less',
-				'Tokens arrive as they are produced, so the wait is visible rather than blank',
+				'The answer is finished sooner, because generation is parallelised',
+				'The reply costs less, since you are billed only for what you read',
+				'Tokens arrive as they are produced, so the wait becomes visible',
 			],
 			answer: 2,
 			explanation:
-				'Generation takes the same time either way — the work is per token. Streaming is an interface decision: progressive text reads as working, while a motionless screen reads as broken.',
+				'Generation takes the same time either way — the work is per token — and you are billed for what the model produced, not for how much of it you read. Streaming is an interface decision: progressive text reads as working, while a motionless screen reads as broken.',
 		},
 	]}
 />
 
-Next: [running a model on your own machine](/ares_materials_estudi/ai-as-a-material/running-a-model-locally/).
+Next: [what a model can do besides text](/ares_materials_estudi/ai-as-a-material/beyond-text/).

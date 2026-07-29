@@ -176,8 +176,8 @@ the page.
 		{
 			q: 'What is a REPL?',
 			options: [
-				'The file a microcontroller runs on start-up',
-				'A live prompt that reads a line you type, runs it immediately, and prints the result',
+				'The file a microcontroller runs when it starts up',
+				'A live prompt that runs each line as you type it',
 				'The program that copies your code onto the board',
 			],
 			answer: 1,
@@ -187,9 +187,9 @@ the page.
 		{
 			q: 'The serial monitor shows a stream of meaningless characters instead of your text. What is the most likely cause?',
 			options: [
-				'The board is damaged',
+				'The USB cable is damaged and dropping bytes',
 				'The baud rate at the two ends does not match',
-				'The program crashed',
+				'The program crashed and printed its error',
 			],
 			answer: 1,
 			explanation:
@@ -198,9 +198,9 @@ the page.
 		{
 			q: 'Your program does `count = input("how many? ")` and then `count + 1`. What happens?',
 			options: [
-				'It works — MicroPython converts the text automatically',
-				'It fails, because input() returns text and you cannot add a number to it',
-				'It waits forever',
+				'It works: MicroPython converts the text for you',
+				'It fails, because input() hands you text, not a number',
+				'It waits forever, because input() never returns',
 			],
 			answer: 1,
 			explanation:

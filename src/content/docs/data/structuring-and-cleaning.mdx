@@ -2,7 +2,7 @@
 title: Structuring and cleaning
 description: Missing values, duplicates, categories that disagree with themselves, dates, units and outliers — and why every cleaning decision has to be written down.
 sidebar:
-  order: 3
+  order: 4
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -104,9 +104,19 @@ therefore vicious. `.toLowerCase()` settles the capitals. The `canonical` object
 everything else, and it is written by hand on purpose — a machine cannot know whether `ZH`
 means Zurich or a person's initials.
 
-`tally[name] = (tally[name] || 0) + 1` is the counting idiom: take what is there, or zero if
-this is the first time, then add one. Add `"ZH"` to the raw list and press Run — an
-unrecognised value announces itself rather than vanishing, which is the behaviour you want.
+Two pieces of JavaScript in there are new.
+
+`continue` abandons the current turn of the loop and jumps straight to the next value. The
+counting line below it never runs for a spelling the lookup did not recognise.
+
+`tally[name] = (tally[name] || 0) + 1` is the counting idiom. Between two values rather than
+two comparisons, `||` is not the boolean *or* from
+[conditionals](/ares_materials_estudi/javascript/conditionals/): it hands back the left side
+if there is anything in it, and the right side otherwise. `tally[name]` is `undefined` the
+first time a city appears, so you get `0 + 1`, and after that the running total plus one.
+
+Add `"ZH"` to the raw list and press Run — an unrecognised value announces itself rather than
+vanishing, which is the behaviour you want.
 
 ## Dates, numbers and units
 
@@ -190,20 +200,20 @@ and re-running it after the second batch of responses arrives takes a second.
 		{
 			q: 'Ages in your dataset include several values of 999, and your average age comes out at 61. What is going on?',
 			options: [
-				'Your participants really were old',
-				'999 is being used as a stand-in for a missing value and is being averaged in as a real number',
-				'The mean is the wrong measure for age',
+				'Your sample really did skew towards much older participants',
+				'999 stands for a missing value and is averaged in as a real age',
+				'The mean is the wrong measure here — use the median instead',
 			],
 			answer: 1,
 			explanation:
-				'Stand-ins like 999, -1 and N/A are more dangerous than blanks, because they survive every check that looks for emptiness. Find them, convert them to genuine missing values, and decide explicitly what each calculation does with them.',
+				'Stand-ins like 999, -1 and N/A are more dangerous than blanks, because they survive every check that looks for emptiness. Find them, convert them to genuine missing values, and decide explicitly what each calculation does with them. Switching to the median would only hide the 999s, which are still in your dataset.',
 		},
 		{
 			q: 'In a survey of ten studios, nine report budgets around 3,000 and one reports 300,000. The mean is 32,700, the median 3,000. What should you do?',
 			options: [
-				'Delete the 300,000 row so the chart looks sensible',
-				'Look at that record to find out what it is, report the median alongside the mean, and write down whatever you decide',
-				'Report only the mean, because it uses every value',
+				'Delete the 300,000 row, since one studio should not drive the chart',
+				'Look at that record, report the median with the mean, and log it',
+				'Report only the mean, because it is the measure that uses every value',
 			],
 			answer: 1,
 			explanation:
@@ -212,9 +222,9 @@ and re-running it after the second batch of responses arrives takes a second.
 		{
 			q: 'Why keep the raw file untouched and write a separate cleaned copy?',
 			options: [
-				'To save disk space',
-				'Because manual edits to the only copy are unrepeatable and invisible — the raw file plus a log is what makes the work checkable',
-				'Because CSV files cannot be edited safely',
+				'So there is a backup if the cleaned file is lost or overwritten',
+				'Because manual edits to the only copy are unrepeatable and invisible',
+				'Because the raw file is the one you hand in with the project',
 			],
 			answer: 1,
 			explanation:

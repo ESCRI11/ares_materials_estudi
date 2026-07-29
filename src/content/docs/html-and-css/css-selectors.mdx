@@ -32,8 +32,13 @@ applies to. Everything inside the braces is the **declaration block**, a list of
 **declarations**. Each declaration is a **property** (what you are changing), a colon, a
 **value** (what you are changing it to), and a semicolon.
 
-The semicolon after every declaration is not optional. A missing one silently kills the
-declaration after it, and it is the single most common reason a beginner's CSS "does nothing".
+The semicolon after every declaration is not optional, and leaving one out costs you two
+lines rather than one. The browser splits the block at the semicolons, so a missing one
+glues your declaration and the next one together into a single unreadable declaration —
+which it then throws away whole. The line you forgot the semicolon on is lost, the line
+after it is lost, and everything from the next semicolon onwards is fine. There is no error
+message; you get less CSS than you wrote. It is the single most common reason a beginner's
+CSS "does nothing".
 
 ## Three ways to attach CSS to HTML
 
@@ -115,6 +120,54 @@ h1, h2, h3 { font-family: Helvetica, Arial, sans-serif; }
 The second rule reads "any paragraph inside anything with the class `card`" — a paragraph
 elsewhere on the page is untouched.
 
+## States: hover and focus
+
+Some selectors match an element only while it is in a particular **state**. They are written
+with a colon after the selector and called **pseudo-classes** — *pseudo* because the state is
+not a class you typed into the HTML; the browser applies it and takes it away again.
+
+Two of them do most of the work:
+
+- **`:hover`** matches while the pointer is over the element. This is the feedback that tells
+  someone a thing is clickable before they click it.
+- **`:focus`** matches while the element is the one receiving keyboard input — after a `Tab`
+  press, or after clicking into a field. Browsers draw a ring by default.
+
+<LiveCode
+	title="Hover the link, then press Tab"
+	height={300}
+	code={`<style>
+  body { font-family: Helvetica, Arial, sans-serif; margin: 1.5rem; }
+  a {
+    color: #1b1b1b;
+    text-decoration: none;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 2px;
+  }
+  a:hover  { border-bottom-color: crimson; }
+  a:focus  { outline: 3px solid teal; outline-offset: 4px; }
+</style>
+
+<p><a href="#">Move the pointer over me, then click in this panel and press Tab.</a></p>`}
+/>
+
+Three rules about these, and the third is the one people get wrong.
+
+**A hover style should change something visible and nothing structural.** Colour, underline,
+background, opacity. Changing size or padding on hover makes the layout jump under the
+pointer, which reads as a fault.
+
+**Never remove the focus ring without replacing it.** `outline: none` is a line people copy
+from the internet because the default ring looks untidy. It leaves anyone navigating by
+keyboard — including anyone who cannot use a mouse — unable to see where they are on your
+page. Restyle it, do not delete it.
+
+**Hover does not exist on a touch screen.** A phone has no pointer to hover with, so a tap
+either does nothing until the second tap or fires the link immediately. Anything you hide
+behind `:hover` is unreachable there: a caption that only appears on hover, a menu
+that only opens on hover, a button whose label is a tooltip. Treat hover as a bonus for
+people with a mouse, never as the only way to reach something.
+
 ## Colour and type
 
 Colour comes in the notations you already use:
@@ -173,15 +226,16 @@ beats a class; a class beats an element name; an inline `style` attribute beats 
 	title="Specificity, visible"
 	height={280}
 	code={`<style>
-  p        { color: grey; }
-  .alert   { color: crimson; }
-  #banner  { color: teal; }
+  p              { color: grey; }
+  .alert         { color: crimson; }
+  /* An id is unique, so two paragraphs need two ids. */
+  #banner, #note { color: teal; }
 </style>
 
 <p>Element rule: grey.</p>
 <p class="alert">Class beats element: crimson.</p>
 <p class="alert" id="banner">Id beats class: teal.</p>
-<p class="alert" id="banner" style="color: black">Inline beats everything: black.</p>`}
+<p class="alert" id="note" style="color: black">Inline beats everything: black.</p>`}
 />
 
 **2. Order.** When specificity ties, the rule written later wins. Two `.alert` rules in the
@@ -194,8 +248,18 @@ which is why almost every stylesheet starts there. Box properties like `border` 
 do not inherit; they would look absurd if they did.
 
 :::tip[When a style refuses to apply]
-It is nearly always one of four things: a typo in the class name, a missing semicolon on the
-line above, another rule winning on specificity, or the file not saved. Check in that order.
+It is nearly always one of five things. Check in this order:
+
+1. **The file is not saved.** Free to check, and it is this more often than you would like.
+2. **A typo in the class name** — in the HTML, in the CSS, or a capital letter in one of
+   them and not the other.
+3. **A missing semicolon on the line above**, which takes your line down with it.
+4. **Another rule winning on specificity.**
+5. **The browser is showing you a cached copy of the stylesheet.** Hold `Shift` and click
+   reload, or press `Ctrl+Shift+R` (`Cmd+Shift+R` on macOS), to force a fresh one. This one
+   only applies once your CSS is in a separate file, and it is maddening until you know it
+   exists.
+
 The [dev tools lesson](/ares_materials_estudi/html-and-css/dev-tools/) shows you how to see
 the answer in the browser instead of guessing at it.
 :::
@@ -238,8 +302,8 @@ face, and make the year small and uppercase. Everything you need is in this less
 			q: 'Two rules both match your paragraph: p { color: grey; } and .lead { color: crimson; }. The paragraph has class="lead". What colour is it?',
 			options: [
 				'Grey, because the element selector is more general',
-				'Crimson, because a class is more specific than an element name',
-				'Whichever rule is written last in the file',
+				'Crimson, because a class outranks an element name',
+				'Whichever of the two is written last in the file',
 			],
 			answer: 1,
 			explanation:
@@ -248,13 +312,24 @@ face, and make the year small and uppercase. Everything you need is in this less
 		{
 			q: 'You want the same styling on twelve captions across the page. Which selector do you use?',
 			options: [
-				'An id, applied to each of the twelve',
-				'A class, applied to each of the twelve',
-				'Twelve inline style attributes',
+				'An id named caption on each of them',
+				'A class named caption on each of them',
+				'An inline style attribute on each of them',
 			],
 			answer: 1,
 			explanation:
 				'A class is designed to be reused across any number of elements. An id must be unique in the page, so twelve of them is invalid. Inline styles work but leave you editing twelve places for one change.',
+		},
+		{
+			q: 'A project caption only appears on :hover over the image. What happens on a phone?',
+			options: [
+				'It appears when the visitor taps the image',
+				'The caption is unreachable — there is no pointer',
+				'The browser shows it permanently instead',
+			],
+			answer: 1,
+			explanation:
+				'Touch screens have nothing to hover with. A tap might flash the state for a moment, or go straight to whatever the element does, and either way the visitor has no reason to think a caption is there. Anything that has to be read belongs on the page; hover adds emphasis, not content.',
 		},
 	]}
 />

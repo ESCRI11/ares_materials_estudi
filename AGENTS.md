@@ -9,9 +9,11 @@ requirements of the MA SUPSI in Interaction Design (2026/27). The reader is smar
 has never used a terminal, git, or an Arduino. Nothing may assume prior programming
 knowledge.
 
-Source of truth for scope: `Syllabus-MA-Interaction-Design-2627.pdf` (abridged, 13 pages —
-the per-course detail pages it references are missing). It is **gitignored**, so it only
-exists on the author's machine; the content map below is what survives in the repo.
+Source of truth for scope: `Syllabus-MA-Interaction-Design-2627.pdf` — 82 pages, including
+the per-course detail pages (pp. 18–39 cover semester 1) that carry the actual tool and
+language requirements. Read those, not just the summary tables: they are where the site's
+two least obvious decisions come from. It is **gitignored**, so it only exists on the
+author's machine; the content map below is what survives in the repo.
 
 ## Stack
 
@@ -26,7 +28,7 @@ component". Do not migrate off it without being asked.
 
 ```
 src/content/docs/     # every .md/.mdx here becomes a page
-src/components/       # Quiz.astro, P5Embed.astro, and nothing else unless justified
+src/components/       # Quiz, LiveCode, Embed — and nothing else unless justified
 src/styles/custom.css # theme overrides — CSS variables, not a Starlight fork
 astro.config.mjs      # site + base + fonts + sidebar order + the checklist script
 .github/workflows/    # deploy.yml — build and publish on push to main
@@ -58,7 +60,7 @@ Three formats, in order of preference:
   `answer` is the index of the correct option. `explanation` is required — a wrong answer
   must teach. Marks right/wrong on click, reveals the correct option, scores at the end.
 - **Self-check task list** — plain markdown checkboxes (`- [ ] …`) for things a quiz can't
-  test ("install this", "push your first commit"). Use for git, terminal, Figma, CAD.
+  test ("install this", "push your first commit"). Use for git, terminal, Fusion, Wokwi.
   Markdown renders these disabled, so a script in `astro.config.mjs` re-enables them and
   persists ticks to `localStorage` per page. Nothing to import.
 - **`<LiveCode>`** — `import LiveCode from '@components/LiveCode.astro'`, then

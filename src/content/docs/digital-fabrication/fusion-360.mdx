@@ -23,8 +23,12 @@ the same place: go to **autodesk.com** and use their own search or menus.
   You have to prove you are a student, which usually means an institutional email address
   or a document from SUPSI — so this one becomes available once you are enrolled.
 - **Personal-use licence.** A free, non-commercial version available to anyone, found in the
-  Fusion product pages. Some features are switched off and the licence has to be renewed
-  periodically, but everything in these lessons works on it.
+  Fusion product pages. The licence has to be renewed periodically, and a set of features is
+  switched off — the ones that run on Autodesk's servers or exist for production, such as
+  cloud rendering, generative design and most of the manufacturing tools. Modelling,
+  parameters, assemblies, drawings, local rendering and exporting DXF, STL and 3MF all work,
+  which is everything these lessons ask you to do. Where a lesson meets one of the missing
+  features it says so and gives you the route that works.
 
 Start on personal use now, and switch to the education licence when your SUPSI credentials
 arrive. Nothing is lost in the change.
@@ -131,7 +135,10 @@ invisible.
 :::note[Set your units before you draw]
 In the browser, right-click `Document Settings` (or open the units entry underneath it) and
 confirm you are in **millimetres**. Every Fablab machine in Europe works in millimetres, and
-a model built in inches arrives at the printer at 25.4 times the size you meant.
+the mesh formats carry no units at all: an STL exported from a model built in inches is read
+by the slicer as millimetres, so a part you drew at 50 mm arrives as a 2 mm speck — 25.4 times
+too small. It is an easy mistake to spot, because the preview is comically wrong, and an
+annoying one to undo.
 :::
 
 ## Check yourself

@@ -1,0 +1,229 @@
+---
+title: JavaScript outside the browser
+description: What Node is, installing it, running a .js file from the terminal, and what is missing when there is no page.
+sidebar:
+  order: 15
+---
+
+import Quiz from '@components/Quiz.astro';
+
+Every line of JavaScript so far has run inside a browser tab, attached to a page. Some things
+cannot happen there. A browser cannot open a file on your disk without you choosing it in a
+dialogue, and it cannot keep a secret — anything in a page is visible to anyone who opens the
+developer tools, including the API key you were told never to publish.
+
+**Node.js**, usually called Node, is the same JavaScript running as an ordinary program on your
+machine, with no page and no browser around it. It is not a new language and there is no new
+syntax to learn: it is the engine out of Chrome, packaged as a command you type in the terminal.
+
+You need it for three things this semester: calling a model's API with a key, running any tool
+that is distributed as a JavaScript package, and processing files without opening a browser at
+all.
+
+## Check whether you already have it
+
+Open your terminal — Ubuntu on Windows, Terminal on macOS — and ask:
+
+```sh
+node --version
+```
+
+A line like `v22.11.0` means it is installed and you can skip the next part. `command not found`
+means it is not.
+
+## Installing it
+
+Same rule as everything else in
+[installing software](/ares_materials_estudi/your-machine/installing-software/): command-line
+tools go where you type their names, which on Windows means inside Ubuntu, not PowerShell.
+
+```sh
+# Windows, in the Ubuntu terminal
+sudo apt update
+sudo apt install nodejs npm
+```
+
+```sh
+# macOS
+brew install node
+```
+
+Then check it landed:
+
+```sh
+node --version
+npm --version
+```
+
+:::note[If a tool later asks for a newer version]
+Ubuntu's package is stable rather than current, so it can be a year or two behind. Nothing in
+this section cares. If some tool refuses to install because it wants a newer Node, get the LTS
+release from [nodejs.org](https://nodejs.org) and follow the instructions there for your system.
+:::
+
+**npm** arrives with Node. It is the package manager for JavaScript — the same idea as `apt` or
+Homebrew, for libraries rather than programs. `npm install some-library` downloads it into a
+`node_modules` folder next to your file. That folder is large, rebuildable, and belongs in your
+`.gitignore` rather than in a commit.
+
+## Running a file
+
+Make a folder, and in it a file called `hello.js`:
+
+```js
+const tools = ["Fusion", "Arduino", "Figma"];
+
+console.log("Hello from Node");
+console.log(tools.length + " tools");
+```
+
+In the terminal, move into that folder and run it:
+
+```sh
+cd ~/projects/node-test
+node hello.js
+```
+
+```
+Hello from Node
+3 tools
+```
+
+That is the entire loop: edit the file in VS Code, save, press up-arrow and Enter in the
+terminal to run it again. `console.log` still prints — to the terminal, which is now the only
+console there is.
+
+`node` runs the file relative to the folder you are standing in, so `node hello.js` fails with
+`Cannot find module` if you are somewhere else. That is
+[moving around](/ares_materials_estudi/your-machine/moving-around/) doing its job, not a Node
+problem.
+
+## What is not there
+
+The language is identical. The room it runs in is not.
+
+| In a browser | In Node |
+| --- | --- |
+| `document`, `querySelector`, the DOM | nothing — there is no page |
+| `window`, `alert`, `localStorage` | nothing |
+| `canvas`, the Web Audio API, the microphone | nothing |
+| A page that sits and waits for events | a script that runs and then exits |
+| Cannot read your files, cannot keep a secret | reads and writes files, reads secrets from the environment |
+
+Paste a line of your DOM code into a Node file and you get:
+
+```
+ReferenceError: document is not defined
+```
+
+That message is worth recognising, because the usual cause is not a mistake in your code — it is
+browser code being run in the wrong place, or a tutorial that assumed the other one.
+
+The reverse happens too. `process`, below, does not exist in a browser.
+
+## Secrets, which is the point
+
+An **environment variable** is a named value that belongs to the terminal session a program runs
+in rather than to any file. Node reads them through `process.env`, so a key can reach your code
+without ever being typed into something you might commit or publish.
+
+```sh
+export MODEL_API_KEY="paste-the-key-here"
+```
+
+```js
+const key = process.env.MODEL_API_KEY;
+
+if (!key) {
+	throw new Error("MODEL_API_KEY is not set in this terminal");
+}
+
+console.log("Key found, length " + key.length);
+```
+
+`export` sets it for that terminal window only. Close the window and it is gone, which is
+inconvenient exactly once and then becomes the thing that stops a key leaking.
+
+Printing the length rather than the key is a small habit worth forming. You get to check it
+arrived without putting the secret itself into your terminal history or a screenshot.
+
+This is the setup the
+[AI section](/ares_materials_estudi/ai-as-a-material/calling-a-model/) assumes when it calls a
+model from your machine.
+
+## fetch works here too
+
+`fetch` is built into Node from version 18 onwards, so the code from
+[fetching data](/ares_materials_estudi/javascript/fetching-data/) runs unchanged — except that
+there is no page to put the result on, so it goes to the terminal. `fetch is not defined` means
+your Node is older than that, and the note above is the fix.
+
+```js
+async function main() {
+	const response = await fetch("https://example.com");
+
+	if (!response.ok) {
+		throw new Error("The server said " + response.status);
+	}
+
+	console.log(response.status, "OK");
+}
+
+main();
+```
+
+Note the shape: `await` inside an `async` function, and the function called at the end. Written
+at the top level of a file instead, it works in some versions of Node and not others, and in a
+browser `<script>` it is a syntax error that stops the whole file. The wrapper costs two lines
+and always works.
+
+Note also that the script does not exit while it is waiting. Node keeps running as long as
+something is still outstanding, and stops on its own when nothing is left — no `while (true)`,
+no server, nothing to interrupt.
+
+## Do this on your machine
+
+- [ ] I ran `node --version` and got a version number back
+- [ ] I made a folder with a `hello.js` in it and ran it with `node hello.js`
+- [ ] I changed the file, saved it, and ran it again to see the change
+- [ ] I pasted `document.querySelector("h1")` into it and saw `ReferenceError: document is not defined`
+- [ ] I set an environment variable with `export` and printed it with `process.env`
+- [ ] I opened a new terminal window and confirmed the variable was gone
+
+<Quiz
+	questions={[
+		{
+			q: 'Your script starts with document.querySelector("#out") and you run it with node script.js. What happens?',
+			options: [
+				'ReferenceError: document is not defined, because there is no page in Node',
+				'It runs and quietly returns null, the same as a selector that matches nothing',
+				'Node opens your default browser so the selector has something to look at',
+			],
+			answer: 0,
+			explanation:
+				'The DOM belongs to the browser, and Node has no page for it to describe. Browser code and Node code are the same language doing different jobs — when this error appears, the question is which of the two the file was meant to be.',
+		},
+		{
+			q: 'Why keep an API key in an environment variable rather than in the JavaScript file?',
+			options: [
+				'A file gets committed and published; the variable belongs to your terminal session',
+				'Environment variables are encrypted, so the key cannot be read by anyone',
+				'Keys written into a file stop working after a few days for security',
+			],
+			answer: 0,
+			explanation:
+				'It is about where the value lives, not about secrecy at rest — anyone at your keyboard can print it. The point is that it is never in the repository, never in a screenshot of your code, and never in a page a visitor can read.',
+		},
+		{
+			q: 'You type node hello.js and get "Cannot find module". The file definitely exists. What is wrong?',
+			options: [
+				'The terminal is in a different folder from the one holding the file',
+				'The file needs to be named script.js for node to recognise it',
+				'Node has to be started before it can run a file, like a server',
+			],
+			answer: 0,
+			explanation:
+				'Node looks for the file relative to your working directory. Run pwd to see where you are and cd into the folder first. This is the single most common first-day problem, and it is a terminal problem rather than a code one.',
+		},
+	]}
+/>

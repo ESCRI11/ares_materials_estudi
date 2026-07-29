@@ -99,9 +99,12 @@ Return JSON only, in this shape:
 {"sentiment": "positive" | "neutral" | "negative", "theme": string, "quote": string}
 ```
 
-Even then, check what arrives before trusting it — models like to wrap JSON in a friendly
-sentence or a code fence. The [next lesson](/ares_materials_estudi/ai-as-a-material/calling-a-model/)
-deals with that from code.
+In a chat window, check what arrives before trusting it: models like to wrap JSON in a friendly
+sentence or a code fence, and "return only the JSON" is a request rather than a rule. From code
+you do not have to ask. Most APIs let you *require* a shape — the fields, the types, the allowed
+values — and constrain the reply to fit it, which
+[structured output](/ares_materials_estudi/ai-as-a-material/beyond-text/) covers. That is the
+difference between a prompt that usually parses and one that always does.
 
 ### Let it work before it answers
 
@@ -185,9 +188,9 @@ ask, will not push back, and will hand you something confident regardless.
 		{
 			q: 'What belongs in the system prompt rather than the user message?',
 			options: [
-				'The specific question you are asking right now',
-				'Standing rules for every request: the role, the constraints, the output format',
-				'Nothing — it is an advanced feature you can ignore',
+				'Whatever you are asking for right now, so the model reads it first',
+				'Standing rules for every request: role, constraints, output format',
+				'Nothing — chat products write it and you cannot change it',
 			],
 			answer: 1,
 			explanation:
@@ -196,20 +199,20 @@ ask, will not push back, and will hand you something confident regardless.
 		{
 			q: 'Your prompt keeps producing text that is fine but generic. What is most likely to help?',
 			options: [
-				'Adding "be creative and original" to the prompt',
-				'Adding the specifics only you know — audience, constraints, examples, words to avoid',
-				'Asking the same question several times and picking the best',
+				'Adding "be creative and original, avoid clichés" to the prompt',
+				'Adding the specifics only you know: audience, constraints, examples',
+				'Raising the temperature so the wording comes out less predictable',
 			],
 			answer: 1,
 			explanation:
-				'Generic in, generic out: with nothing to narrow it, the answer lands in the middle of everything ever written on the subject. Adjectives like "creative" barely move it; concrete constraints and two examples move it a long way.',
+				'Generic in, generic out: with nothing to narrow it, the answer lands in the middle of everything ever written on the subject. Adjectives like "creative" barely move it, and temperature only changes which ordinary words get drawn. Concrete constraints and two examples move it a long way.',
 		},
 		{
 			q: 'You run the same prompt twice and get two different answers. What does that tell you?',
 			options: [
-				'The model is broken or the service is unstable',
-				'Nothing unusual — each token is drawn from a distribution, so variation is the normal behaviour',
-				'Your prompt contains a contradiction',
+				'The service moved you onto a different version of the model',
+				'Nothing unusual — tokens are drawn from a distribution',
+				'Your prompt is ambiguous and needs to be more specific',
 			],
 			answer: 1,
 			explanation:

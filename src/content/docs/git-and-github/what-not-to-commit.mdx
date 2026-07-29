@@ -1,0 +1,185 @@
+---
+title: What not to commit
+description: The .gitignore file, the exports and secrets that must never enter a repository, and why deleting them afterwards does not undo it.
+sidebar:
+  order: 3
+---
+
+import Quiz from '@components/Quiz.astro';
+
+Git records what you tell it to record, and `git add .` means "everything here". For a
+programmer that is mostly harmless — text files are small. For you it is not. Your project
+folders fill up with 300 MB renders, Photoshop scratch files, video exports and a scatter of
+invisible junk the operating system leaves behind.
+
+This lesson is the one habit that keeps a repository usable, and it takes five minutes to
+set up once per project.
+
+## Why it matters more than it sounds
+
+**Git keeps every version of every file, forever.** That is the whole point of it, and it is
+why a big file is not a one-off cost. Commit a 200 MB video, change it twice, and the
+repository holds three copies — permanently, in the history, downloaded again by every
+person who clones it and by every machine you clone it onto.
+
+**Git cannot describe what changed in a binary file.** As the
+[Markdown lesson](/ares_materials_estudi/git-and-github/markdown/) puts it, git can show you
+which words moved in a text file and can only tell you that a `.psd` is *different*. So the
+history you are paying all that space for tells you nothing.
+
+**GitHub enforces a limit.** It warns above 50 MB and **refuses any file over 100 MB
+outright**. The push is rejected, and here is the part that catches people: deleting the file
+and committing again does not fix it, because the earlier commit still contains it. The
+repository has to be repaired, or started again.
+
+## The .gitignore file
+
+A file called `.gitignore`, in the top folder of the repository, one pattern per line.
+Anything matching a line in it is invisible to git: `git status` stops mentioning it, and
+`git add .` will not pick it up.
+
+The name starts with a dot, so it is a **hidden file** — the convention from
+[moving around](/ares_materials_estudi/your-machine/moving-around/) that keeps configuration
+out of your way. `ls -a` shows it, and VS Code's file tree shows it without being asked.
+
+Make one:
+
+```bash
+touch .gitignore
+code .gitignore
+```
+
+A reasonable starting point for a design project:
+
+```
+# Clutter the operating system leaves behind
+.DS_Store
+Thumbs.db
+
+# Downloaded packages — large, and reinstallable from a list
+node_modules/
+
+# Working files and heavy exports
+*.psd
+*.ai
+*.mp4
+*.mov
+exports/
+
+# Anything holding a secret
+.env
+```
+
+`.DS_Store` is a small invisible file macOS drops into every folder you open in Finder. It
+records icon positions. It is meaningless to everyone else, it appears in dozens of folders,
+and it is the single most common piece of noise in a student repository — including on
+Windows, where it arrives inside a zip a classmate sent you.
+
+### The pattern syntax
+
+Five rules, and there is no sixth you need this year:
+
+| Pattern | Matches |
+|---|---|
+| `.DS_Store` | that name, in any folder of the repository |
+| `*.mp4` | every file ending in `.mp4` — `*` stands for any part of a name |
+| `exports/` | a folder called `exports` and everything inside it |
+| `# a note` | nothing — a comment for whoever reads the file |
+| `!brand-master.psd` | an exception, un-ignoring one file that an earlier line ignored |
+
+Order matters for that last one: `*.psd` then `!brand-master.psd` keeps that single file and
+ignores the rest.
+
+**Commit the `.gitignore` itself.** It is part of the project, not a personal setting —
+everyone who clones the repository gets the same rules, which is exactly what you want.
+
+:::caution[Ignoring does not un-track]
+`.gitignore` only applies to files git is not already recording. Add `node_modules/` to it
+after you have committed that folder and nothing happens at all. You have to tell git to
+stop tracking it first:
+
+```bash
+git rm -r --cached node_modules
+```
+
+`--cached` is the important word: it removes the folder from git's records and **leaves it on
+your disk**. Then commit, and the ignore rule takes over from there.
+:::
+
+## So where do the big files go?
+
+The repository holds the **source** — the thing you edit. The heavy output goes wherever
+heavy files already live for you: a shared drive, a video platform, a folder you hand in.
+Then link to it from the README, so someone reading the repository knows where to look.
+
+For a laser-cut file or a 3D model this rarely bites, because they are small. It bites on
+video, on raw photography, and on anything exported at print resolution.
+
+## A committed secret is a leaked secret
+
+If you commit an API key, a password or a GitHub token, then notice, delete the line and
+commit again — **the key is still in the repository**. It sits in the earlier commit, which
+is where the history is supposed to keep things. Anyone who clones the repository has it, and
+if the repository is public, automated scanners find keys within minutes of a push.
+
+The only response that actually works is to **revoke the key** with whoever issued it and
+generate a new one. Rewriting the history is possible and difficult, and it does not help
+once the thing has been public for even a short time — you cannot un-see it on someone else's
+behalf.
+
+So: a key never goes in a file you commit. The conventional name for a file that holds one
+is `.env`, and `.gitignore` should list it before you ever create it — but reading a `.env`
+file takes extra machinery, so when this site actually calls an API it puts the key in an
+**environment variable** instead, which lives in your terminal rather than in any file. Both
+routes exist to keep the key out of the repository; the second one keeps it out of the
+folder entirely.
+
+## Do this now
+
+Use the practice repository from the previous lessons.
+
+- [ ] I created a `.gitignore` in the top folder of my repository
+- [ ] It contains `.DS_Store`, `node_modules/` and at least one pattern of my own
+- [ ] I made a file that the ignore rules should catch, and `git status` did not mention it
+- [ ] I committed the `.gitignore` itself
+- [ ] I can explain why `git add .` is safe once a `.gitignore` is in place
+- [ ] I know that GitHub refuses files over 100 MB, and that deleting one later is too late
+- [ ] I know that a committed key has to be revoked, not deleted
+
+<Quiz
+	questions={[
+		{
+			q: 'You commit a 300 MB video, then delete it in the next commit. What is the situation?',
+			options: [
+				'The repository is clean again — the file is gone from the current version',
+				'The file is still in the earlier commit, and still in the repository',
+				'Git compresses deleted files, so the space is recovered',
+			],
+			answer: 1,
+			explanation:
+				'Deleting a file changes what the project looks like now; it does not change what happened. The earlier commit still holds the whole video, so the repository stays that size and everyone who clones it downloads it. Ignoring it from the start is far easier than repairing it afterwards.',
+		},
+		{
+			q: 'You add node_modules/ to .gitignore, but git keeps listing its files as changed. Why?',
+			options: [
+				'The pattern needs a leading slash to match the top folder',
+				'.gitignore only takes effect after you commit the file itself',
+				'It is already tracked; ignore rules only cover untracked files',
+			],
+			answer: 2,
+			explanation:
+				'Ignore rules decide what git picks up next; they say nothing about what it already has. Run git rm -r --cached node_modules to stop tracking it — the --cached leaves the folder on your disk — then commit, and the rule works from there.',
+		},
+		{
+			q: 'You pushed a commit containing your API key, then deleted the line and pushed again. What should you do?',
+			options: [
+				'Revoke the key with whoever issued it, and make a new one',
+				'Add the file to .gitignore, which hides it from anyone browsing',
+				'Make the repository private, since only you can read it now',
+			],
+			explanation:
+				'The key is in the earlier commit, and on a public repository automated scanners read it within minutes of the push. Neither ignoring the file nor changing who can read the repository takes it back from whoever already has it. Revoking is the only step that ends the problem.',
+			answer: 0,
+		},
+	]}
+/>

@@ -2,7 +2,7 @@
 title: Running a model locally
 description: Why you would run a model on your own laptop — privacy, cost, offline work — what you give up, and what model size and quantisation mean in practice.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 The syllabus for *Intelligence as a Material* names "private, local models" alongside cloud
@@ -57,6 +57,12 @@ that is a real argument.
 **Capability.** A model that fits on a laptop is far smaller than a hosted one. It follows long
 or layered instructions less reliably, invents more, and is noticeably weaker in languages
 other than English. The gap narrows every year and it has not closed.
+
+**The three capabilities from the last lesson, unevenly.** Structured output, tool use and image
+input are supported by some local models and not others, and a small model that technically
+supports them is markedly worse at them: it invents field names, calls the wrong tool, or calls
+none when it should. Check what a specific model claims before you design around it, and expect
+to test rather than assume.
 
 **Disk and memory.** Models are gigabytes each, and the whole thing has to be held in memory
 while it runs. Collecting six of them is a straightforward way to fill a laptop.
@@ -129,8 +135,8 @@ a mirror.
 
 ## The part that connects to the last lesson
 
-Both of these can also run as a **local server** on your machine, which means the code from the
-[previous lesson](/ares_materials_estudi/ai-as-a-material/calling-a-model/) works nearly
+Both of these can also run as a **local server** on your machine, which means the code from
+[calling a model](/ares_materials_estudi/ai-as-a-material/calling-a-model/) works nearly
 unchanged: the same `fetch`, the same list of messages, an address on your own computer instead
 of a provider's, and no API key to protect. Each tool documents its own local address and
 request format — check its documentation, exactly as you would a hosted provider's.

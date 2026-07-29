@@ -83,7 +83,8 @@ Two things follow from being connected, and both are the point of the exercise:
   editor telling you which side of the machine an add-on belongs on.
 
 :::note[The slow way, and why not to use it]
-You can also open `\\wsl$\Ubuntu\home\you\ind-prep` in a plain VS Code window. It works,
+You can also open `\\wsl$\Ubuntu\home\you\ind-prep` — or `\\wsl.localhost\Ubuntu\...`, the
+newer spelling of the same address — in a plain VS Code window. It works,
 and it is the wrong habit: the editor is then reaching across the filesystem boundary for
 every read and every save, its terminal is PowerShell rather than bash, and git gets
 noticeably slow. Connect properly once and forget about it.
@@ -172,13 +173,13 @@ a file you forgot to save, which is a rite of passage worth skipping.
 		{
 			q: 'Why does VS Code want you to open a folder rather than a single file?',
 			options: [
-				'Single files cannot be edited in VS Code',
-				'The file tree, search across files, the built-in terminal and git support are all scoped to the open folder',
-				'It makes the editor start faster',
+				'Colour and syntax help only work when a folder is open',
+				'Search, the file tree and the terminal are all scoped to it',
+				'It is only a preference; the two behave identically',
 			],
 			answer: 1,
 			explanation:
-				'You can open a lone file, and sometimes that is what you want. But the features that make the editor worth using need a project to work on, and a terminal that starts in the right folder saves a cd every single time.',
+				'You can open a lone file, and sometimes that is what you want — it edits and colours perfectly well either way. But the features that make the editor worth using need a project to work on: search across every file, the tree, git, and a terminal that starts in the right folder.',
 		},
 		{
 			q: 'You have the ind-prep folder open and you run pwd in the integrated terminal. What does it print?',
@@ -194,9 +195,9 @@ a file you forgot to save, which is a rite of passage worth skipping.
 		{
 			q: 'On Windows, what does the WSL extension let you do?',
 			options: [
-				'Run VS Code itself inside Ubuntu instead of Windows',
-				'Keep the editor on Windows while it edits, searches and runs commands inside Ubuntu, next to your files',
-				'Copy your Linux files onto the C: drive so Windows can open them',
+				'Run VS Code itself inside Ubuntu rather than on Windows',
+				'Keep the window on Windows while it works inside Ubuntu',
+				'Copy your Linux files onto C: so Windows can open them',
 			],
 			answer: 1,
 			explanation:

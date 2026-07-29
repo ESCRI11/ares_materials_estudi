@@ -2,7 +2,7 @@
 title: Making a chart
 description: Drawing a bar chart from an array of objects onto a canvas — finding the maximum, scaling values to pixels, a baseline, labels — and what a charting library does for you afterwards.
 sidebar:
-  order: 5
+  order: 6
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -117,10 +117,10 @@ line of code you either write or do not.
 An unlabelled chart is decoration. Three additions turn this one into something readable:
 space around the plot, an axis, and text.
 
-Text on canvas is one command: `ctx.fillText(text, x, y)`, drawn in whatever `ctx.font`
-holds — a CSS font shorthand such as `"11px sans-serif"`. `ctx.textAlign` decides whether
-that x is the text's left edge, centre or right edge, which is what lets you centre a label
-under a bar without measuring the string.
+Text is `ctx.fillText(text, x, y)` and `ctx.font`, both from
+[choosing a visual model](/ares_materials_estudi/data/choosing-a-visual-model/). One addition:
+`ctx.textAlign` decides whether that x is the text's left edge, centre or right edge, which is
+what lets you centre a label under a bar without measuring the string.
 
 <LiveCode
 	title="A chart you could show someone"
@@ -296,9 +296,9 @@ interesting work in this course usually is.
 		{
 			q: 'Why calculate max with a loop instead of typing 340?',
 			options: [
-				'Loops are faster than typing',
-				'Because the scale must follow the data — a hand-typed maximum is wrong the moment a value changes',
-				'Because JavaScript cannot store 340 accurately',
+				'Because a loop finds the maximum faster than you can read it off',
+				'Because the scale must follow the data, and a typed maximum stops being true',
+				'Because 340 is the total, and a scale has to be built from the mean',
 			],
 			answer: 1,
 			explanation:
@@ -318,13 +318,13 @@ interesting work in this course usually is.
 		{
 			q: 'Given that libraries do all of this better, what is the point of drawing it by hand once?',
 			options: [
-				'Libraries are too heavy for small projects',
-				'So that a library’s defaults and failures are readable to you — the axis it chose, the scale it applied, the strings it never converted to numbers',
-				'Because canvas is faster than a library',
+				'Because a charting library is too heavy for a small project',
+				'So a library’s defaults and failures are readable to you',
+				'Because canvas draws faster than any charting library does',
 			],
 			answer: 1,
 			explanation:
-				'A library replaces the labour, not the understanding. Every confusing chart it produces is one of the steps in this lesson going wrong, and you can only correct what you can name.',
+				'A library replaces the labour, not the understanding. Every confusing chart it produces is one of the steps in this lesson going wrong — the axis it chose, the scale it applied, the strings it never converted to numbers — and you can only correct what you can name.',
 		},
 	]}
 />

@@ -95,8 +95,8 @@ it because it is where the files live.
 			q: 'Your internet connection is down. Which of these can you still do?',
 			options: [
 				'Nothing — git needs a connection to record anything',
-				'Record commits normally; only sending them to GitHub has to wait',
-				'Only view old versions, not create new ones',
+				'Record commits normally; only pushing has to wait',
+				'Only view old versions; new commits need the server',
 			],
 			answer: 1,
 			explanation:
@@ -105,24 +105,24 @@ it because it is where the files live.
 		{
 			q: 'What does a single commit contain?',
 			options: [
-				'One changed file',
-				'A snapshot of the whole project at that moment, plus a message about what changed',
-				'A copy of the project as it was when you started',
+				'Only the files you changed since the last commit',
+				'A snapshot of the whole project, plus your message',
+				'A list of the differences from the commit before it',
 			],
 			answer: 1,
 			explanation:
-				'A commit captures the state of everything at once, which is why you can return the folder to exactly how it was on any given day. The message is what makes that history readable later.',
+				'A commit captures the state of everything at once, which is why you can return the folder to exactly how it was on any given day. Git does store it compactly and does show you the differences, which is where the other two answers come from — but what it records is the whole snapshot.',
 		},
 		{
 			q: 'You delete the hidden .git folder from a project. What have you lost?',
 			options: [
-				'Your current files',
-				'The history — the files stay exactly as they are now',
-				'Nothing, because the history is on GitHub',
+				'Your current files, since git was managing them',
+				'The history; the files stay exactly as they are',
+				'Nothing — the history is on GitHub, so it comes back',
 			],
 			answer: 1,
 			explanation:
-				'The repository is your files plus the record of their history, and the record lives in .git. Your working files are untouched, but every earlier version is gone unless a copy exists somewhere else.',
+				'The repository is your files plus the record of their history, and the record lives in .git. Your working files are untouched, but every earlier version is gone from this machine. If you had pushed to GitHub you could clone it back; if you had not, that history exists nowhere.',
 		},
 	]}
 />

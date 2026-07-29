@@ -209,9 +209,9 @@ be a number. Fix it so the last line prints `40` rather than `328`.
 		{
 			q: 'const colour = "#1b1b1b"; colour = "#f7f7f7"; console.log(colour); — what happens?',
 			options: [
-				'It prints #f7f7f7',
-				'It prints #1b1b1b',
-				'The program stops with an error at the second line',
+				'It prints #f7f7f7, because the second line replaced the value',
+				'It prints #1b1b1b, because the second assignment is ignored',
+				'Nothing is printed — the second line raises a TypeError',
 			],
 			answer: 2,
 			explanation:

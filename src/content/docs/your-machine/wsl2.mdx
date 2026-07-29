@@ -152,6 +152,10 @@ File Explorer, or into the Start menu:
 \\wsl$\Ubuntu\home\ares
 ```
 
+Newer versions of Windows spell the same address `\\wsl.localhost\Ubuntu\home\ares`, and
+both forms still work. Use whichever your File Explorer offers when you go looking; they
+open the same folder.
+
 The files are ordinary files. You can open them in Photoshop, drag them onto a browser
 window, attach them to an email.
 
@@ -216,7 +220,7 @@ generic set of steps.
 - [ ] `whoami` in Ubuntu prints the Linux username I chose
 - [ ] I ran `ls /mnt/c/Users` and recognised the folder names as my Windows users
 - [ ] I ran `explorer.exe .` and a File Explorer window opened
-- [ ] I found my Linux home from Windows by typing `\\wsl$\Ubuntu` into File Explorer
+- [ ] I found my Linux home from Windows by typing `\\wsl$\Ubuntu` or `\\wsl.localhost\Ubuntu` into File Explorer
 - [ ] I understand that project folders go in `~` and not in `/mnt/c`
 
 <Quiz
@@ -225,7 +229,7 @@ generic set of steps.
 			q: 'What is WSL2?',
 			options: [
 				'A program that translates Linux commands into Windows ones',
-				'A real Linux kernel running alongside Windows on the same machine',
+				'A real Linux kernel running beside Windows on one machine',
 				'A replacement for Windows that you boot into instead',
 			],
 			answer: 1,
@@ -235,9 +239,9 @@ generic set of steps.
 		{
 			q: 'Ubuntu asks you for a password during installation. Which password is it asking for?',
 			options: [
-				'Your Windows password',
-				'Your Microsoft account password',
-				'A new password you invent now, used only inside Linux',
+				'Your Windows sign-in password, reused inside Ubuntu',
+				'Your Microsoft account password, since Microsoft ships WSL',
+				'A new one you invent now, used only inside Linux',
 			],
 			answer: 2,
 			explanation:

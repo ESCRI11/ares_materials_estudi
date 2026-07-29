@@ -32,6 +32,41 @@ Nearly every part is made by repeating three steps.
 Then sketch on a face of what you built, and go round again. A complicated object is a long
 sequence of simple loops, not one difficult operation.
 
+## The loop, click by click
+
+Reading about extruding is not the same as extruding. Here is a 40 × 20 × 10 mm block, in the
+actual buttons, so the rest of the lesson has something to attach to.
+
+1. **Start the sketch.** `Solid → Create → Create Sketch`. The canvas dims and Fusion waits
+   for you to choose where to draw: the three origin planes appear as translucent rectangles
+   crossing at the centre. Click the flat one on the ground — the top plane. The view swings
+   to look straight at it, a grid appears, and a **Sketch Palette** panel opens on the right.
+2. **Draw the outline.** `Create → 2-Point Rectangle`, or press `R`. Click once at the origin
+   for the first corner, move the cursor out, then *type* `40`, press `Tab`, type `20`, press
+   `Enter`. Typing while you draw sets real dimensions instead of leaving you to fix them
+   afterwards. Press `Escape` to put the tool down.
+3. **Check it is pinned.** The Sketch Palette says whether the sketch is fully constrained.
+   Blue lines can still be dragged; black ones cannot. Add a dimension with `D` — click a
+   line, drag the witness line out, type the number, `Enter`.
+4. **Leave the sketch.** Click **Finish Sketch** at the right-hand end of the toolbar. The
+   view returns to 3D and your rectangle is now a closed region waiting to be given depth.
+5. **Extrude it.** `Solid → Create → Extrude`, or press `E`. Click inside the rectangle to
+   select the region — it highlights — then drag the arrow, or type `10` in the Distance
+   field, and press `Enter`. A solid exists.
+6. **Go round again.** Click the top face of the block, press `E`, and Fusion offers to
+   extrude that face directly. Or click the face, `Create Sketch`, and draw the next thing on
+   it.
+
+Two navigation habits from lesson 2 that you will use constantly here: `F6` reframes
+everything when you lose the model, and holding the mouse wheel pans.
+
+:::note[If a shortcut does nothing]
+Fusion prints the keyboard shortcut beside each command in its own menus — open
+`Solid → Create` and read down the right-hand edge. Those letters are the source of truth, not
+this page, because Autodesk moves them between releases. Pressing `S` opens a search box for
+any command by name, which is the fastest way to find something you only know the name of.
+:::
+
 ## What a sketch plane is
 
 A **sketch** is a 2D drawing, and it always lives on a flat surface in 3D space. Choosing
@@ -131,6 +166,44 @@ Once a solid exists, several features need no sketch at all:
 Keep fillets and chamfers late in the sequence. They are decoration on top of the shape, and
 having them early makes every later edit harder for the solver to rebuild.
 
+## Bodies and components
+
+That `New body` option needs explaining, because the difference it introduces decides what you
+can do with the model later, and it is invisible until the day it stops you.
+
+A **body** is a lump of solid geometry. Extrude anything and a body appears in the browser
+under `Bodies`. Several bodies can sit in one design, and they are only shapes: they have no
+names worth the word, no position relative to each other, and no idea that one of them is a
+lid and another is a box.
+
+A **component** is a named *part*. It has its own origin planes, its own sketches and its own
+bodies inside it, and — the point — it can be positioned and moved with respect to other
+components. An assembly is components; a lump of geometry is bodies.
+
+The rule of thumb: **one component per thing you could pick up and hold on its own.** The base
+of your enclosure is a component. The lid is another. The two of them together are the
+assembly.
+
+Three things need components and refuse to work without them:
+
+- **Joints** — telling Fusion that this pin slides in that hole, so the parts move as the real
+  ones would.
+- **Exploded views and assembly animations** — the `Animation` workspace can only pull apart
+  components, so a design modelled as five bodies has nothing to explode.
+- **A parts list on a drawing**, and separate files when someone asks for one part.
+
+Two ways to get them:
+
+- **Before you model a part:** `Assemble → New Component`, give it a name, and it becomes the
+  *active* component — the dot beside it in the browser. Everything you sketch and extrude
+  from then on lands inside it.
+- **After the fact:** select the bodies in the browser, right-click, and choose
+  `Create Components from Bodies`. This is the rescue for a design already built as a pile of
+  bodies, and it is worth doing the moment you notice.
+
+Name them as you make them. `Component1`, `Component2` and `Component3` are worth nothing in
+an animation, a drawing or a conversation with a tutor.
+
 ## The timeline is an editable history
 
 The strip along the bottom of the window holds one icon per operation, left to right, in the
@@ -198,9 +271,9 @@ will argue about.
 		{
 			q: 'Your sketch is still drawn in blue and you can drag the edges around. Why does that matter?',
 			options: [
-				'It does not, as long as the dimensions look right on screen',
-				'The sketch has freedom you did not decide, so a later edit can change it in ways you did not choose',
-				'Blue geometry cannot be extruded',
+				'It does not, as long as it looks right on screen',
+				'It holds freedom you did not decide, so edits move it',
+				'Blue geometry cannot be extruded into a solid body',
 			],
 			answer: 1,
 			explanation:
@@ -209,9 +282,9 @@ will argue about.
 		{
 			q: 'You need two holes that must always be the same diameter as each other, whatever that diameter turns out to be. What do you use?',
 			options: [
-				'A dimension on each hole, with the same number typed into both',
+				'A dimension on each hole with the same number typed in',
 				'An equal constraint between them, plus one dimension',
-				'Snapping one circle to the other while drawing',
+				'Snapping one circle to the other while drawing them',
 			],
 			answer: 1,
 			explanation:
@@ -220,9 +293,9 @@ will argue about.
 		{
 			q: 'What does dragging the timeline marker backwards do?',
 			options: [
-				'Undoes the operations permanently',
-				'Rewinds the model to that point in its construction, so you can inspect it or insert a new feature there',
-				'Exports a previous version of the file',
+				'Undoes the operations after that point, permanently',
+				'Rewinds the model to that point in its construction',
+				'Opens the previously saved version of the file',
 			],
 			answer: 1,
 			explanation:
@@ -235,6 +308,7 @@ will argue about.
 
 Half an hour with your hands on it is worth more than rereading the page.
 
+- [ ] I followed the six steps above and got a 40 × 20 × 10 mm block out of them
 - [ ] I sketched a 20 mm square on the front origin plane and extruded it 20 mm into a cube
 - [ ] I dragged an edge of an unconstrained sketch and watched it move
 - [ ] I added dimensions and constraints until the sketch went from blue to black
@@ -246,4 +320,9 @@ Half an hour with your hands on it is worth more than rereading the page.
 - [ ] I changed that parameter and saw more than one thing in the model move
 - [ ] I put a fillet on an edge, then dragged the timeline marker back before it to see the
       model without it
+- [ ] I made a second body — a lid sitting on top of the cube — so the design has two
+- [ ] I selected both bodies and used `Create Components from Bodies`, then renamed them
+      `base` and `lid` instead of leaving the numbers
+- [ ] I made a third part with `Assemble → New Component` first, and watched the new geometry
+      land inside it in the browser
 - [ ] I saved the file with a comment describing what it is

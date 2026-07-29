@@ -98,9 +98,13 @@ An **overhang** is any part of the model that sticks out over empty space, so a 
 have nothing beneath it to rest on.
 
 Plastic can lean. As long as each layer is supported by most of the layer below, the part
-prints cleanly. The working limit is around **45 degrees from vertical** — steeper than
-that and the surface starts to droop, sag and pick up a rough, stringy texture, and past
-about 60 degrees it fails outright.
+prints cleanly. The working limit is around **45 degrees from vertical** — lean a surface
+further out than that, so it approaches a flat ceiling, and it starts to droop, sag and pick
+up a rough, stringy texture. Past about 60 degrees from vertical it fails outright.
+
+Measure the angle from the vertical, not from the bed: a wall standing straight up is 0
+degrees and prints perfectly, and every degree you tip it away from upright makes the layer
+below support a little less of the one above.
 
 Consequences you can design around:
 
@@ -191,9 +195,9 @@ parts that can be flat.
 		{
 			q: 'You print a hook with the curve standing vertically, and it snaps under load at the base. What is the likeliest cause?',
 			options: [
-				'Infill was set too low',
-				'The load ran across the layer lines, and the bond between layers is weaker than the plastic itself',
-				'The layer height was too small',
+				'The infill percentage was set too low for the load',
+				'The load ran across the layer lines, the weak axis',
+				'The layer height was too small for a part that size',
 			],
 			answer: 1,
 			explanation:
@@ -202,9 +206,9 @@ parts that can be flat.
 		{
 			q: 'What does the slicer add to your model that you did not draw?',
 			options: [
-				'Nothing — it only converts the format',
-				'Layers, nozzle paths, internal infill, supports and bed adhesion, then writes it all out as gcode',
-				'Only the supports',
+				'Nothing: it converts one file format into another',
+				'Layers, nozzle paths, infill, supports and adhesion',
+				'Only the supports, which it adds under overhangs',
 			],
 			answer: 1,
 			explanation:
@@ -213,8 +217,8 @@ parts that can be flat.
 		{
 			q: 'You need a 5 mm steel rod to slide through a printed part. What diameter do you model the hole at?',
 			options: [
-				'Exactly 5 mm, and ream it out afterwards if needed',
-				'A few tenths of a millimetre larger than 5 mm, confirmed with a small test print',
+				'Exactly 5 mm, then ream it out afterwards if needed',
+				'A few tenths larger, confirmed with a test print',
 				'A few tenths smaller, because plastic stretches',
 			],
 			answer: 1,
@@ -223,3 +227,29 @@ parts that can be flat.
 		},
 	]}
 />
+
+## Do this before the next lesson
+
+The printing waits for the lab, the induction and a booked machine. The slicing does not: the
+slicer is a free download, it runs on your laptop, and it will tell you almost everything
+about how a part is going to print before anyone lets you near a printer.
+
+Install one — **PrusaSlicer**, **Cura** or **Bambu Studio**, whichever the lab turns out to
+use — from its own site, and pick any printer profile in the setup wizard. You are using it as
+a measuring instrument, not sending anything anywhere.
+
+- [ ] I installed a slicer and it opens with a printer profile selected
+- [ ] I exported the cube I made in lesson 3 from Fusion as STL or 3MF and loaded it
+- [ ] I sliced it, read the estimated time and the material figure, and looked at the preview
+- [ ] I changed the layer height from 0.2 mm to 0.1 mm, sliced again, and the time roughly
+      doubled
+- [ ] I raised infill from 15% to 50%, sliced again, and compared the time and the material
+- [ ] I modelled a part with a ledge sticking out, sliced it, and found the supports the
+      slicer added underneath
+- [ ] I chamfered that ledge at 45 degrees, sliced again, and the supports disappeared
+- [ ] I rotated a tall part to lie down, sliced both orientations, and wrote down which was
+      faster and which would be stronger in use
+- [ ] I stepped through the layer preview and can point at the walls, the infill and the
+      first layer
+- [ ] I exported a model in inches on purpose, loaded it, and watched it arrive 25.4 times
+      too small

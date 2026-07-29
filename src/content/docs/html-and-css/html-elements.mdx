@@ -44,6 +44,36 @@ Change the content and the words change; change the `href` and the destination c
 
 An element can carry several attributes, separated by spaces. Order never matters.
 
+## MDN, where you look things up
+
+The link in that example points at [MDN Web Docs](https://developer.mozilla.org), and it is
+worth stopping on, because knowing where to look things up outlasts anything else in this
+section. MDN is the reference for HTML, CSS and JavaScript: not a tutorial site and not a
+forum, but the documentation itself, maintained by Mozilla with the people who build the
+browsers. It is free, it needs no account, and it is the source your lecturers will quote.
+
+The habit to form today is a search shape: type `mdn` and then the thing you are stuck on.
+`mdn img`, `mdn flex-wrap`, `mdn line-height`. The MDN page is nearly always the first
+result, and it is the one to open — above the forum answers, which are older than they look.
+
+You almost never read one of those pages top to bottom. They all have the same four parts:
+
+- **The opening paragraph** says what the thing is and what it is for. Frequently all you
+  needed.
+- **Examples** come next, and they run on the page — a code panel with the result beside it,
+  editable in the same way as the boxes on this site. Reading the example is usually faster
+  than reading the prose.
+- **Syntax** lists every value the thing accepts. Skim it when the example is close but not
+  what you want.
+- **Browser compatibility** is the table at the bottom: which browsers support this, from
+  which version. A tick in every column means use it and stop worrying. It only ever matters
+  for something very new.
+
+Two words of warning. MDN is written for people who already write code, so the first sentence
+can be denser than the examples below it — scroll down before giving up. And a search will
+turn up other reference sites alongside it, **w3schools** most often. They are easier to read
+and less carefully maintained; where one disagrees with MDN, MDN is the one to trust.
+
 ## Nesting
 
 Elements go inside other elements. This is **nesting**, and it is what turns a flat list of
@@ -253,7 +283,7 @@ things you want to learn, and a link to any site you like. Nest the link inside 
 			options: [
 				'In the body — it prints the page title at the top of the page',
 				'In the head — it names the browser tab and the bookmark',
-				'Anywhere — it is the same thing as an h1',
+				'Anywhere in the file — it is another name for the h1',
 			],
 			answer: 1,
 			explanation:
@@ -262,13 +292,13 @@ things you want to learn, and a link to any site you like. Nest the link inside 
 		{
 			q: 'You want a subheading to look smaller than the one above it, so you use h4 instead of h2. What is wrong with that?',
 			options: [
-				'Nothing — heading levels are a visual choice',
-				'Heading levels describe structure; size is CSS\'s job, and skipped levels break screen-reader navigation',
-				'h4 is deprecated and should not be used',
+				'Nothing — as long as the text ends up the right size',
+				'Levels are structure; skipping one breaks navigation',
+				'An h4 has to sit inside an h3 element to be valid',
 			],
 			answer: 1,
 			explanation:
-				'Headings are the document outline, the same outline you would build in a print layout. Pick the level that matches the structure, then set any size you want in CSS. Choosing levels by eye leaves anyone navigating by headings with a broken table of contents.',
+				'Headings are the document outline, the same outline you would build in a print layout. Pick the level that matches the structure, then set any size you want in CSS. Choosing levels by eye leaves anyone navigating by headings with a broken table of contents. Headings are not nested inside each other, either — they are siblings, and the level carries the hierarchy.',
 		},
 	]}
 />

@@ -2,7 +2,7 @@
 title: Drawing on canvas
 description: The 2D context, a coordinate system that runs downwards, rectangles, arcs, paths, fill and stroke.
 sidebar:
-  order: 9
+  order: 10
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -203,24 +203,24 @@ Rectangles, arcs and paths will carry you a long way before you need anything el
 		{
 			q: 'You draw two circles and both come out yellow, although you set strokeStyle to black before the second one. What happened?',
 			options: [
-				'fillStyle is still yellow from the first circle, and you filled both',
-				'Canvas only supports one colour at a time',
-				'arc() ignores strokeStyle',
+				'fillStyle is still yellow, and both circles were filled rather than stroked',
+				'Setting strokeStyle resets fillStyle back to its default colour',
+				'Each setting applies only to the shape drawn immediately after it',
 			],
 			answer: 0,
 			explanation:
-				'fillStyle and strokeStyle are settings that stay in force until reassigned. Setting one does not clear the other, and every fill() after it uses whatever fillStyle currently holds.',
+				'fillStyle and strokeStyle are settings that stay in force until reassigned — they are not attached to one shape, and setting one does not clear the other. Every fill() uses whatever fillStyle currently holds, whichever line last touched it.',
 		},
 		{
 			q: 'You want a shape already drawn on the canvas to move ten pixels to the right. What do you do?',
 			options: [
-				'Select it and change its x property',
-				'Clear the canvas and draw it again at the new position',
-				'Call ctx.move(10, 0)',
+				'Select the shape and change its x property, as you would in Figma',
+				'Clear the canvas and draw it again ten pixels along',
+				'Call ctx.translate(10, 0) to shift what is already drawn',
 			],
 			answer: 1,
 			explanation:
-				'Canvas keeps pixels, not shapes. Nothing on it can be selected or edited afterwards. Movement means clearing and redrawing, which is what animation is.',
+				'Canvas keeps pixels, not shapes. Nothing on it can be selected or edited afterwards, and translate moves the coordinate system for what you draw next rather than what is already there. Movement means clearing and redrawing, which is what animation is.',
 		},
 	]}
 />

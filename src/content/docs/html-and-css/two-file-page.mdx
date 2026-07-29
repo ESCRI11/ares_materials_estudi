@@ -1,0 +1,260 @@
+---
+title: Build a page from two files
+description: Put the whole section together — a real index.html and style.css in your own project folder, opened in your own browser.
+sidebar:
+  order: 8
+---
+
+Every editable box in this section has been a fragment: a snippet of HTML with a `style` block
+sitting on top of it, running inside this page. That was deliberate — it removes everything
+between you and the one idea being taught.
+
+It also means you have never typed the document skeleton, never made a stylesheet, and never
+had two files that know about each other. That is what a real project is, and it is what
+you will be handed in the first week of the course. This lesson is one hour with your own
+editor, your own folder and your own browser, and nothing new to learn: every property here
+came from the six lessons before it.
+
+## 1. Make the folder
+
+Open Ubuntu on Windows, or Terminal on macOS, and build a room for the project inside the
+`ind-prep` folder you made earlier:
+
+```sh
+cd ~/ind-prep
+mkdir portfolio
+cd portfolio
+touch index.html style.css
+code .
+```
+
+`mkdir` makes the folder, `touch` makes two empty files, and `code .` opens the folder —
+the folder, not a file — in VS Code. On Windows, check the bottom-left corner reads
+**WSL: Ubuntu**.
+
+In the Explorer panel on the left you should see exactly two files. If you would rather not
+use the terminal, the *new file* icon that appears when you hover the folder name does the
+same job; type the whole name, extension included.
+
+## 2. Type index.html
+
+Click `index.html` and type this. Type it rather than pasting it — the point of the exercise
+is that the skeleton stops being a thing you copy.
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ares Bianchi — Interaction Design</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header class="header">
+      <strong>Ares Bianchi</strong>
+      <nav>
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1 id="work">Three things I have made</h1>
+
+      <div class="cards">
+        <article class="card">
+          <h2>Breathing lamp</h2>
+          <p>A lamp that matches the pace of the room it sits in.</p>
+        </article>
+        <article class="card">
+          <h2>Field recorder</h2>
+          <p>A box that listens to one street for an hour.</p>
+        </article>
+        <article class="card">
+          <h2>Wall of names</h2>
+          <p>Two hundred visitors, printed as they arrive.</p>
+        </article>
+      </div>
+
+      <p id="about">Interaction designer, currently learning to build things that respond.</p>
+    </main>
+  </body>
+</html>
+```
+
+Three lines are worth naming as you go past them.
+
+`<link rel="stylesheet" href="style.css">` is the join between the two files. It says: fetch
+`style.css` and apply it to this page. `rel` states the relationship — that the linked file is
+a stylesheet and not something else.
+
+`<header>`, `<nav>`, `<main>` and `<article>` are the
+[semantic elements](/ares_materials_estudi/html-and-css/html-elements/) mentioned earlier.
+They behave exactly like a `div` and say what the region is, which is free and worth having.
+
+`href="#work"` is a link to an `id` on the same page. Click it and the browser scrolls to the
+element carrying that id instead of loading anything.
+
+Save with `Ctrl+S`, or `Cmd+S` on macOS.
+
+## 3. Type style.css
+
+Now click `style.css`. There are no tags in here and no `<style>` element — a `.css` file is
+nothing but rules, from the first line to the last.
+
+```css
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  color: #1b1b1b;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #1b1b1b;
+  color: white;
+}
+
+.header a {
+  color: white;
+  text-decoration: none;
+  margin-left: 1.5rem;
+}
+
+.header a:hover,
+.header a:focus {
+  text-decoration: underline;
+}
+
+main {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+h1 {
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card {
+  flex-grow: 1;
+  min-width: 15rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+}
+
+.card h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+}
+
+.card p {
+  margin: 0;
+  color: #666;
+}
+```
+
+Nothing in there is new. `box-sizing` on everything and typography on `body` are the two
+lines every stylesheet starts with; `max-width` with `margin: 0 auto` is the centred column;
+the header is `space-between`; the cards wrap because of `flex-wrap` and a `min-width`.
+
+Save it.
+
+## 4. Open it in a browser
+
+**Windows.** In the VS Code terminal — View → Terminal, or Ctrl and the backtick key — run:
+
+```sh
+explorer.exe .
+```
+
+The folder opens as an ordinary File Explorer window. Double-click `index.html`.
+
+**macOS.** In the terminal:
+
+```sh
+open index.html
+```
+
+You get a black header with the name on the left and two links on the right, a heading, and
+three cards in a row. Narrow the window: at some point the cards drop under each other, with
+no media query anywhere in the file. That is `flex-wrap` and `min-width` doing responsive
+work on their own.
+
+Leave the browser open next to VS Code. This is the arrangement you will work in for the next
+two years: editor on one side, page on the other, `Ctrl+S` then `Ctrl+R`.
+
+## When the page comes out unstyled
+
+Sooner or later you will reload and see black Times New Roman on white — headings big, links
+blue, no black bar. That is not a broken stylesheet. That is *no* stylesheet: the browser
+could not find `style.css`, so it drew the HTML with its own defaults.
+
+`href="style.css"` is a **relative path**: it means "a file called `style.css` in the same
+folder as this page". Three things break it, and the third is the one that catches people who
+have only ever used Windows or macOS:
+
+- The file is in a different folder from `index.html`.
+- The name has a typo — `styles.css` and `style.css` are different files.
+- The capitalisation differs. `Style.css` is not `style.css` on Linux, and your project runs
+  on a Linux server the moment you publish it. Keep every filename lowercase and you never
+  meet this.
+
+To find out which, open the [dev tools](/ares_materials_estudi/html-and-css/dev-tools/) and
+look at the Console. A stylesheet that could not be loaded is reported there in one red line,
+with the name the browser went looking for.
+
+And if the console is clean but your newest change is missing, it is the cache: hold `Shift`
+and click reload, or press `Ctrl+Shift+R` (`Cmd+Shift+R` on macOS), to force fresh copies of
+the linked files.
+
+## Make it yours
+
+The file is a starting point, not an exercise with a solution. Four changes worth making,
+each of which uses something from an earlier lesson:
+
+1. Replace the name, the cards and the sentence with your own. Three cards is not a rule.
+2. Change the type: a different `font-family` on `body`, a bigger or smaller `h1`.
+3. Give `.card` a hover state — a border colour, a background — and check that nothing on the
+   page moves when the pointer arrives.
+4. Add a `@media (min-width: 50rem)` block that does one thing differently on a wide screen.
+
+Then open the dev tools on your own page and change a value there first, the way you would on
+someone else's site. Finding the number in the browser and then writing it into `style.css` is
+the loop, and this is the first page where you own both halves of it.
+
+:::tip[Two files, and now a repository]
+This folder is a good candidate for the first repository of your own: `git init`, a commit
+after each change worth keeping, and a push to GitHub. The
+[git section](/ares_materials_estudi/git-and-github/your-first-repository/) has the commands,
+and [GitHub Pages](/ares_materials_estudi/git-and-github/github-pages/) will put this exact
+page on the internet at a real address for nothing.
+:::
+
+## Check yourself
+
+- [ ] I made a `portfolio` folder inside `ind-prep` with `index.html` and `style.css` in it
+- [ ] I typed the document skeleton myself instead of copying it
+- [ ] The page opens in my browser from a `file://` address
+- [ ] The header is black, which proves `style.css` was found and applied
+- [ ] I renamed `style.css` on purpose, reloaded, and saw the page lose its styling
+- [ ] I put the name back, hard-reloaded, and got the styling back
+- [ ] I narrowed the window until the cards wrapped
+- [ ] I changed something in the dev tools first, then wrote it into `style.css`
+- [ ] The page says my name and describes my own work

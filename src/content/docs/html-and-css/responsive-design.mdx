@@ -62,19 +62,28 @@ with someone's accessibility setting instead of ignoring it.
 
 The other habit worth forming now: **`max-width` instead of `width`**.
 
+The result panel below is narrower than 1200 pixels, which is the whole demonstration: the
+first box demands 1200 and runs off the edge, and the second takes what it can get.
+
 <LiveCode
 	title="width versus max-width"
 	height={320}
 	code={`<style>
   body { font-family: Helvetica, Arial, sans-serif; margin: 1rem; }
   div { background: #eee; padding: 1rem; margin-bottom: 10px; }
-  .rigid { width: 600px; }
-  .fluid { max-width: 600px; }
+  .rigid { width: 1200px; }
+  .fluid { max-width: 1200px; }
 </style>
 
-<div class="rigid">width: 600px — I stay 600px wide and overflow when there is less room.</div>
-<div class="fluid">max-width: 600px — I am 600px at most, and narrower when I have to be.</div>`}
+<div class="rigid">width: 1200px — I am 1200px wide whatever happens, so my right-hand edge is
+somewhere off the side of this panel and you have to scroll to reach it.</div>
+<div class="fluid">max-width: 1200px — I would take 1200px if there were room. There is not,
+so I fit.</div>`}
 />
+
+Change both numbers to `200px` and press Run: now there *is* room for 200 pixels, and the two
+boxes come out identical. A fixed width is only a problem when the space is smaller than the
+number — which, across every screen your page will meet, is most of the time.
 
 `max-width: 600px` reads as "600 pixels, or the space available, whichever is smaller". Almost
 every fixed width in a layout wants to be a max-width. The same applies to images, where
@@ -200,8 +209,8 @@ room. Make it responsive — cards that wrap, a gap, and no fixed widths.
 			q: 'Your layout is correct on a laptop but appears as a shrunken desktop page on a phone, and none of your media queries fire. What is missing?',
 			options: [
 				'The viewport meta tag in the head',
-				'A max-width on the body',
-				'More breakpoints',
+				'A max-width: 100% rule on the body',
+				'A media query for smaller breakpoints',
 			],
 			answer: 0,
 			explanation:
@@ -210,9 +219,9 @@ room. Make it responsive — cards that wrap, a gap, and no fixed widths.
 		{
 			q: 'Why is max-width: 600px usually better than width: 600px?',
 			options: [
-				'It renders faster',
-				'It means 600px at most, so the element shrinks rather than overflowing on narrow screens',
-				'It is required for media queries to work',
+				'It is faster for the browser to render',
+				'It is a ceiling, so the element can shrink',
+				'Media queries only work with max-width',
 			],
 			answer: 1,
 			explanation:
@@ -222,8 +231,8 @@ room. Make it responsive — cards that wrap, a gap, and no fixed widths.
 			q: 'What does mobile-first mean in practice?',
 			options: [
 				'Designing the phone version in Figma before the desktop one',
-				'Writing the narrow layout as the base CSS and adding wider layouts inside min-width media queries',
-				'Serving a separate site to phones',
+				'Writing the narrow layout as the base and widening it later',
+				'Serving a separate, smaller site to phone browsers',
 			],
 			answer: 1,
 			explanation:

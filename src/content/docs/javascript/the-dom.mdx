@@ -2,7 +2,7 @@
 title: The DOM
 description: How JavaScript reaches into a page — finding elements, changing their text and style, and building new ones.
 sidebar:
-  order: 7
+  order: 8
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -82,9 +82,18 @@ Change the strings and press Run. The first render already ran the code — the 
 heading you see is the rewritten one.
 
 :::caution[textContent, not innerHTML]
-There is a second property, `innerHTML`, that accepts tags rather than plain text. It is also
-how pages get attacked: text typed by a visitor and pushed into `innerHTML` can carry a script
-with it. Use `textContent` unless you specifically need to insert markup.
+There is a second property, `innerHTML`, that accepts tags rather than plain text. Anything you
+assign to it is read as markup and built into real elements — which is fine for markup you
+wrote, and a way in for markup somebody else wrote.
+
+A `<script>` tag inserted this way does not run, and finding that out is what convinces people
+the warning is imaginary. The attack does not use one. It uses an ordinary element with an
+attribute that runs code: `<img src=x onerror="…">` asks for an image that cannot exist, and
+the browser dutifully runs the `onerror` code the moment it fails. There are dozens of
+variations.
+
+`textContent` parses nothing. It puts characters on the page and that is all, so a visitor
+who types tags sees their tags. Use it unless you specifically need to insert markup.
 :::
 
 ## Changing appearance
@@ -221,9 +230,9 @@ element containing "Semester 1" above the list, and give the second item the `ma
 		{
 			q: 'You run document.createElement("li") and set its textContent, but nothing appears on the page. Why?',
 			options: [
-				'createElement is not a real function',
-				'The element exists but was never appended to anything on the page',
-				'List items only work inside a table',
+				'A list item has to be created from the ul, not from document',
+				'It exists in memory but was never appended to the page',
+				'Elements made in JavaScript need a class before they are visible',
 			],
 			answer: 1,
 			explanation:

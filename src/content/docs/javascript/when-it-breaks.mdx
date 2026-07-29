@@ -2,7 +2,7 @@
 title: When it breaks
 description: Reading an error message, using the stack trace and console.log, and recognising the five mistakes everybody makes at the start.
 sidebar:
-  order: 13
+  order: 16
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -92,7 +92,7 @@ done; a console full of your own noise hides the next real message.
 | --- | --- |
 | `Uncaught SyntaxError: Unexpected token` | A missing bracket, brace or quote. The line number is where the browser *noticed*, often a line or two after the real mistake. |
 | `ReferenceError: total is not defined` | The name is spelled differently from where you declared it, or it was declared inside a different pair of braces. |
-| `TypeError: Cannot read properties of null` | `querySelector` matched nothing: wrong selector, or the script ran before the element existed. |
+| `TypeError: Cannot read properties of null`, or `Cannot set properties of null` | `querySelector` matched nothing: wrong selector, or the script ran before the element existed. *Read* means you were taking a value out, *set* means you were assigning one. |
 | `TypeError: x is not a function` | A method name is misspelled, or the value is not what you assumed. `getElementByID` is not a thing; `getElementById` is. |
 | Nothing happens, no error at all | The listener is on the wrong element or the event name is wrong, or the function was defined but never called. |
 
@@ -115,8 +115,13 @@ was, which tells you where to look.
 </script>`} />
 
 Press Run: the heading stays as it is. Open the console and you get
-`Cannot read properties of null (reading 'textContent')`. The id in the HTML is `headline`; the
+`Cannot set properties of null (setting 'textContent')`. The id in the HTML is `headline`; the
 selector asks for `title`. Fix the selector and Run again.
+
+That message is one word different from the one at the top of this lesson, and the word is
+worth having. **Read** and *reading* mean you were taking a value out. **Set** and *setting*
+mean you were putting one in — there was an `=` after it. Same cause, `null` where an element
+should be; the wording tells you which side of the line to look at.
 
 In these boxes the error names the file as `about:srcdoc`, because the code has no file of its
 own. In your own project it will name your file and line.
@@ -191,9 +196,9 @@ curriculum.
 		{
 			q: 'The console says "Uncaught TypeError: Cannot read properties of null (reading \'style\')" at line 12. What do you look at first?',
 			options: [
-				'Whether the CSS file is loading',
-				'Whether the querySelector on or before line 12 actually matched an element',
-				'Whether the browser supports style',
+				'Whether the stylesheet holding that rule actually loaded',
+				'Whether the querySelector on line 12 matched an element',
+				'Whether the property should be written background-color instead',
 			],
 			answer: 1,
 			explanation:
@@ -202,9 +207,9 @@ curriculum.
 		{
 			q: 'A stack trace lists five "at" lines. Which one do you read first?',
 			options: [
-				'The last one, where the program started',
-				'The top one, and then down to the first line in a file you wrote',
-				'They are printed in random order',
+				'The last one, which is where the program originally started',
+				'The top one, then down to the first line in a file you wrote',
+				'The one naming a library file, since that is where it broke',
 			],
 			answer: 1,
 			explanation:
@@ -213,13 +218,13 @@ curriculum.
 		{
 			q: 'Your page does exactly nothing when you click the button, and the console is empty. What is that a sign of?',
 			options: [
-				'A syntax error somewhere in the file',
-				'Something wired to the wrong place — wrong selector, wrong event name, or a function that is never called',
-				'A browser that needs updating',
+				'A syntax error, which stops the file before any of it runs',
+				'Something wired to the wrong place, or a function never called',
+				'The console has to be open before the page loads to catch it',
 			],
 			answer: 1,
 			explanation:
-				'Silence means no code threw. Something perfectly valid is attached to the wrong thing or never invoked. A console.log at the top of the handler settles it in ten seconds: if it does not print, the handler is not running.',
+				'Silence means no code threw — a syntax error would have printed loudly. Something perfectly valid is attached to the wrong thing or never invoked. A console.log at the top of the handler settles it in ten seconds: if it does not print, the handler is not running.',
 		},
 	]}
 />

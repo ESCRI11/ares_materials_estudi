@@ -2,7 +2,7 @@
 title: Sound and the microphone
 description: Making a tone with the Web Audio API, then taking live microphone input and using its level to drive a canvas.
 sidebar:
-  order: 11
+  order: 13
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -157,18 +157,31 @@ microphone, so it runs anywhere.
   draw();
 </script>`} />
 
-In your own file, the only change is where the number comes from:
+In your own file, the number comes from the microphone instead. One piece of structure comes
+with it: `await` only works inside a function marked `async`, so the whole start-up has to live
+in one.
 
 ```js
-const level = await startMic();   // ask once, at the top
+async function start() {
+	const level = await startMic();   // ask once, when it starts
 
-function draw() {
-	const value = level();          // read it every frame
-	// …the same drawing code
-	requestAnimationFrame(draw);
+	function draw() {
+		const value = level();          // read it every frame
+		// …the same drawing code
+		requestAnimationFrame(draw);
+	}
+
+	draw();
 }
-draw();
+
+start();   // nothing above this line runs until it is called
 ```
+
+Writing `const level = await startMic();` at the top of the file instead, outside any function,
+is the mistake to expect. In a plain `<script>` that is not a small error in one line — the
+browser refuses to read the file at all, so nothing runs and you get a blank page. A
+`SyntaxError` in the console saying `await` is only valid in async functions is that, and the
+wrapper above is the fix.
 
 Anything that took a number can now take that one: a radius, a colour, a rotation, how many
 shapes appear. That substitution is the whole technique.
@@ -188,13 +201,17 @@ Be honest with yourself about this part, because it is part of the design of you
 - When you are finished, release it: `stream.getTracks().forEach((track) => track.stop())`.
 
 ```js
-try {
-	const level = await startMic();
-	// …
-} catch (error) {
-	document.querySelector("#status").textContent =
-		"No microphone. Allow it from the icon in the address bar and reload.";
+async function start() {
+	try {
+		const level = await startMic();
+		// …the draw loop, as above
+	} catch (error) {
+		document.querySelector("#status").textContent =
+			"No microphone. Allow it from the icon in the address bar and reload.";
+	}
 }
+
+start();
 ```
 
 Everything either node can do is on
@@ -207,9 +224,9 @@ analyser will carry an entire first-semester project.
 		{
 			q: 'Your beep works when triggered by a button, but the version that plays automatically as the page loads is silent. Why?',
 			options: [
-				'Oscillators only work inside event handlers',
-				'Browsers block audio until the visitor has interacted with the page',
-				'The frequency defaults to zero',
+				'An oscillator can only be started from inside an event handler',
+				'Browsers block audio until the visitor has interacted',
+				'The AudioContext needs a gain above 0.2 before it is audible',
 			],
 			answer: 1,
 			explanation:
@@ -218,9 +235,9 @@ analyser will carry an entire first-semester project.
 		{
 			q: 'What does the analyser node produce?',
 			options: [
-				'An amplified copy of the sound for the speakers',
-				'Numbers describing the audio passing through it, which your code can read',
-				'A recording saved to a file',
+				'An amplified copy of the sound, on its way to the speakers',
+				'Numbers describing the audio passing through it',
+				'A recording of the input, saved as a file you can play back',
 			],
 			answer: 1,
 			explanation:
@@ -229,13 +246,13 @@ analyser will carry an entire first-semester project.
 		{
 			q: 'You open your microphone sketch by double-clicking the HTML file in your folder and nothing happens. What is the most likely cause?',
 			options: [
-				'The page has a file:// address, and microphone access needs https or localhost',
-				'The microphone is broken',
-				'Canvas cannot be used with audio',
+				'The page has a file:// address, and the microphone needs localhost',
+				'The permission prompt only appears the second time a page is opened',
+				'Microphone access has to be requested before the page finishes loading',
 			],
 			answer: 0,
 			explanation:
-				'Microphone access is restricted to secure contexts. Serving the folder with the Live Server extension in VS Code gives you a localhost address, which qualifies.',
+				'Microphone access is restricted to secure contexts, and a file opened straight from your file manager is not one. Serving the folder with the Live Server extension in VS Code gives you a localhost address, which qualifies. The prompt appears whenever you call getUserMedia, first visit or hundredth.',
 		},
 	]}
 />

@@ -85,18 +85,30 @@ try {
 	assert.equal(await box.isChecked(), true, 'tick did not persist across reload');
 
 	// --- quiz ---
+	// Options are shuffled at build time, so the test cannot assume a fixed index.
+	// Read the block's key the same way the component does.
+	const answers = await page
+		.locator('quiz-block')
+		.first()
+		.evaluate((el) =>
+			atob(el.dataset.k)
+				.split(',')
+				.map(Number),
+		);
+
 	const first = page.locator('.quiz-q').first();
 	assert.equal(await page.locator('.quiz-score').isVisible(), false, 'score shown before any answer');
-	await first.locator('.quiz-option').first().click(); // deliberately wrong
+	const wrongIndex = [0, 1, 2].find((i) => i !== answers[0]);
+	await first.locator('.quiz-option').nth(wrongIndex).click(); // deliberately wrong
 	assert.equal(await first.locator('.is-wrong').count(), 1, 'wrong answer not flagged');
 	assert.equal(await first.locator('.is-correct').count(), 1, 'correct answer not revealed');
 	await first.locator('.quiz-explanation').waitFor({ state: 'visible' });
 
-	await first.locator('.quiz-option').nth(2).click({ force: true });
+	await first.locator('.quiz-option').nth(answers[0]).click({ force: true });
 	assert.equal(await first.locator('.is-wrong').count(), 1, 'answered question still takes clicks');
 
 	assert.equal(await page.locator('.quiz-score').isVisible(), false, 'score shown too early');
-	await page.locator('.quiz-q').nth(1).locator('.quiz-option').nth(1).click(); // correct
+	await page.locator('.quiz-q').nth(1).locator('.quiz-option').nth(answers[1]).click(); // correct
 	assert.match(await page.locator('.quiz-score').textContent(), /1 of 2 correct/);
 
 	// --- select-a-word definitions ---

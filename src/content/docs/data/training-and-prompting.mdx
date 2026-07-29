@@ -130,7 +130,7 @@ The practical differences:
 |  | Training your own | Prompting an existing one |
 | --- | --- | --- |
 | What you need | Labelled examples, and enough of them | A clear description, and examples in the message |
-| What you produce | A small model that does one narrow thing | Text, images, or structured output on request |
+| What you produce | A small model that does one narrow thing | Text, images, or [structured output](/ares_materials_estudi/ai-as-a-material/beyond-text/) |
 | Where it runs | Often on your machine or in the browser | Usually a service you call over an API |
 | What it costs | Your time collecting and labelling | Money per request, and time spent evaluating |
 | Repeatable? | Yes — same input, same output | Not exactly — the same prompt can vary |
@@ -184,9 +184,9 @@ you keep the line between them written down.
 		{
 			q: 'You have 300 photos of your own ceramic pieces, each tagged glazed or unglazed, and you want a program to sort new photos. Which is this?',
 			options: [
-				'A feature is glazed or unglazed, and the label is the photo',
-				'The features are what the model looks at in the photo, and glazed or unglazed is the label',
-				'Neither — sorting photos does not use labels',
+				'The feature is glazed or unglazed, and the photo is the label',
+				'The features come from the photo, and glazed or unglazed is the label',
+				'Neither — with only 300 examples this is clustering, not labelling',
 			],
 			answer: 1,
 			explanation:
@@ -195,9 +195,9 @@ you keep the line between them written down.
 		{
 			q: 'Your model gets 99% right on the data you trained it on and 55% on photos taken in a different room. What happened?',
 			options: [
-				'The model needs more training on the same photos',
-				'It overfitted — it learned the particulars of your training examples, including the room, rather than the pattern',
-				'55% is a normal result and nothing is wrong',
+				'It needs more training rounds on the same set of photos',
+				'It overfitted — it learned your training examples, the room included',
+				'The second room was lit differently, so those photos need retaking',
 			],
 			answer: 1,
 			explanation:

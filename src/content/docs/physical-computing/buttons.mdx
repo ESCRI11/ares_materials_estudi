@@ -216,9 +216,9 @@ one behave without leaving the page.
 		{
 			q: 'An input pin with a button to GND and no pull-up reads randomly when the button is released. Why?',
 			options: [
-				'The button is faulty',
-				'The pin is floating — nothing defines its voltage when the button is open, so it picks up interference',
-				'The pin needs to be configured as an output first',
+				'The button is faulty, since a good one reads steady',
+				'The pin is floating: nothing defines its idle voltage',
+				'The pin has to be configured as an output first',
 			],
 			answer: 1,
 			explanation:
@@ -227,9 +227,9 @@ one behave without leaving the page.
 		{
 			q: 'What is bounce?',
 			options: [
-				'The program checking the pin too often',
-				'The metal contacts inside the switch physically touching and separating several times over a few milliseconds',
-				'Interference from the LED on the same board',
+				'The program checking the pin far too often to keep up',
+				'The switch contacts touching and parting several times',
+				'Electrical interference from the LED on the same board',
 			],
 			answer: 1,
 			explanation:

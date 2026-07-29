@@ -2,7 +2,7 @@
 title: Events
 description: Making a page react — addEventListener, clicks, typing, keys, and why the code you write runs later.
 sidebar:
-  order: 8
+  order: 9
 ---
 
 import LiveCode from '@components/LiveCode.astro';
@@ -183,9 +183,9 @@ does the work in one line.
 		{
 			q: 'Why does the counter example put "let count = 0" outside the click callback?',
 			options: [
-				'Variables cannot be declared inside a function',
-				'So the value survives between clicks instead of being recreated each time',
-				'Because callbacks run before the rest of the page',
+				'A variable declared inside a callback cannot be read by the browser',
+				'So the value survives between clicks instead of being recreated',
+				'Because the callback runs once before any click happens',
 			],
 			answer: 1,
 			explanation:
@@ -194,9 +194,9 @@ does the work in one line.
 		{
 			q: 'What is wrong with button.addEventListener("click", start())?',
 			options: [
-				'Nothing — this is the standard form',
-				'The brackets run start immediately and register its return value instead of the function',
-				'"click" should be "onclick"',
+				'Nothing is wrong with it — this is the standard way to register a handler',
+				'The brackets run start immediately and register whatever it returned',
+				'The event name should be written "onclick" rather than "click"',
 			],
 			answer: 1,
 			explanation:

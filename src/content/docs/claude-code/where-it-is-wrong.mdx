@@ -40,8 +40,8 @@ is what the mechanism produces. This is
 form, and the code equivalent of an invented citation.
 
 You often meet it as an immediate error, which makes it the friendliest failure in this list.
-Sometimes it is quieter: an option name that does not exist is simply ignored, so the code runs
-and the setting you thought you applied does nothing.
+Sometimes it is quieter: an option name that does not exist is ignored without complaint, so the
+code runs and the setting you thought you applied does nothing.
 
 **Notice it by** the error, when you are lucky, and by checking the documentation for anything you
 have not seen before. If it names a package you have never heard of, look it up before installing
@@ -126,9 +126,9 @@ enough that you will actually do it.
 		{
 			q: 'You get code that works perfectly on your test input. What is the most likely remaining problem?',
 			options: [
-				'It will be slow',
-				'It fails on an edge case — empty input, zero, a second click, an unusual value',
-				'It uses an outdated style',
+				'It is slower than a version you would have written yourself',
+				'It fails on an edge case — empty, zero, a second click',
+				'It uses a style your lecturer will not recognise',
 			],
 			answer: 1,
 			explanation:
@@ -137,9 +137,9 @@ enough that you will actually do it.
 		{
 			q: 'Twenty exchanges into a session, it uses a library you told it at the start not to use. What is going on?',
 			options: [
-				'It is overriding your instruction because it disagrees',
-				'The context window has filled and your early instruction has lost weight — clear the session and put the rule in CLAUDE.md',
-				'The instruction was not phrased strongly enough',
+				'It has decided the library is the better approach and overridden you',
+				'The context window filled and the early instruction lost weight',
+				'The instruction needed repeating in every message to hold',
 			],
 			answer: 1,
 			explanation:
@@ -148,8 +148,8 @@ enough that you will actually do it.
 		{
 			q: 'Which kind of failure does reading the diff NOT help you catch?',
 			options: [
-				'A function that does not exist',
-				'A library you banned reappearing',
+				'A function or option name that does not exist in that library',
+				'A banned library reappearing in an import line',
 				'A confident but wrong explanation of how something works',
 			],
 			answer: 2,
@@ -171,5 +171,7 @@ enough that you will actually do it.
 />
 
 That is the section. What it leaves you with is a tool you can point at your own project without
-being nervous, and a clear sense of the two places it will hurt you: the diff you approved without
-reading, and the explanation you believed without checking.
+being nervous, and a clear sense of the three places it will hurt you: the diff you approved
+without reading, the explanation you believed without checking, and — from
+[the permissions lesson](/ares_materials_estudi/claude-code/permissions/) — the instruction that
+came from a file rather than from you.

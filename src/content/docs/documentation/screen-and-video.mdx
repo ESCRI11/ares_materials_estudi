@@ -1,0 +1,137 @@
+---
+title: Screen recordings and the project video
+description: Capturing what happens on screen, and building the 90-second video that tells the story of the project without narrating what the camera already shows.
+sidebar:
+  order: 3
+---
+
+Two of the deliverables live in moving pictures: **screenshots and screen recordings** of
+anything digital, and **a video that tells the story of the project**. They are different jobs.
+A screen recording proves something works. The project video explains why it exists.
+
+## Capturing the screen
+
+Everything you need is already installed.
+
+**Windows.** `Win` + `Shift` + `S` opens the Snipping Tool overlay: drag a region for a still,
+or switch it to its recording mode for video of that region. `Win` + `G` opens the Game Bar,
+which records the active window and is the more reliable of the two for anything longer than a
+few seconds.
+
+**macOS.** `Cmd` + `Shift` + `4` for a region still, `Cmd` + `Shift` + `5` for the recorder,
+which offers the whole screen or a selection.
+
+**More than that**, and the standard free answer is OBS Studio, which records several sources at
+once — screen, camera, microphone. Worth installing only if you need a face or a camera angle
+composited with the screen.
+
+Five things to do before you press record:
+
+- **Silence notifications.** Do Not Disturb on either system. A message sliding in over your
+  demo is the single most common reason a recording gets redone.
+- **Clean the frame.** Hide the bookmarks bar, close the twenty tabs, use an empty desktop. A
+  personal browser window in a submitted recording is a small permanent embarrassment.
+- **Make the text bigger.** Editor and terminal text at your normal size is unreadable once the
+  video is scaled down into a page. Two or three steps up.
+- **Record the window, not the whole desktop.** Cropping afterwards throws away resolution.
+- **Move the cursor slowly and deliberately.** The viewer follows the pointer. Pause for a beat
+  after each click so they can see what changed.
+
+Then cut the loading, the typos and the pauses. A screen recording that earns its place is
+usually under thirty seconds.
+
+## The project video
+
+The syllabus asks for a video that *tells the story of the project*. Story means it has an
+order, and the order is the same one every time.
+
+Four beats, fifteen to thirty seconds each:
+
+1. **What it is.** The object, working, in one clean shot. The first ten seconds decide whether
+   the rest gets watched.
+2. **What it does.** Someone using it. Their hand, and the response.
+3. **How it works.** The inside, the schematic on screen, a sensor value moving, the mechanism.
+4. **What you learned.** The version that failed, the thing you would change. Twenty seconds,
+   and it is what separates documentation from a demo reel.
+
+**Sixty to a hundred and twenty seconds** for the whole thing. Ninety is usually right. Long
+videos are not watched to the end, and the fourth beat is at the end.
+
+## Show the interaction, do not narrate it
+
+The rule that fixes most student videos: **if the camera can show it, the voice should not say
+it.** A shot of a hand pressing a button, over a voice saying "the user presses the button", is
+dead air twice over.
+
+Use the voice for what the picture cannot carry: why a button rather than a gesture, what the
+threshold is set to, what surprised you.
+
+The hardest shot in the whole exercise is the hand and the response in one frame. Three ways
+through it:
+
+- Frame wide enough that both are in shot, and accept that neither is large.
+- Cut — the press in one shot, the response in the next — and cut *on* the action, so the timing
+  reads as continuous.
+- If the response is on a screen, record the screen separately and place the two side by side in
+  the edit. This is usually the clearest and it is the least work.
+
+## Filming the object
+
+- **Lock the camera off.** A tripod, or books. Handheld footage of a small object is unusable.
+- **Two people.** One uses the object, one operates the camera. Doing both alone produces a
+  video of your own arm.
+- **Shoot each action three times.** Editing is choosing, and one take gives you nothing to
+  choose between.
+- **Get b-roll** — the supporting footage you cut away to when a shot runs short. Slow moves
+  across the object, close-ups of a connector, the LED in a dark room. Five minutes of it saves
+  the edit.
+- **Record the object's own sound** if it has one: a servo, a relay, a click. Sync sound is what
+  makes a physical object feel real on screen.
+- **Do not put music under speech** unless you can lower the music where the voice sits.
+  Otherwise both become unintelligible.
+
+## Voice, captions and text
+
+**Record the voiceover separately**, in a quiet room, phone about 20 cm away, reading from a
+script you wrote down. Recording it live over the shot gives you room echo, camera noise and a
+sentence you cannot re-record without reshooting.
+
+**Or use no voice at all.** Title cards between the four beats, sync sound underneath. This is
+faster, it is often stronger, and it removes the accent question entirely.
+
+**Captions are not optional.** The video will be watched on a phone with the sound off, and by
+people whose first language is not English. Most editors will generate them automatically now —
+read every line before you export, because they will confidently mistranscribe every technical
+word in the project.
+
+Text on screen has to be readable on a phone: large, high contrast, two lines at most, on screen
+long enough to read twice.
+
+## Exporting and where it lives
+
+**1080p, MP4 with H.264, 30 frames per second.** Higher settings make a bigger file that looks
+the same in the page it is embedded in.
+
+The file does not go in the repository. GitHub warns above 50 MB and
+[refuses anything over 100 MB](/ares_materials_estudi/git-and-github/what-not-to-commit/), and a
+video committed once stays in the history forever. Upload it to a video platform or a shared
+drive, set the sharing so that anyone with the link can watch, and put the link in the README.
+
+Then **open that link in a private browser window**. A video nobody can open is a video that was
+not submitted, and permission settings default to private more often than you would expect.
+
+## Do this now
+
+None of this waits for the semester. Use anything on your desk as the subject — a lamp, a
+kettle, a door.
+
+- [ ] I recorded thirty seconds of my screen with notifications off and a clean desktop
+- [ ] I recorded it as a window rather than the full desktop, with the text size increased
+- [ ] I wrote the four beats of a video as four lines before shooting anything
+- [ ] I filmed an object being used, with the camera on something solid and someone else's hands
+- [ ] I shot the same action three times and picked the best take
+- [ ] I shot two minutes of b-roll: details, slow moves, one shot in low light
+- [ ] I cut it to under two minutes, with the "what I learned" beat still in it
+- [ ] I added captions and read every line of them
+- [ ] I exported 1080p MP4 and checked the file size
+- [ ] I uploaded it, took the link, and opened it in a private window to prove it plays

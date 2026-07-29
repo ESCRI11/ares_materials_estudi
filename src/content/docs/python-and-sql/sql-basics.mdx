@@ -1,0 +1,295 @@
+---
+title: SQL basics
+description: SELECT, WHERE, ORDER BY, LIMIT, COUNT and GROUP BY, and one JOIN — the language where you describe the answer instead of writing the loop.
+sidebar:
+  order: 4
+---
+
+import Quiz from '@components/Quiz.astro';
+
+Every language you have met so far takes instructions in order. Loop over these rows. If this,
+then that. Push it onto the list. You write the *how*, and the answer is whatever falls out of
+the end.
+
+**SQL** — Structured Query Language, said either as "sequel" or as three letters — does not work
+that way. You describe the rows you want, and the database works out how to find them. There is
+no loop to write, no index to keep, no order to get wrong. That is the conceptual jump in this
+lesson, and it is a bigger one than any syntax.
+
+One consequence to hold on to: **a query takes a table and gives you back a table**. Always. A
+single number is a table with one row and one column.
+
+## Make something to query
+
+Two tables, the ones from the last lesson. Save this as `setup.py` and run it once with
+`python3 setup.py`:
+
+```python
+import sqlite3
+
+db = sqlite3.connect("studio.db")
+
+db.executescript("""
+CREATE TABLE venues (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  city TEXT
+);
+
+CREATE TABLE visits (
+  id INTEGER PRIMARY KEY,
+  venue_id INTEGER,
+  day TEXT,
+  people INTEGER
+);
+
+INSERT INTO venues VALUES
+  (1, 'Museo', 'Lugano'),
+  (2, 'Teatro', 'Bellinzona'),
+  (3, 'Studio', 'Lugano');
+
+INSERT INTO visits VALUES
+  (1, 1, '2026-03-01', 120),
+  (2, 1, '2026-03-02', 95),
+  (3, 2, '2026-03-01', 40),
+  (4, 2, '2026-03-02', 180),
+  (5, 3, '2026-03-01', 22);
+""")
+
+db.commit()
+db.close()
+```
+
+`CREATE TABLE` is the schema being written down: every column named and typed before a single
+row exists. `db.commit()` is what makes the changes permanent — without it the file is left as it
+was. Run the script twice and the second run fails with `table venues already exists`, which is
+the database refusing to quietly duplicate your work. Delete `studio.db` if you want to start
+over.
+
+Now open a prompt on that file:
+
+```sh
+sqlite3 studio.db
+```
+
+Two settings make the output readable, and then you can type queries:
+
+```
+sqlite> .headers on
+sqlite> .mode column
+```
+
+Lines starting with a dot are instructions to this program, not SQL. `.quit` gets you out. If
+`sqlite3` is not installed, `sudo apt install sqlite3` on Ubuntu, or `brew install sqlite` on
+macOS.
+
+## SELECT and FROM
+
+The two words every query has:
+
+```sql
+SELECT name, city FROM venues;
+```
+
+```
+name    city
+------  ----------
+Museo   Lugano
+Teatro  Bellinzona
+Studio  Lugano
+```
+
+`SELECT` lists the columns you want, `FROM` says which table. `SELECT *` means every column —
+handy while exploring, and worth replacing with real names in anything you keep, so that adding
+a column later does not change what your query returns.
+
+Two conventions: keywords are written in capitals so the shape of a query is readable at a
+glance, and a statement ends with a semicolon. In the `sqlite3` prompt the semicolon is what
+says "now run it", so a missing one leaves you staring at a `...>` prompt waiting for more.
+
+## WHERE
+
+```sql
+SELECT day, people FROM visits WHERE people > 100;
+```
+
+```
+day         people
+----------  ------
+2026-03-01  120
+2026-03-02  180
+```
+
+`WHERE` is a condition applied to every row, keeping the ones that pass. Note two differences
+from JavaScript: comparison is a single `=`, not `==`, and text goes in single quotes.
+
+```sql
+SELECT * FROM venues WHERE city = 'Lugano';
+```
+
+`AND`, `OR` and `NOT` are spelled as words, as they are in Python.
+
+## ORDER BY and LIMIT
+
+```sql
+SELECT day, people FROM visits ORDER BY people DESC LIMIT 3;
+```
+
+```
+day         people
+----------  ------
+2026-03-02  180
+2026-03-01  120
+2026-03-02  95
+```
+
+`ORDER BY` sorts, `DESC` reverses it, `LIMIT` cuts the result short. Together they are "the top
+three", which is a question you will ask constantly. Without `ORDER BY`, `LIMIT` gives you three
+arbitrary rows — the database is under no obligation to hand them over in any particular order,
+and you should never assume one.
+
+## COUNT and GROUP BY
+
+`COUNT(*)` counts rows:
+
+```sql
+SELECT COUNT(*) FROM visits;
+```
+
+On its own that is one number about everything. `GROUP BY` is what makes it interesting: it
+gathers rows that share a value and gives you one output row per group.
+
+```sql
+SELECT venue_id, COUNT(*), SUM(people) FROM visits GROUP BY venue_id;
+```
+
+```
+venue_id  COUNT(*)  SUM(people)
+--------  --------  -----------
+1         2         215
+2         2         220
+3         1         22
+```
+
+This is precisely the dictionary you built by hand in
+[Python for data](/ares_materials_estudi/python-and-sql/python-for-data/) — a running total per
+key — written as one line and with nothing to get wrong. `SUM`, `AVG`, `MIN` and `MAX` work the
+same way.
+
+The rule that catches everybody: any column you `SELECT` alongside a `COUNT` or a `SUM` should be
+one you grouped by. Asking for `day` in that query is asking which of two days it should print,
+and there is no sensible answer.
+
+## JOIN, and why there are two tables
+
+The result above says `venue_id 1`, which is not something you can put in front of anybody.
+The name is in the other table, and `JOIN` is how you bring them together:
+
+```sql
+SELECT venues.name, visits.day, visits.people
+FROM visits
+JOIN venues ON visits.venue_id = venues.id;
+```
+
+```
+name    day         people
+------  ----------  ------
+Museo   2026-03-01  120
+Museo   2026-03-02  95
+Teatro  2026-03-01  40
+Teatro  2026-03-02  180
+Studio  2026-03-01  22
+```
+
+`ON` states which column in each table has to match. For every visit, the database finds the
+venue whose `id` equals that visit's `venue_id`, and produces one row with the columns of both.
+When two tables have a column of the same name, you write `table.column` to say which you mean.
+
+This is the payoff for splitting the data up in the first place. The venue's name is stored
+once, and any query that needs it asks for it. Put a `GROUP BY` on top and you get the report
+you actually wanted:
+
+```sql
+SELECT venues.name, SUM(visits.people) AS total
+FROM visits
+JOIN venues ON visits.venue_id = venues.id
+GROUP BY venues.name
+ORDER BY total DESC;
+```
+
+```
+name    total
+------  -----
+Teatro  220
+Museo   215
+Studio  22
+```
+
+`AS total` renames a column in the output, so you can refer to it in `ORDER BY` and so the
+result has a heading a person can read.
+
+## The translation table
+
+| JavaScript on an array | SQL |
+| --- | --- |
+| `.filter(...)` | `WHERE` |
+| `.sort(...)` | `ORDER BY` |
+| `.slice(0, 3)` | `LIMIT 3` |
+| `.map(r => r.city)` | `SELECT city` |
+| `.length` | `COUNT(*)` |
+| `.reduce(...)` to a total | `SUM(...)` |
+| a dictionary of running totals | `GROUP BY` |
+| two nested loops matching by id | `JOIN` |
+
+The right-hand column is the same work described rather than performed. That is the whole of
+SQL's argument for itself, and it is why the language has outlasted every framework built on
+top of it.
+
+## Do this on your machine
+
+- [ ] I ran `setup.py` and got a `studio.db` file in the folder
+- [ ] I opened it with `sqlite3 studio.db` and turned on `.headers on` and `.mode column`
+- [ ] I ran a `SELECT` with a `WHERE` on it and got fewer rows back
+- [ ] I forgot the semicolon on purpose and saw the `...>` prompt waiting
+- [ ] I used `ORDER BY ... DESC LIMIT 3` to get a top three
+- [ ] I ran the `GROUP BY` query and checked one total against the CSV by hand
+- [ ] I ran the `JOIN` and saw venue names appear beside visit rows
+- [ ] I left the prompt with `.quit`
+
+<Quiz
+	questions={[
+		{
+			q: 'SQL is described as saying what you want rather than how to get it. What does that mean in practice?',
+			options: [
+				'You describe the rows you want and the database finds them',
+				'You still write the loop, in a language made for tables',
+				'You write plain English and the database interprets it',
+			],
+			answer: 0,
+			explanation:
+				'There is no loop, no counter and no order of operations in a query — you state the conditions and the shape of the result. How the rows are actually located is the database’s business, and it will change its mind as your data grows.',
+		},
+		{
+			q: 'Which query answers "how many visits did each venue have"?',
+			options: [
+				'SELECT venue_id, COUNT(*) FROM visits GROUP BY venue_id;',
+				'SELECT venue_id, COUNT(*) FROM visits WHERE venue_id;',
+				'SELECT COUNT(venue_id) FROM visits ORDER BY venue_id;',
+			],
+			answer: 0,
+			explanation:
+				'GROUP BY is the word that turns one number about everything into one number per group. WHERE filters rows before any counting happens, and ORDER BY only arranges what is already there.',
+		},
+		{
+			q: 'In a JOIN, what does ON visits.venue_id = venues.id do?',
+			options: [
+				'It states which column in each table has to match',
+				'It sorts both tables so their rows line up in order',
+				'It copies the venues table into the visits table',
+			],
+			answer: 0,
+			explanation:
+				'It is the rule for pairing a row in one table with a row in the other. Leave it out and the database pairs every row with every row, which on two small tables gives nonsense and on two large ones gives millions of rows.',
+		},
+	]}
+/>

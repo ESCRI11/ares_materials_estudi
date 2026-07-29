@@ -1,0 +1,147 @@
+---
+title: What a database is
+description: Where a spreadsheet stops working, what tables, rows, columns and keys actually are, and why SQLite is the one to learn on.
+sidebar:
+  order: 3
+---
+
+import Quiz from '@components/Quiz.astro';
+
+You have been doing fine with files. A CSV per dataset, a script that reads it, a chart at the
+end. For a survey, a sensor log or a set of visitor counts, that is the right amount of
+machinery and adding more would be showing off.
+
+Then a project arrives where it stops working. This lesson is about recognising that moment and
+knowing the name of what comes next, because *Prototyping Spatial Experiences* expects you to
+have met it.
+
+## Where a file stops being enough
+
+Four things break, usually in this order.
+
+**The same fact is written in many places.** Your `visits.csv` has a `venue` column with
+`Museo` in it four hundred times. The museum changes its name, or someone types `Museo` with a
+trailing space, and you now have two venues that are one venue. Every correction is four hundred
+corrections and you will miss some.
+
+**Nothing enforces the shape.** A spreadsheet lets anyone add a column halfway down, type
+`many` where a number goes, or leave a row that is only a note to themselves. The file looks
+fine. Your script does not survive it.
+
+**Two people cannot both write.** One CSV, two laptops, two versions, and no way to merge them
+that does not involve someone reading both.
+
+**The question needs more than one file.** Visits are in one place, venue addresses are in
+another, opening hours in a third. Answering "which venues in Lugano were busiest in March"
+means joining them by hand, in a spreadsheet, once per question.
+
+A **database** is the tool built for those four problems: data stored in a structured way, with
+rules the software itself enforces, that many programs can read and write at the same time, and
+that answers questions without you writing the loop.
+
+## The vocabulary
+
+The kind you will meet is a **relational database**, and it is called that because it is built
+out of tables that relate to one another. Most of the words are ones you already have from the
+data section, wearing slightly stricter clothes.
+
+- A **table** holds one kind of thing. Visits in one, venues in another. It is a tidy table in
+  the sense you already know: one row per record, one column per field.
+- A **row** is one record — one visit, one venue, one person.
+- A **column** is one field, and unlike a spreadsheet column it is declared once, up front, with
+  a name and a **type**: this one holds text, that one holds a whole number, that one a date.
+- A **primary key** is the column whose value identifies a row and never repeats. Usually a
+  plain counter called `id`. It is what lets you say *this exact row* without describing it.
+- A **foreign key** is a column holding another table's primary key. It is the join between
+  them, and it is why two tables can be two tables.
+
+That last pair is the whole idea, so it is worth a picture:
+
+```mermaid
+flowchart LR
+  V["visits: id, venue_id, day, people"] -->|"venue_id points at id"| N["venues: id, name, city"]
+```
+
+The venue's name and city are written **once**, in `venues`. Every visit refers to it by number.
+Correct a spelling and it is corrected everywhere, immediately, because there was only ever one
+copy. That is the fix for the first of the four problems, and it is why a database looks like
+several small tables rather than one wide one.
+
+The set of tables, their columns and their types has a name: the **schema**. It is written down
+before the data goes in, and changing it later is a deliberate act rather than a keystroke.
+
+## SQLite, which is a file
+
+You do not need a server to start. **SQLite** is a database that lives in a single ordinary
+file — `studio.db` sits in your project folder next to your scripts, and there is nothing
+running, nothing to install, no account, no password.
+
+It is not a toy version. SQLite is in every phone in the room, in your browser, in aircraft and
+in cameras, and it is the most widely deployed database in the world. It is what to reach for
+whenever the data belongs to one project rather than to a company.
+
+Python can talk to it with nothing installed at all — `sqlite3` is part of the standard library,
+like `csv`. There is also a `sqlite3` command that gives you a prompt to type queries into; on
+Ubuntu, if it says `command not found`, `sudo apt install sqlite3` fetches it. The documentation
+lives at [sqlite.org](https://sqlite.org/).
+
+What SQLite deliberately does not do is the third problem above: many people writing at once,
+over a network, from different machines. That is what PostgreSQL and MySQL are for, and they are
+the same ideas with a server in front of them and an administrator behind them. Everything you
+learn on SQLite carries across.
+
+## So how is this different from my CSV files?
+
+| A folder of CSVs | A database |
+| --- | --- |
+| Columns are whatever the last person typed | Columns are declared, with names and types |
+| Nothing stops a duplicate record | A primary key stops it |
+| Relationships live in your head | Relationships are a column, checkable by the software |
+| You load the whole file to ask anything | You describe the answer and get it back |
+| Readable in any text editor | Needs a tool to look inside |
+
+The last row is a real cost, not a footnote. A CSV can be opened by anybody, forever, with no
+software. A `.db` file cannot — and because it is a **binary file**, git can record that it
+changed but cannot show you what changed inside it, so a database rarely belongs in a
+repository. Commit the script that builds it and the raw CSVs it was built from; leave the
+`.db` in your `.gitignore`.
+
+Both, then. Files to hand data around and to keep; a database when the questions get hard.
+
+<Quiz
+	questions={[
+		{
+			q: 'What is a primary key?',
+			options: [
+				'A column whose value identifies one row and never repeats',
+				'The column a table is sorted by when you open it',
+				'The first column of a table, whatever it happens to hold',
+			],
+			answer: 0,
+			explanation:
+				'It is the handle for one exact row, usually a plain counter called id. Its uniqueness is enforced by the database rather than watched over by you, which is what makes duplicates impossible rather than unlikely.',
+		},
+		{
+			q: 'Why put venues in their own table instead of a venue column on every visit?',
+			options: [
+				'The venue is stored once, so correcting it is one edit',
+				'Two small tables take up less disk space than one large one',
+				'A table has a limit on how many columns it is allowed',
+			],
+			answer: 0,
+			explanation:
+				'Every repeated copy of a fact is a chance for the copies to disagree. Storing it once and referring to it by key is the whole reason relational databases are shaped the way they are.',
+		},
+		{
+			q: 'What makes SQLite different from a database like PostgreSQL?',
+			options: [
+				'The whole database is one file, with no server running',
+				'It holds one table at a time, so it cannot relate them',
+				'It keeps data in memory, so the data goes when you quit',
+			],
+			answer: 0,
+			explanation:
+				'Nothing runs and nothing listens: your program opens a file. That is why it suits a project on your own machine, and also why it is the wrong choice when several people have to write to it over a network.',
+		},
+	]}
+/>

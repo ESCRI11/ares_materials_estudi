@@ -112,6 +112,13 @@ The heaviest section for images, because most of it is physical and none of it i
 | `laser-finger-joints.png` | Designing for laser cutting | A finger-jointed box, assembled or mid-assembly. |
 | `fablab-machines.png` | What a Fablab is | The actual machines at Fablab SUPSI. Not strictly necessary, but a photo of the room they'll walk into is worth something. |
 
+### 6b · Documenting work
+
+| Filename | Lesson | What it must show |
+|---|---|---|
+| `wokwi-diagram-panel.png` | Documenting work → Schematics and source | The Wokwi `diagram.json` view showing a wired circuit, which is what the lesson tells the reader to submit as their wiring diagram. |
+| `photo-lit-vs-unlit.png` | Documenting work → Photographing your work | A pair: the same LED prototype exposed for the object, then exposed for the light. The lesson explains the trade-off and a pair makes it obvious in a second. |
+
 ### 7 · AI as a material
 
 Mostly conceptual and already carried by diagrams. Low priority throughout.

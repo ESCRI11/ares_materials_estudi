@@ -1,0 +1,208 @@
+---
+title: Schematics and source files
+description: Why a photograph of a breadboard is not a schematic, three honest ways to produce one, and what handing in "the software source files" actually means.
+sidebar:
+  order: 4
+---
+
+import Quiz from '@components/Quiz.astro';
+
+Of the five deliverables, three sit close to what a design education already gave you. Two do
+not: **the hardware schematics** and **the software source files**. Both are technical documents
+with a right answer, which — once you know what the right answer is — makes them the easiest
+two to get full marks on.
+
+## A photograph of a breadboard is not a schematic
+
+It is a useful photograph. It is not the document that was asked for, for four reasons:
+
+- **Wires hide each other.** Jumper wires cross, arch and sit on top of one another, and a
+  photograph flattens all of that into one plane.
+- **It cannot say which hole.** Two adjacent rows on a breadboard are electrically strangers,
+  and at photograph resolution they are one pixel apart.
+- **It does not state values.** A 220 Ω and a 10 kΩ resistor are the same object with different
+  stripes, and the stripes are not legible at any size you will publish.
+- **It cannot say which pin.** `GP15` and `GP16` are next to each other on the board and print
+  in 1 mm type.
+
+The test, which the rest of this lesson keeps coming back to: **could a competent stranger
+rebuild this circuit from this page, without asking you anything?** If not, it is a photograph
+of a circuit, which is a different and lesser thing.
+
+A **schematic** states connection and ignores position. The conventions for reading one — the
+dot at a junction, the crossing without a dot, every ground symbol being the same point — are in
+[circuits and breadboards](/ares_materials_estudi/physical-computing/circuits-and-breadboards/).
+This lesson is about producing one.
+
+## What yours has to state
+
+Whatever tool you use, these five things have to be recoverable from the drawing:
+
+1. **Every component, named, with its value or part number.** `220 Ω resistor`, `SG90 servo`,
+   `Raspberry Pi Pico`. Not "resistor".
+2. **Every connection**, including the ones that feel too obvious to draw.
+3. **Which pin on the board**, by its printed label rather than "the third one down".
+4. **The power source and its voltage.** Where the energy enters.
+5. **The shared ground.** If a motor or a strip has its own supply, its ground still has to meet
+   the board's ground, and leaving that line off the drawing is the most common omission there
+   is.
+
+Alongside the drawing goes a **bill of materials** — often shortened to BOM — a list of every
+part with its quantity and value, so that someone could order the parts without measuring your
+prototype. A markdown table is the whole job:
+
+```md
+| Qty | Part | Value / model |
+|---|---|---|
+| 1 | Microcontroller board | Raspberry Pi Pico |
+| 1 | LED | 5 mm red |
+| 1 | Resistor | 220 Ω |
+| 1 | Pushbutton | 6 mm tactile |
+```
+
+## Three honest ways to produce one
+
+### 1. Out of Wokwi
+
+You will have built every circuit in
+[physical computing](/ares_materials_estudi/physical-computing/circuits-and-breadboards/) in
+**Wokwi**, the browser simulator. A Wokwi project is two files: your code, and a file called
+`diagram.json` — the wiring, stored as text. Every part, every wire and every pin is in there,
+which is why an earlier lesson could turn off a button's contact bounce by editing one line of
+it.
+
+That gives you two artefacts for no extra work:
+
+- **A picture.** The diagram panel is an exact, labelled drawing of the circuit. Capture it with
+  the screenshot shortcut from
+  [the previous lesson](/ares_materials_estudi/documentation/screen-and-video/). Be accurate
+  about what it is when you submit it: this is a **wiring diagram** — it draws the parts where
+  they physically sit — rather than a symbolic schematic. For a course project with a dozen
+  connections, presented together with the bill of materials and a pin table, that is honest and
+  sufficient.
+- **A file you can commit.** `diagram.json` goes in the repository next to the code. It is text,
+  so git can show what changed in it, and your wiring gets a history like everything else. Better
+  still, anyone can load it back into Wokwi and *run* your circuit without owning a single
+  component — which is a stronger deliverable than any drawing.
+
+One honesty requirement: Wokwi's parts are not always the parts in your kit. Where the simulated
+component differs from the one in your hand, say so in the README rather than letting the
+diagram imply otherwise.
+
+### 2. A drawing tool
+
+- **Fritzing** draws the same circuit three ways — as a breadboard, as a schematic, and as a
+  circuit board — and switching between the first two views is how the pictorial version and the
+  symbolic version finally connect for most people. It asks a small payment for the ready-built
+  download.
+- **KiCad** is free, professional, and what real electronics is designed in. It is far more tool
+  than a semester-one project needs, and a genuine skill if you want it later.
+
+Neither is required. Do not start learning KiCad the week before a hand-in.
+
+### 3. By hand
+
+A ruled pen drawing, labelled, photographed square and evenly lit, is a legitimate schematic —
+it was the professional format for a century. It fails on exactly two things: illegibility, and
+private symbols. Use the standard ones from the circuits lesson, write every value next to its
+component, and it stands up.
+
+### The minimum that always works: a pin table
+
+Even with no drawing at all, this table answers most of what a reader needs, and it is written
+in the [Markdown](/ares_materials_estudi/git-and-github/markdown/) you already have:
+
+```md
+| From | To | Note |
+|---|---|---|
+| `GP15` | pushbutton, leg 1 | other leg to `GND` |
+| `GP16` | LED anode, via 220 Ω resistor | cathode to `GND` |
+| `GP26` | potentiometer, wiper | outer legs to `3V3` and `GND` |
+| `3V3` | sensor `VCC` | |
+| `GND` | sensor `GND` | shared with the board |
+```
+
+It is not a substitute for a drawing when a drawing is what was asked for. It is text, so git
+tracks it, a reader can copy it, and it removes every ambiguity a photograph leaves behind. Put
+one on every project page you write.
+
+## What "software source files" means
+
+It means the files you edit. Not a PDF of the code, not screenshots of the editor, not a zip
+called `project_final_final2`.
+
+Two ways it goes wrong:
+
+- **Readable but not runnable** — code pasted into a document, so a reader can see it and cannot
+  execute it.
+- **Runnable only on your machine** — a folder that works because of something installed on your
+  laptop that is written down nowhere.
+
+The answer is one you already have from
+[the git section](/ares_materials_estudi/git-and-github/github/): a repository, with a
+[README](/ares_materials_estudi/git-and-github/markdown/) saying what it is, how to run it, and
+what it is made of. Push it, and hand in the link.
+
+For one of these projects, the repository holds:
+
+- the code — `main.py`, or the HTML, CSS and JavaScript
+- `diagram.json`, or the schematic source, plus an exported image of it
+- the CAD source file *and* the exported `.stl` or `.dxf` — the source as well as the export,
+  because an STL cannot be edited back into a design
+- the README: description, bill of materials, pin table, how to run it, a link to the video
+- an `images/` folder with the web-sized photographs
+- a [.gitignore](/ares_materials_estudi/git-and-github/what-not-to-commit/) keeping the raw
+  photographs, the video export and the renders out
+
+And the test one more time: send the link to a classmate who was not in the room. Whatever they
+have to ask you is the thing the documentation is missing.
+
+<Quiz
+	questions={[
+		{
+			q: 'Why is a photograph of your breadboard not a schematic?',
+			options: [
+				'It cannot say reliably what connects to what',
+				'It is not a drawing made in proper software',
+				'Photographs are never accepted as deliverables',
+			],
+			answer: 0,
+			explanation:
+				'Wires hide each other, adjacent rows are a pixel apart, and resistor values are unreadable at any size you would publish. A schematic exists to state connections unambiguously, which is exactly what the photograph cannot do.',
+		},
+		{
+			q: 'What does committing Wokwi\'s diagram.json give you that a screenshot of the diagram does not?',
+			options: [
+				'A circuit anyone can reload, run and diff',
+				'A drawing that uses the standard symbols',
+				'An image at higher resolution than a capture',
+			],
+			answer: 0,
+			explanation:
+				'It is text, so git records what changed in your wiring and a reader can load it straight back into the simulator and run it. The screenshot is still worth including — it is what a human reads — but the file is what makes the circuit reproducible.',
+		},
+		{
+			q: 'A classmate clones your repository and cannot get the project running. What does that tell you?',
+			options: [
+				'Nothing — their machine is set up differently',
+				'The README is missing something they needed',
+				'The code should have been exported as a PDF',
+			],
+			answer: 1,
+			explanation:
+				'A stranger being able to run it is the definition of a working source-file deliverable. Their question is the gap: write the answer into the README rather than answering it in a message.',
+		},
+	]}
+/>
+
+## Do this now
+
+Use any circuit you built in the physical computing section.
+
+- [ ] I opened one of my Wokwi projects and found the `diagram.json` file in it
+- [ ] I captured the diagram panel as an image, cropped to the circuit
+- [ ] I wrote a bill of materials as a markdown table, with a value for every part
+- [ ] I wrote a pin table listing every connection by its printed pin label
+- [ ] I checked that the shared ground appears in my drawing or my table
+- [ ] I put the code, the `diagram.json` and both tables in one repository with a README
+- [ ] I sent the link to someone and asked whether they could rebuild it without asking me anything

@@ -1,0 +1,148 @@
+---
+title: What documentation is for
+description: Two modules in the first semester cannot be assessed without it. What the courses ask for, and why a log kept while you build beats a report written the night before.
+sidebar:
+  order: 1
+---
+
+import Quiz from '@components/Quiz.astro';
+
+Two of the courses you take in semester 1 are called **Documentation and Communication**.
+One of them, ID120.02, sits inside the Digital Fabrication module; the other, ID140.02, sits
+inside Physical Computing. They are 24 hours each — 48 hours of your first semester, which is
+more time than the syllabus gives to most single subjects.
+
+The syllabus says of ID140.02, in plain words: *in order to assess this module, it is
+mandatory to submit the project documentation.* Both modules are worth 5 **ECTS** — the credit
+unit European universities count degrees in — and neither can be passed without the document.
+
+So this is not the write-up of the work. It is part of the work, marked alongside the object.
+
+## What is actually asked for
+
+Five things, across the two courses:
+
+- **A written project description.**
+- **Visual documentation** — *screenshots* for anything that lives on a screen, *photographs*
+  for anything physical.
+- **A video that tells the story of the project.**
+- **The software source files.**
+- **The hardware schematics.**
+
+Everything has to follow the guidelines each course hands out, and everything has to be good
+enough to sit in a professional portfolio afterwards. That second requirement is not decoration:
+it is the difference between a folder you submit and forget, and four projects you can show
+someone eighteen months later.
+
+Where the course guidelines differ from anything in this section, follow the course. This section
+exists so that none of those five words is unfamiliar when you meet them.
+
+:::note[Three of these are nearly home ground]
+You have a design degree. Photographs, video and a written description are closer to what you
+already do than anything else on this site, and these lessons will not teach you composition.
+What is new is documenting a *technical* project: a drawing of a circuit, a handover of source
+files, a demo of something that only makes sense when a hand touches it.
+:::
+
+## The log and the reconstruction
+
+There are two ways to arrive at a finished document, and they are not equally hard.
+
+**The reconstruction** is written in the two days before the deadline, from memory and from
+whatever photographs your phone happened to keep. It is the normal way, it takes a miserable
+weekend, and it is always thinner than the project was.
+
+**The build log** is a folder and a text file. At the end of each working session — ten minutes,
+not more — you write down what you tried, what happened, and what you changed, and you drop in
+the photographs you took that day.
+
+The log wins for a reason that has nothing to do with discipline: **half the material only
+exists while the work is happening.**
+
+- The photograph of the inside of the enclosure cannot be taken after you glue the lid on.
+- The circuit is in the simulator this week and dismantled back into the kit next week.
+- The two days you lost to a sensor that read nonsense is the most interesting page in the
+  finished document, and it is the page you will have completely forgotten by December.
+- The value you finally settled on — 220 Ω, a 40 ms debounce, 0.6 mm of clearance — is
+  unrecoverable once the thing works. Nobody remembers a number that stopped being a problem.
+
+A log entry does not need to be well written. Mine is a date, three lines, and two photographs.
+
+```
+2026-10-14
+Servo jittering whenever the LED strip was on. Suspected the shared supply.
+Gave the strip its own battery pack, kept a common ground to the board. Fixed.
+Photos: servo-jitter-before.mp4, wiring-two-supplies.jpg
+```
+
+The log is not the document, and nobody will read it. It is the raw material the document gets
+made out of, and having it turns a miserable weekend into an afternoon of editing.
+
+## Who reads it, and for what
+
+Two readers, and they want different things from the same pages.
+
+**The marker** reads for evidence that you understand your own project. Why this sensor and not
+the other one, why the joint is that shape, what you did when it did not work. A polished object
+with no reasoning behind it is indistinguishable from a lucky one, and the documentation is the
+only place the reasoning can appear. This is also why the failures belong in it — a problem you
+diagnosed and solved is the strongest thing you can show, and hiding it throws away your best
+evidence.
+
+**A studio, later** reads for whether you can be handed a problem and come back with something.
+They skim: what is it, what does it do, could I have built this from what is on this page. They
+look at three projects and stop. The one with a video and a schematic beats the one with four
+paragraphs of intent.
+
+Those two readings pull in slightly different directions, which is why the deliverables are
+split the way they are. The description and the build log carry the *why*, for the marker. The
+video, the photographs and the schematic carry the *what*, for everyone else.
+
+<Quiz
+	questions={[
+		{
+			q: 'The syllabus says that submitting the project documentation is mandatory in order to assess ID140.02. What follows from that?',
+			options: [
+				'An undocumented project cannot be marked at all',
+				'The documentation is a separate small component of the mark',
+				'A strong prototype can carry a thin write-up',
+			],
+			answer: 0,
+			explanation:
+				'Assessment of the module depends on the documentation existing. It is not a percentage you can afford to lose — without it there is nothing to mark, however good the object is.',
+		},
+		{
+			q: 'Why is a log kept during the work easier than a report written at the end?',
+			options: [
+				'It replaces the final document, so there is less to write',
+				'Much of the material only exists while it happens',
+				'Markers give credit for the number of entries in it',
+			],
+			answer: 1,
+			explanation:
+				'The inside of a sealed enclosure, the circuit that has gone back in the kit, the two days lost to a bad sensor — none of that can be retrieved later. The log is still raw material, and you still edit it into a document at the end.',
+		},
+		{
+			q: 'A marker and a studio read the same documentation differently. What is the marker looking for?',
+			options: [
+				'Proof that the finished object photographs well',
+				'Evidence you understand the decisions you made',
+				'A complete record of every hour that you worked',
+			],
+			answer: 1,
+			explanation:
+				'The object shows what you built. Only the documentation can show why, which is the part being taught and therefore the part being assessed. That is also why a diagnosed failure counts in your favour rather than against you.',
+		},
+	]}
+/>
+
+## Do this now
+
+Before you build anything, decide where the log lives — a text file in the project folder is
+enough.
+
+- [ ] I know that two modules in semester 1 are assessed on documentation, not only on the object
+- [ ] I can name the five deliverables: description, screenshots or photographs, video, source
+      files, schematics
+- [ ] I made a project folder with a `log.md` file in it
+- [ ] I understand that a failure I diagnosed belongs in the document rather than being hidden

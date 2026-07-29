@@ -97,8 +97,12 @@ export default defineConfig({
 			// Adding a LESSON needs no change here — drop a file in the section folder.
 			// Adding a SECTION is one line: create src/content/docs/<dir>/ and list it below.
 			// Order here is the order the reader learns in, so it is deliberate, not alphabetical.
+			// Learning order, not alphabetical. Design Methods sits second on purpose:
+			// it is the one area this reader already has, so it is an anchor before the
+			// technical sections rather than a reward after them.
 			sidebar: [
 				{ label: 'Start Here', items: [{ autogenerate: { directory: 'start-here' } }] },
+				{ label: 'Design Methods', items: [{ autogenerate: { directory: 'design-methods' } }] },
 				{ label: 'Your Machine', items: [{ autogenerate: { directory: 'your-machine' } }] },
 				{ label: 'Git & GitHub', items: [{ autogenerate: { directory: 'git-and-github' } }] },
 				{ label: 'HTML & CSS', items: [{ autogenerate: { directory: 'html-and-css' } }] },
@@ -111,12 +115,13 @@ export default defineConfig({
 					label: 'Digital Fabrication',
 					items: [{ autogenerate: { directory: 'digital-fabrication' } }],
 				},
+				{ label: 'Documenting Work', items: [{ autogenerate: { directory: 'documentation' } }] },
+				{ label: 'Data', items: [{ autogenerate: { directory: 'data' } }] },
+				{ label: 'Python & SQL', items: [{ autogenerate: { directory: 'python-and-sql' } }] },
 				{
 					label: 'AI as a Material',
 					items: [{ autogenerate: { directory: 'ai-as-a-material' } }],
 				},
-				{ label: 'Data', items: [{ autogenerate: { directory: 'data' } }] },
-				{ label: 'Design Methods', items: [{ autogenerate: { directory: 'design-methods' } }] },
 				{ label: 'Claude Code', items: [{ autogenerate: { directory: 'claude-code' } }] },
 			],
 		}),

@@ -1,0 +1,138 @@
+---
+title: The project page
+description: Assembling a description, photographs, a video and a schematic into one page a stranger can read in two minutes — and publishing it where it can be found.
+sidebar:
+  order: 5
+---
+
+import Quiz from '@components/Quiz.astro';
+
+By now you have parts: a folder of photographs, a video link, a schematic, a repository, and a
+log full of things that went wrong. None of that is documentation yet. The document is the thing
+that arranges it.
+
+## One project, one page
+
+The unit is a page. Everything about one project in one place, in an order a reader can predict,
+so that someone who has already looked at forty of these can find what they want in ten seconds.
+
+The order that works:
+
+1. **Title and one sentence.** What it is, in plain words, for someone who arrived from a link
+   with no context.
+2. **One image, or the video.** Above everything else — the identifying shot from
+   [photographing a prototype](/ares_materials_estudi/documentation/photographing-your-work/).
+3. **What it is.** Two or three paragraphs: the brief, the idea, who it is for.
+4. **What it does.** The interaction, described in the order it happens. The photograph of it in
+   someone's hand belongs here.
+5. **How it works.** The schematic, the pin table and the bill of materials from
+   [schematics and source files](/ares_materials_estudi/documentation/schematics-and-source/),
+   plus a link to the repository. Not two hundred lines of pasted code.
+6. **How it was made.** The build log, edited down: three or four moments, including at least one
+   thing that failed and what you did about it.
+7. **What is next.** What you would change with another week. Three sentences.
+8. **The footer.** Your name, the date, the course and module code, the repository link, and
+   credit for anyone who helped.
+
+Those need not be eight headings. But a reader looks for each of them, and a page missing 5 and 6
+reads as a portfolio piece rather than as documentation — which is the wrong document for a
+module assessed on documentation.
+
+## Writing the description
+
+The description is the part designers most often overwrite.
+
+- **Present tense, active voice.** "The lamp brightens as the room gets louder." Not "the aim of
+  this project was to explore the relationship between sound and light."
+- **What before why.** One sentence of what it does, and then the reasoning. A reader who does
+  not know what the thing is cannot follow an argument about why it should exist.
+- **Name the technology plainly.** "A Raspberry Pi Pico reads a microphone and drives an LED
+  strip" costs one line and demonstrates that you understand your own project. Vagueness in this
+  sentence reads as not knowing.
+- **Cut every sentence that would be true of another project.** "This project explores the
+  relationship between people and technology" is true of everything in the building, and it
+  occupies the position where the reader was deciding whether to keep reading.
+- **150 to 300 words** for the whole "what it is" section. Longer than that is a report, and a
+  report is a different deliverable.
+- **Write it last.** You cannot describe accurately what you have not finished.
+
+## Where it lives
+
+You already know both routes, so this is a choice, not a new skill.
+
+**A README in the repository.** GitHub renders `README.md` as the front page of the repository,
+so the page and the source sit in the same place. Images go in an `images/` folder and are
+referenced with a relative path, exactly as in
+[Markdown and the README](/ares_materials_estudi/git-and-github/markdown/). This is the fastest
+complete answer that exists, and for most coursework it is the whole job.
+
+**A page on GitHub Pages.** The same content with your own layout, at an address you can put on a
+CV — see [publishing with GitHub Pages](/ares_materials_estudi/git-and-github/github-pages/).
+Remember the caution from that lesson: a project site lives in a subfolder of the domain, so
+paths beginning with `/` break in production while working locally.
+
+Do the README always, because it is free and it is where the code is. Add a Pages site when the
+project has earned its own address — an end-of-semester piece, or something going into a
+portfolio.
+
+Two things do not live in the repository at all: **the video**, which goes on a hosting service
+and is linked, and **the raw photographs**, which stay on a drive. Both are covered by
+[what not to commit](/ares_materials_estudi/git-and-github/what-not-to-commit/). The web-sized
+photographs do belong in the repository — they are small, and a page whose images live on
+somebody else's drive is a page that breaks the first time a sharing setting changes.
+
+## Before you hand it in
+
+- **Follow the course guidelines where they differ from this page.** Each module hands out its
+  own: format, length, file naming, where to submit. Those win.
+- **Open it in a private browser window.** Every image either loads or does not; every link
+  either works or does not. A broken image path that worked on your own machine is the most
+  common failure of an otherwise finished document.
+- **Read it on a phone.** That is where it will actually be read.
+- **Give it to someone who was not in the room** and watch where they stop. Where they stop is
+  the sentence that assumes something you never wrote down.
+
+<Quiz
+	questions={[
+		{
+			q: 'Where should the project video file itself live?',
+			options: [
+				'In the repository, next to the source code',
+				'On a hosting service, linked from the page',
+				'Attached to the submission email as a file',
+			],
+			answer: 1,
+			explanation:
+				'GitHub warns above 50 MB and refuses anything over 100 MB, and a committed video stays in the history permanently. Host it, link it, and check the link in a private window so you know the sharing settings are right.',
+		},
+		{
+			q: 'You open a description with "This project explores the relationship between people and technology." What is wrong with it?',
+			options: [
+				'It is too short to open a description with',
+				'It would be true of any project on the course',
+				'It is written in the present tense, not the past',
+			],
+			answer: 1,
+			explanation:
+				'It occupies the one position where a reader decides whether to continue, and it tells them nothing about your project specifically. Say what the thing does in plain words first, then give the reasoning.',
+		},
+	]}
+/>
+
+## Do this before the semester starts
+
+Document one thing you have already made on this site — the box from
+[parametric modelling](/ares_materials_estudi/digital-fabrication/parametric-modelling/), or a
+Wokwi circuit. A small project documented completely is far better practice than a large one
+documented badly.
+
+- [ ] I made a repository for one project, with a `README.md` as its project page
+- [ ] The first screenful has a title, one sentence, and an image
+- [ ] I wrote the description in 150 to 300 words, present tense, saying what it does first
+- [ ] I removed every sentence that would be true of somebody else's project
+- [ ] The "how it works" section has a schematic or wiring diagram, a pin table and a parts list
+- [ ] The "how it was made" section includes one thing that failed
+- [ ] The video is hosted elsewhere and linked, and the link opens in a private window
+- [ ] The photographs are web-sized, in an `images/` folder, referenced with relative paths
+- [ ] The footer has my name, the date, the module code and the repository link
+- [ ] I opened the finished page on a phone and read it end to end

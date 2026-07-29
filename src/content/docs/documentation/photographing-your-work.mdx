@@ -1,0 +1,125 @@
+---
+title: Photographing a prototype
+description: The five shots every physical project owes you, why an LED ruins an exposure, and the photographs that can only be taken on the day.
+sidebar:
+  order: 2
+---
+
+You can already see, and this is not a lesson on composition. It is a short list of the things
+that are different about photographing a half-built electronic object rather than a finished
+product, and they are mostly problems of *timing* and *legibility* rather than of taste.
+
+## What makes a prototype awkward
+
+**It is unfinished on purpose.** There will be jumper wires, tape, a breadboard, a USB cable
+going somewhere. The instinct to hide all of that produces a photograph that lies about what
+stage the work is at. The instinct to accept a cluttered frame produces one nobody can read.
+The middle is: show the mess that is the project, remove the mess that is your desk.
+
+**It has no scale.** A microcontroller board photographed alone could be the size of a stamp or
+a book. A hand in the frame fixes this in one shot and nothing else does as well.
+
+**It emits light.** An LED, a screen or a strip will be several stops brighter than the object
+around it, and a camera exposing for the object turns the light into a white blob with no colour.
+
+**It only makes sense in use.** An interactive object sitting on a table is a photograph of a
+lump. The interaction is the design, and it needs a hand in it.
+
+**It is temporary.** The circuit goes back in the kit, the enclosure gets glued, the prototype
+gets cannibalised for the next one. Some photographs have a window of one afternoon.
+
+## The five shots
+
+Every physical project owes you these. Take them all, on the day.
+
+1. **The whole object, plain background.** The identifying shot — the one that goes at the top
+   of the project page and in your portfolio. Frame so that the crop cuts off wires heading
+   offstage rather than leaving them trailing across the picture.
+2. **In use, or in the hand.** Solves scale and purpose in the same frame. Borrow someone
+   else's hands so yours can hold the camera.
+3. **The detail.** The joint, the connector, the sensor, the thing you spent a day on. Close
+   subjects have very little depth of field, so decide which millimetre is sharp before you
+   press, or take several and choose later.
+4. **The inside, before it closes.** Wiring, board placement, how it is held together. This is
+   the shot that cannot be retaken, and it is the one people forget.
+5. **The failure.** The warped print, the misaligned cut, version one next to version three.
+   These are the pictures the [build log](/ares_materials_estudi/documentation/what-documentation-is-for/)
+   exists to keep, and the ones a marker reads most carefully.
+
+## Light
+
+Three specifics for objects like these; the rest you already know.
+
+**One big soft source, plus a fill.** A window with the object close to it, and a sheet of white
+card or paper on the opposite side to lift the shadow. Two hard sources give two shadows in
+different directions, which is the fastest way to make an object look like a snapshot.
+
+**Turn the room light off when you use the window.** Daylight and a warm bulb in one frame
+leave a colour cast that cannot be corrected in a single move, because the two casts sit in
+different parts of the picture. You know this; it happens in a workshop far more than in a
+studio, because the workshop lights are always on.
+
+**An LED will blow out.** If you expose so the object reads, the light is a featureless white
+patch. Two ways out:
+
+- Shoot in a dim room and expose for the light, accepting that the object goes dark around it.
+  A glowing thing in the dark is often the better picture anyway.
+- Take two frames from the same position — one exposed for the object, one for the light — and
+  use both in the document, side by side. Two honest photographs beat one compromised.
+
+Turning the brightness down in code before shooting is legitimate and often the easiest fix.
+
+## Background
+
+Plain is the safe default: a sheet of paper curving up the wall, a piece of MDF, a painted wall.
+It isolates the object and it never fights.
+
+Context is frequently the better choice for something interactive — a desk, a doorway, a
+kitchen. The point made in
+[drawings and renders](/ares_materials_estudi/digital-fabrication/drawings-and-renders/) about
+resisting the studio-white default applies to photographs at least as much as to renders: an
+object shown where it would be used argues its own case.
+
+What is never right is the workshop behind the object by accident. Either the environment is
+chosen or it is removed.
+
+## Screens are screenshots
+
+Do not photograph a screen. You get moiré, reflections, a colour shift and a dark band across
+it from the refresh. Take a screenshot and place it in the document instead — that is what
+screenshots are named as a deliverable for.
+
+The exception is when the object and its screen have to be in one frame to make sense. Then:
+lower the screen brightness, and use a shutter of 1/60 s or slower, because a faster one catches
+the display mid-refresh and leaves the band.
+
+## Practical matters
+
+- **Shoot on the day.** Not at the end of the project, and not once for everything.
+- **Take five times what you need.** Deleting is free; going back is not possible.
+- **A phone is fine.** A recent phone in good light beats a borrowed camera you have not set up,
+  and this is not the week to learn a new body.
+- **Put it on something.** A tripod, a stack of books, a shelf. Add the two-second timer and the
+  shake disappears.
+- **Name files as you copy them off.** `2026-10-14-enclosure-v2-open.jpg` sorts chronologically
+  and says what it is. `IMG_4471.jpg` is a file you will open twelve of to find one.
+- **Keep the originals out of the repository.** Raw files and full-resolution exports are exactly
+  what [.gitignore](/ares_materials_estudi/git-and-github/what-not-to-commit/) is for. Export a
+  web copy — around 2000 px on the long edge, comfortably under 500 KB — for the document, and
+  keep the originals on a drive.
+
+## Do this now
+
+You do not need the kit for this. Photograph something you have already made, or a mock-up of
+one — a box with a cable coming out of it will do for practice.
+
+- [ ] I photographed an object whole, on a plain background, with nothing of my desk in frame
+- [ ] I took a second shot with a hand in it, so the scale is unambiguous
+- [ ] I took a detail shot and checked at full size that the part I cared about is sharp
+- [ ] I took an "inside" shot before closing or covering anything
+- [ ] I photographed something that went wrong, and kept it
+- [ ] I used one soft light source and something white opposite it as fill
+- [ ] I turned the room light off while shooting by a window, and compared the two versions
+- [ ] I made a bright light in the frame and shot it twice — once for the object, once for the light
+- [ ] I renamed the files by date and description as I copied them off the camera
+- [ ] I exported a web-sized copy and left the originals outside the repository

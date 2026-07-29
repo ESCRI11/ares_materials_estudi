@@ -1,0 +1,230 @@
+---
+title: Python on your laptop
+description: The Python you met on a microcontroller, running as an ordinary program — real files, the standard library, pip, and a virtual environment that keeps your system Python intact.
+sidebar:
+  order: 1
+---
+
+import Quiz from '@components/Quiz.astro';
+
+The second-semester course *Prototyping Spatial Experiences* names Python and SQL among the
+languages you will work in. The first semester hands you neither: you meet Python only in its
+microcontroller costume, and SQL not at all. This section closes that gap before it opens.
+
+Python first, because most of it is already yours.
+[From JavaScript to MicroPython](/ares_materials_estudi/physical-computing/from-javascript-to-micropython/)
+taught the syntax — indentation instead of braces, `def` instead of `function`, `print` instead
+of `console.log`, `True` with a capital T. That is this same language. What changes is the room
+it runs in: a laptop with a disk, a package manager and tens of thousands of libraries, instead
+of a chip with two modules and no filing system.
+
+## You almost certainly have it already
+
+Open your terminal — Ubuntu on Windows, Terminal on macOS — and ask:
+
+```sh
+python3 --version
+```
+
+Something like `Python 3.12.3` means you are done. Ubuntu inside WSL2 ships with Python, because
+parts of Ubuntu itself are written in it. macOS has one too, though the first time you type
+`python3` it may offer to install Apple's command line tools; let it, and try again afterwards.
+
+Note the `3`. On Ubuntu, plain `python` is usually not a command at all, and you get
+`command not found` from a machine that has Python perfectly well installed. Type `python3`
+every time and the problem never appears. Every tutorial that says `python` means this.
+
+If it really is missing:
+
+```sh
+# Windows, in the Ubuntu terminal
+sudo apt update
+sudo apt install python3
+```
+
+```sh
+# macOS
+brew install python
+```
+
+Both follow the same rule as everything in
+[installing software](/ares_materials_estudi/your-machine/installing-software/): a command-line
+tool has to be installed where you type its name, which on Windows means inside Ubuntu rather
+than in PowerShell. The Windows installer at [python.org](https://www.python.org/) exists and
+works, but it gives you a second Python that your Ubuntu terminal cannot see, which is a
+confusion you do not need.
+
+## Running a file
+
+Make a folder, and in it a file called `hello.py`:
+
+```python
+tools = ["Fusion", "Arduino", "Figma"]
+
+print("Hello from Python")
+print(len(tools), "tools")
+```
+
+Then, in the terminal:
+
+```sh
+cd ~/projects/python-test
+python3 hello.py
+```
+
+```
+Hello from Python
+3 tools
+```
+
+That is the whole loop, and it is the one you already know from
+[Node](/ares_materials_estudi/javascript/outside-the-browser/): edit in VS Code, save, press
+up-arrow and Enter to run it again. If you get
+`python3: can't open file 'hello.py': No such file or directory`, the file is fine and your
+terminal is standing somewhere else. Run `pwd`, then `cd` into the right folder.
+
+## The prompt, for trying one thing
+
+Type `python3` on its own and you get a live prompt instead:
+
+```
+>>> 3 * 7
+21
+>>> len("Bellinzona")
+10
+```
+
+This is a **REPL** — the same idea as the browser console, and the same thing MicroPython gives
+you over the serial cable. The `>>>` is Python's prompt and you never type it. Press Ctrl+D, or
+type `exit()`, to get back to your shell. Use it to check what one line does; put anything you
+want to keep in a file.
+
+## What a whole computer gives you
+
+| On the board | On your laptop |
+| --- | --- |
+| `machine`, `Pin`, `ADC` | nothing — there are no pins |
+| a loop that runs until the power goes | a script that runs and then exits |
+| one file, `main.py` | as many files and folders as you like |
+| a handful of built-in modules | the standard library, plus anything you install |
+| output over a serial cable | output in the terminal you started it from |
+
+Three of those are worth doing by hand.
+
+**Files.** Python opens a file with `open`, and the `with` block closes it again for you when
+the block ends — including when your code crashes halfway through:
+
+```python
+notes = ["first idea", "second idea"]
+
+with open("notes.txt", "w", encoding="utf-8") as f:
+    for note in notes:
+        f.write(note + "\n")
+
+with open("notes.txt", encoding="utf-8") as f:
+    print(f.read())
+```
+
+`"w"` means write, and it replaces whatever was in the file without asking. Leave it out to
+read. `encoding="utf-8"` is the same habit the
+[data section](/ares_materials_estudi/data/spreadsheets-csv-json/) asked for: type it every
+time and Zürich stays Zürich.
+
+**Typing.** `input()` stops the program and waits for a line from the keyboard:
+
+```python
+name = input("Your name: ")
+print("Hello,", name)
+```
+
+It is **blocking** — nothing else happens while it waits, which is fine for a tool you drive by
+hand and wrong for anything watching a sensor.
+
+**The standard library.** A large set of modules that arrive with Python and need no install:
+`csv`, `json`, `datetime`, `random`, `statistics`, `pathlib` and a few hundred more. `import csv`
+and it is there. This is the loudest practical difference from JavaScript, where reading a CSV
+means finding a package first.
+
+## pip, and the error everyone hits
+
+For everything else there is **pip**, Python's package manager — the same job `npm` does for
+JavaScript and `apt` does for Ubuntu. And your first `pip install` will very likely fail:
+
+```
+error: externally-managed-environment
+```
+
+This is not a permissions problem, and `sudo` makes it worse rather than better. The Python that
+came with Ubuntu belongs to Ubuntu: system tools are written against it, and if pip replaces a
+library one of them depends on, you break parts of your operating system in a way that is
+tedious to undo. Recent Ubuntu and Homebrew Pythons refuse rather than let that happen.
+
+The answer is a **virtual environment**: a folder holding its own Python and its own set of
+packages, belonging to one project, into which pip may install anything at all.
+
+```sh
+cd ~/projects/python-test
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+Your prompt now starts with `(.venv)`. That is the whole signal that it worked. From here:
+
+```sh
+pip install pandas
+```
+
+...installs into that folder and nowhere else. `deactivate` when you are finished, and note that
+activation belongs to that one terminal window — open a second one and you activate again.
+
+Two housekeeping notes. `.venv/` goes in your `.gitignore`, for the same reason `node_modules`
+does: it is large and it is rebuildable. And `pip freeze > requirements.txt` writes down what
+you installed, so that someone else — or you, on another machine — can get the same set back
+with `pip install -r requirements.txt`.
+
+:::note[If venv itself refuses]
+On Ubuntu, `python3 -m venv` sometimes fails with a message about `ensurepip` not being
+available. Ubuntu ships that part separately: `sudo apt install python3-venv`, then run the
+`venv` command again.
+:::
+
+One environment per project, made on the day you make the folder. It costs two commands and it
+removes an entire category of "it works on my machine".
+
+## Do this on your machine
+
+- [ ] I ran `python3 --version` and got a version number back
+- [ ] I made a folder with a `hello.py` in it and ran it with `python3 hello.py`
+- [ ] I ran `python3` on its own, evaluated something at the `>>>` prompt, and left with Ctrl+D
+- [ ] I wrote a file from Python with `open` and read it back
+- [ ] I created a virtual environment with `python3 -m venv .venv` and activated it
+- [ ] I saw `(.venv)` appear at the start of my prompt
+- [ ] I installed one package with `pip install` and ran `deactivate` afterwards
+- [ ] I added `.venv/` to the `.gitignore` of that folder
+
+<Quiz
+	questions={[
+		{
+			q: 'You type pip install pandas and get "error: externally-managed-environment". What is the right response?',
+			options: [
+				'Ubuntu owns that Python, so install into a virtual environment',
+				'Your account lacks the rights, so repeat the command with sudo',
+				'The package list is stale, so run apt update and install again',
+			],
+			answer: 0,
+			explanation:
+				'Ubuntu is protecting its own tools, which are written in that Python. A virtual environment gives pip somewhere it can do no harm. Forcing past the message with sudo is how people end up reinstalling their Linux.',
+		},
+		{
+			q: 'You activated a virtual environment and installed pandas in it. What is true in a second terminal window you open afterwards?',
+			options: [
+				'It has to be activated there too, or pandas is not found',
+				'Pandas is available there, since it is now installed on the machine',
+				'Pandas is available in any window standing in that project folder',
+			],
+			answer: 0,
+			explanation:
+				'Activating changes one shell session: it puts the environment’s python and pip at the front of that terminal’s PATH. Nothing is written to the machine as a whole, and nothing about the folder you are standing in does it for you.',
+		},
+	]}
+/>

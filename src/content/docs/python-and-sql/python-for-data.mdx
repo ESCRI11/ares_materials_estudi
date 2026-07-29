@@ -1,0 +1,238 @@
+---
+title: Python for data
+description: Reading a CSV with the standard library, looping over rows, filtering, totalling, writing a result out — and where pandas comes in.
+sidebar:
+  order: 2
+---
+
+import Quiz from '@components/Quiz.astro';
+
+The [data section](/ares_materials_estudi/data/spreadsheets-csv-json/) taught you what a tidy
+table is and what a CSV file actually contains. This lesson is what you do with one when the
+spreadsheet has run out of patience: fifty files to treat identically, or a calculation you want
+to be able to run again next week and get the same answer.
+
+Python is the language that job is usually done in, which is why *Prototyping Spatial
+Experiences* lists it. Nothing here is new programming — a loop, an `if`, a dictionary. It is the
+same work you did in JavaScript, on a file instead of on a page.
+
+## The file to work with
+
+Make a folder, and in it a file called `visits.csv`:
+
+```csv
+venue,city,day,people
+Museo,Lugano,2026-03-01,120
+Museo,Lugano,2026-03-02,95
+Teatro,Bellinzona,2026-03-01,40
+Teatro,Bellinzona,2026-03-02,180
+```
+
+Four records, four fields, a header row and nothing else on the sheet. Tidy, in the sense the
+data section meant.
+
+## Reading it, with nothing installed
+
+The `csv` module is part of the standard library, so there is no `pip install` here. Save this
+as `read.py` next to the CSV:
+
+```python
+import csv
+
+with open("visits.csv", newline="", encoding="utf-8") as f:
+    for row in csv.DictReader(f):
+        print(row["venue"], row["people"])
+```
+
+```sh
+python3 read.py
+```
+
+```
+Museo 120
+Museo 95
+Teatro 40
+Teatro 180
+```
+
+Three things are happening.
+
+`csv.DictReader` reads the header row first and then hands you one **dictionary** per line,
+keyed by the column names — `row["venue"]`, `row["people"]`. That is the same shape as the
+JavaScript objects you already loop over, and it is why you never count commas or remember which
+column was third. (`csv.reader` exists too and gives you a plain list per line; the dictionary
+version is worth the extra word almost every time.)
+
+`newline=""` is what the `csv` module asks for so that a value containing a line break survives.
+Type it and move on.
+
+And the loop reads the file a line at a time rather than loading all of it, which stops
+mattering at four rows and starts mattering at four million.
+
+## Filter and total
+
+Same file, more work:
+
+```python
+import csv
+
+total = 0
+busy = []
+
+with open("visits.csv", newline="", encoding="utf-8") as f:
+    for row in csv.DictReader(f):
+        people = int(row["people"])
+        total = total + people
+        if people > 100:
+            busy.append(row["venue"] + " on " + row["day"])
+
+print("total visitors:", total)
+print("busy days:", busy)
+```
+
+```
+total visitors: 435
+busy days: ['Museo on 2026-03-01', 'Teatro on 2026-03-02']
+```
+
+`int(row["people"])` is the line to remember. **Every value read from a CSV arrives as text**,
+because a CSV file is text and nothing in it says otherwise. Skip the conversion and `total`
+ends up as `"12095"` rather than `215`, because `+` on two strings joins them. This is the same
+trap as `NaN` in JavaScript, wearing a different coat: `int()` for whole numbers, `float()` for
+anything with a decimal point.
+
+## One number per category
+
+The thing you actually want most often is a total per city, and a dictionary does it:
+
+```python
+import csv
+
+totals = {}
+
+with open("visits.csv", newline="", encoding="utf-8") as f:
+    for row in csv.DictReader(f):
+        city = row["city"]
+        totals[city] = totals.get(city, 0) + int(row["people"])
+
+print(totals)
+```
+
+```
+{'Lugano': 215, 'Bellinzona': 220}
+```
+
+`totals.get(city, 0)` reads the running total for that city, or `0` if this is the first time
+the city has come up. Reaching for a key that does not exist with `totals[city]` would be an
+error, and this is the polite way to ask.
+
+Remember this shape. It is exactly what SQL's `GROUP BY` does in one line, two lessons from now,
+and seeing it written out by hand first is what makes that line make sense.
+
+## Writing the result out
+
+A result that only exists in your terminal is not a result. `csv.writer` puts it back on disk,
+where a chart or a colleague can reach it:
+
+```python
+with open("totals.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["city", "people"])
+    for city, people in totals.items():
+        writer.writerow([city, people])
+```
+
+`totals.items()` gives you the key and the value together on each turn of the loop. The header
+row is written explicitly, because a file without one is a file whose columns you will be
+guessing at in a month.
+
+Note what you now have: `visits.csv` untouched, `totals.csv` produced by a script anyone can
+read. That is the rule from
+[structuring and cleaning](/ares_materials_estudi/data/structuring-and-cleaning/) — never edit
+the raw file — made automatic. The script *is* the record of what you did to the data.
+
+## Where pandas comes in
+
+**pandas** is the library everyone means when they say "data in Python". It is not part of the
+standard library, so it goes in a virtual environment:
+
+```sh
+source .venv/bin/activate
+pip install pandas
+```
+
+It gives you one thing: the **DataFrame**, a whole table held in memory, which knows its own
+column names and knows that the `people` column is numbers. Everything the three scripts above
+did, in four lines:
+
+```python
+import pandas as pd
+
+df = pd.read_csv("visits.csv")
+print(df[df["people"] > 100])
+print(df.groupby("city")["people"].sum())
+```
+
+```
+    venue        city         day  people
+0   Museo      Lugano  2026-03-01     120
+3  Teatro  Bellinzona  2026-03-02     180
+city
+Bellinzona    220
+Lugano        215
+Name: people, dtype: int64
+```
+
+`import pandas as pd` gives the module a shorter name; `pd` is a convention so universal that
+every example you find online assumes it. No `int()` anywhere, because `read_csv` looked at the
+column and worked out that it holds numbers.
+
+That is where this lesson stops. pandas is large, it has its own way of thinking about selecting
+and reshaping, and learning it properly is a course of its own. Two honest notes to carry
+forward:
+
+- For a few thousand rows and a straightforward question, the `csv` module is enough, and it has
+  no install, no version, and no idioms to learn.
+- Reach for pandas when the operations start piling up — grouping, joining two tables, dates,
+  missing values, twenty files at once — because writing those by hand is where the bugs live.
+
+The reference for both is at [python.org](https://www.python.org/), and pandas has its own
+documentation site that a search will find. Read either the way you read MDN: to look one thing
+up, not front to back.
+
+## Do this on your machine
+
+- [ ] I made `visits.csv` with the four rows above
+- [ ] I ran the `DictReader` script and saw one line per record
+- [ ] I removed the `int()` and watched the total come out as joined-up text
+- [ ] I changed the `if` to a different threshold and got a different list of busy days
+- [ ] I ran the totals-per-city script and understood what `.get(city, 0)` is for
+- [ ] I wrote `totals.csv` out and opened it in a text editor to check the header row
+- [ ] I pointed one of these scripts at a CSV of my own
+
+<Quiz
+	questions={[
+		{
+			q: 'Your script adds up a people column and prints 12095 where you expected 215. What went wrong?',
+			options: [
+				'Every CSV value arrives as text, so + joined them instead of adding',
+				'print writes several values side by side without any separator',
+				'The file was saved with the delimiter your region uses, not a comma',
+			],
+			answer: 0,
+			explanation:
+				'A CSV file is plain text and carries no types, so every field comes out of the reader as a string. Wrap it in int() or float() at the moment you read it, not later, and this class of bug disappears.',
+		},
+		{
+			q: 'What does csv.DictReader hand you for each line of the file?',
+			options: [
+				'A dictionary keyed by the names in the header row',
+				'A list of values, in the order the columns appear',
+				'A string holding the whole line, commas included',
+			],
+			answer: 0,
+			explanation:
+				'It reads the header first and uses it for the keys, so you write row["city"] rather than row[1]. csv.reader is the one that gives you a plain list, which means a renamed or reordered column silently breaks your script.',
+		},
+	]}
+/>

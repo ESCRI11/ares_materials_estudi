@@ -208,16 +208,21 @@ cross-checked against maind.supsi.ch. Folder names are the directories under
 
 | # | Folder | Covers | Syllabus course |
 |---|---|---|---|
-| 1 | `your-machine` | Files and paths, the terminal, **WSL2**, package managers, VS Code | baseline — no course teaches this |
-| 2 | `git-and-github` | Version control, commits, branches, PRs, Markdown, Pages | ID102.01 names both as required tools |
-| 3 | `html-and-css` | Elements, selectors, box model, flexbox, responsive, dev tools | Creative Coding Foundations (ID102.01) |
-| 4 | `javascript` | Console, variables, loops, functions, **DOM**, events, **Canvas**, **microphone**, **fetch/APIs**, debugging | Creative Coding Foundations (ID102.01) |
-| 5 | `physical-computing` | Electricity, circuits, breadboards, **Arduino + MicroPython**, sensors, actuators, serial | Creating Tangible Interfaces (ID140.01) |
-| 6 | `digital-fabrication` | **Fusion 360**, parametric modelling, laser cutting, 3D printing, slicers | Digitally Designed Objects (ID120.01) |
-| 7 | `ai-as-a-material` | LLM fundamentals, prompting, cloud APIs, **local models**, ethics | Intelligence as a Material (ID131.02) |
-| 8 | `data` | Data in design, CSV/JSON, structuring, visual models, ML training vs prompting | Making Sense of Data (ID190.01) |
-| 9 | `design-methods` | Design Thinking, research plans, insights, **flow and customer-experience mapping**, adaptive/agentic vocabulary | ID111.01, ID180.01, ID170.02 |
-| 10 | `claude-code` | What it is, installing on WSL2, the permission model, learning vs outsourcing, CLAUDE.md, working in a git repo, conversation technique, failure modes | none — added by the author |
+| 1 | `design-methods` | Design Thinking, research plans, insights, flow and journey mapping, adaptive/agentic vocabulary | ID111.01, ID180.01, ID170.02 |
+| 2 | `your-machine` | Files and paths, terminal, **WSL2**, working with files, package managers, VS Code | baseline — no course teaches this |
+| 3 | `git-and-github` | Version control, commits, **what not to commit**, branches, conflicts, undo, Markdown, Pages | ID102.01 names both as required tools |
+| 4 | `html-and-css` | Elements, selectors, box model, flexbox, responsive, states, dev tools, a two-file project | Creative Coding Foundations (ID102.01) |
+| 5 | `javascript` | Console → objects, **array methods**, DOM, events, Canvas, **randomness**, microphone, fetch, **Node**, debugging | Creative Coding Foundations (ID102.01) |
+| 6 | `physical-computing` | Electricity, breadboards, **Arduino + MicroPython**, sensors, actuators, serial | Creating Tangible Interfaces (ID140.01) |
+| 7 | `digital-fabrication` | **Fusion 360**, parametric modelling, laser cutting, 3D printing, drawings | Digitally Designed Objects (ID120.01) |
+| 8 | `documentation` | Build logs, photography, video, **schematics**, source files, project pages | ID120.02 + ID140.02 — **mandatory to pass both modules** |
+| 9 | `data` | Collecting, CSV/JSON, cleaning, visual models, charts, ML training vs prompting | Making Sense of Data (ID190.01) |
+| 10 | `python-and-sql` | Python on a laptop, CSV work, databases, SELECT/WHERE/JOIN | ID212.01 (semester 2) lists both; nothing teaches them |
+| 11 | `ai-as-a-material` | LLM mechanics, prompting, APIs, **tool use and structured output**, local models, ethics | Intelligence as a Material (ID131.02) |
+| 12 | `claude-code` | What it is, WSL2 install, permissions, **prompt injection**, learning vs outsourcing, failure modes | none — added by the author |
+
+Sidebar order is deliberate and lives in `astro.config.mjs`. **Design Methods sits first** because it is the
+one area this reader already has: an anchor before the technical sections rather than a reward after them.
 
 §10 is deliberately last and deliberately sceptical. ID102.01 sets **a weekly individual written test**, so a reader who lets an assistant write code they don't understand passes the assignments and fails the tests. Any edit to that section must keep the learning-not-outsourcing framing; do not turn it into a product tour.
 
@@ -226,9 +231,14 @@ Two facts that are easy to get wrong, because the obvious guess is the wrong one
 - **Creative Coding is plain JavaScript, HTML, CSS and Canvas in VS Code — not p5.js.**
 - **Physical Computing is Arduino boards with MicroPython — not Arduino C++.**
 
-Deliberately out of scope: **Documentation and Communication** (ID120.02, ID140.02 — video,
-product photography, schematics, portfolio). Excluded by the author. Do not add it back
-without being asked. Semesters 2–4 are also out of scope.
+Documentation and Communication was originally excluded and has since been added, because the
+syllabus states that submitting the documentation is **mandatory to assess** ID120.02 and
+ID140.02 — it gates two 5-ECTS modules, so leaving it out risked the reader failing them.
+
+Semesters 2–4 are out of scope, with one deliberate exception: `python-and-sql`. ID212.01 in
+semester 2 lists "HTML, CSS, Javascript, SQL, and Python" as its languages and **no course in
+the programme teaches SQL or laptop Python**, so preparation is the only place it can come
+from.
 
 Physical Computing states the only explicit prerequisite in the syllabus — *"basic knowledge
 of programming and code structures"* — which is why §4 comes before §5, and why §5 opens
